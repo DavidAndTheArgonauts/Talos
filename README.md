@@ -91,6 +91,7 @@ List all commits:
 When presented with a conflict which git cannot resolve you must do it manually.
 Git will present you with a list of files which contain conflicts.  Resolving 
 them is a straight forward process outlined in the steps below:
+
 1. Open each file with conflict(s)
 2. Find the conflicts and change it to the version you want to commit
 3. After making all changes, add the files and commit
@@ -106,8 +107,7 @@ Currently there are the following branches:
 
 * master - _no one should push to this branch_
 * milestone - _this contains working milestone code_
-* develop - _when working on the code, make a branch this, work on it and then 
-merge it back in_
+* develop - _when making changes see basic working practices - making changes_
 
 The three teams are welcome to make any other branches they need.
 
