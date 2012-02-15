@@ -2,17 +2,20 @@ package comms.robot;
 
 import comms.robot.connection.*;
 
-public class Commander
+public class Commander implements RobotCallback
 {
 	
 	/* constants */
 	public static final int SPEED_FAST = 1;
-	public static final int SPEED_MEDIAN = 2;
+	public static final int SPEED_MEDIUM = 2;
 	public static final int SPEED_SLOW = 3;
 	
 	private static final int FAST = 90;
-	private static final int MEDIAN = 55;
+	private static final int MEDIUM = 55;
 	private static final int SLOW = 15;
+	
+	private int lWheelSpeed = 0, rWheelSpeed = 0;
+	private boolean lSensorTouched = false, rSensorTouched = false;
 	
 	private Connection connection = new Connection();
 	
@@ -62,8 +65,8 @@ public class Commander
 			case Commander.SPEED_FAST:
 				setSpeed(Commander.FAST,Commander.FAST);
 				break;
-			case Commander.SPEED_MEDIAN:
-				setSpeed(Commander.MEDIAN,Commander.MEDIAN);
+			case Commander.SPEED_MEDIUM:
+				setSpeed(Commander.MEDIUM,Commander.MEDIUM);
 				break;
 			case Commander.SPEED_SLOW:
 				setSpeed(Commander.SLOW,Commander.SLOW);
@@ -96,8 +99,8 @@ public class Commander
 			case Commander.SPEED_FAST:
 				setSpeed(0,Commander.FAST);
 				break;
-			case Commander.SPEED_MEDIAN:
-				setSpeed(0,Commander.MEDIAN);
+			case Commander.SPEED_MEDIUM:
+				setSpeed(0,Commander.MEDIUM);
 				break;
 			case Commander.SPEED_SLOW:
 				setSpeed(0,Commander.SLOW);
@@ -114,8 +117,8 @@ public class Commander
 			case Commander.SPEED_FAST:
 				setSpeed(Commander.FAST,0);
 				break;
-			case Commander.SPEED_MEDIAN:
-				setSpeed(Commander.MEDIAN,0);
+			case Commander.SPEED_MEDIUM:
+				setSpeed(Commander.MEDIUM,0);
 				break;
 			case Commander.SPEED_SLOW:
 				setSpeed(Commander.SLOW,0);
@@ -132,8 +135,8 @@ public class Commander
 			case Commander.SPEED_FAST:
 				setSpeed(-Commander.FAST,Commander.FAST);
 				break;
-			case Commander.SPEED_MEDIAN:
-				setSpeed(-Commander.MEDIAN,Commander.MEDIAN);
+			case Commander.SPEED_MEDIUM:
+				setSpeed(-Commander.MEDIUM,Commander.MEDIUM);
 				break;
 			case Commander.SPEED_SLOW:
 				setSpeed(-Commander.SLOW,Commander.SLOW);
@@ -150,8 +153,8 @@ public class Commander
 			case Commander.SPEED_FAST:
 				setSpeed(Commander.FAST,-Commander.FAST);
 				break;
-			case Commander.SPEED_MEDIAN:
-				setSpeed(Commander.MEDIAN,-Commander.MEDIAN);
+			case Commander.SPEED_MEDIUM:
+				setSpeed(Commander.MEDIUM,-Commander.MEDIUM);
 				break;
 			case Commander.SPEED_SLOW:
 				setSpeed(Commander.SLOW,-Commander.SLOW);
@@ -186,6 +189,47 @@ public class Commander
 	{
 		
 		connection.unsubscribe(rc);
+		
+	}
+	
+	public void robotCallback(Message response)
+	{
+		
+		switch (response.getOpcode())
+		{
+			case Opcodes.WHEEL_FEEDBACK:
+				
+				int[] speeds = response.getArguments(2);
+				
+				lWheelSpeed = speeds[0];
+				rWheelSpeed = speeds[1];
+				
+				break;
+				
+			case Opcodes.SENSOR_TOUCHED:
+			
+				int[] states = response.getArguments(2);
+				
+				if (states[0] == 1)
+				{
+					lSensorTouched = true;
+				}
+				else
+				{
+					lSensorTouched = false;
+				}
+				
+				if (states[1] == 1)
+				{
+					rSensorTouched = true;
+				}
+				else
+				{
+					rSensorTouched = false;
+				}
+				
+				break;
+		}
 		
 	}
 	

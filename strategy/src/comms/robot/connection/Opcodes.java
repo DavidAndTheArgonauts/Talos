@@ -13,6 +13,7 @@ public abstract class Opcodes
 	
 	// return opcodes
 	public static final int COMMAND_COMPLETE = 0x01;
-	public static final int SENSOR_DATA = 0x02;
+	public static final int SENSOR_TOUCHED = 0x02;
+	public static final int WHEEL_FEEDBACK = 0x03;
 	
 }

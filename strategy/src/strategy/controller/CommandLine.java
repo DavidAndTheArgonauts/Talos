@@ -39,12 +39,12 @@ public class CommandLine
 			if (cmd.equals("stop")) c.stop();
 			else if (cmd.equals("kick")) c.kick();
 			else if (cmd.equals("drive fast")) c.drive(Commander.SPEED_FAST);
-			else if (cmd.equals("drive median")) c.drive(Commander.SPEED_MEDIAN);
+			else if (cmd.equals("drive medium")) c.drive(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("drive slow")) c.drive(Commander.SPEED_SLOW); 
-			else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_MEDIAN);
-			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_MEDIAN);
-			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIAN);
-			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIAN);
+			else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_MEDIUM);
+			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_MEDIUM);
+			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
+			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("quit")) System.exit(0);
 			
 		}
