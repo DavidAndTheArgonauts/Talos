@@ -131,8 +131,7 @@ public class Commander implements RobotCallback
 	public void stop()
 	{
 		
-		clearQueue();
-		connection.queueCommand(new Message(Opcodes.SET_SPEED,0,0));
+		setSpeed(0,0);
 		
 	}
 	
