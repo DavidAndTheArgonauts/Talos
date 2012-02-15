@@ -99,7 +99,7 @@ them is a straight forward process outlined in the steps below:
 ### Getting access
 
 To get full access please speak to me (Will) in the labs or give me an email at
-w.pond@sms.ed.ac.uk.
+w(dot)pond [at] sms.ed.ac.uk.
 
 ## Branches
 
