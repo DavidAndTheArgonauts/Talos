@@ -41,7 +41,7 @@ public class Ball
 
 	/**
 	 * Sets the ball's y position
-	 * @param new_x The new y position
+	 * @param new_y The new y position
 	*/
 	public void setY(double new_y) {
 		y = new_y;

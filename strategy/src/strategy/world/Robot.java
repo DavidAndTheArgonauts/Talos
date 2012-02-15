@@ -58,7 +58,7 @@ public class Robot
 	
 	/**
 	 * Sets the robot's x direction component
-	 * @param new_x The x direction component
+	 * @param new_dir The x direction component
 	*/
 	public void setDX(double new_dir) {
 		dx = new_dir;
@@ -66,7 +66,7 @@ public class Robot
 
 	/**
 	 * Sets the robot's y direction component
-	 * @param new_x The y direction component
+	 * @param new_dir The y direction component
 	*/
 	public void setDY(double new_dir) {
 		dy = new_dir;
