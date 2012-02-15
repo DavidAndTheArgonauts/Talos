@@ -1,0 +1,64 @@
+<project name="sdp3-comms" default="build">
+	
+	<!-- input directories -->
+	<property name="sdp.input.libs" value="../../libs" />
+	<property name="sdp.input.3rdpartylibs" value="../../libs" />
+	
+	<!-- path to lejos classes -->
+	<property name="sdp.nxj.pccomm" value="${sdp.input.libs}/pccomm.jar" />
+	<property name="sdp.nxj.jtools" value="${sdp.input.libs}/jtools.jar" />
+	<property name="sdp.nxj.classes" value="${sdp.input.libs}/classes.jar" />
+	<property name="sdp.nxj.bcel" value="${sdp.input.3rdpartylibs}/bcel.jar" />
+	
+	<!-- path to bluecove -->
+	<property name="sdp.bluecove.bluecove" value="${sdp.input.3rdpartylibs}/bluecove.jar" />
+	<property name="sdp.bluecove.bluecove-gpl" value="${sdp.input.3rdpartylibs}/bluecove-gpl.jar" />
+	
+	<!-- output directories -->
+	<property name="sdp.control.comms.output.build" value="../../build/nxt" />
+	<property name="sdp.control.comms.output.classes" value="${sdp.control.comms.output.build}/classes" />
+	<property name="sdp.control.comms.output.jars" value="${sdp.control.comms.output.build}/jars" />
+	
+	<!-- simple proxy -->
+	<property name="sdp.control.comms.simpleproxy.class" value="simpleproxy/Entrypoint.class" />
+	<property name="sdp.control.comms.simpleproxy.entrypoint" value="simpleproxy.Entrypoint" />
+	<property name="sdp.control.comms.simpleproxy.jar" value="simpleproxy.jar" />
+	
+	<target name="clean">
+		<delete dir="${sdp.control.comms.output.build}" />
+	</target>
+	
+	<target name="rebuild" depends="clean">
+		
+		<mkdir dir="${sdp.control.comms.output.classes}" />
+		
+		<javac srcdir="." destdir="${sdp.control.comms.output.classes}">
+			<classpath location="${sdp.nxj.pccomm}" />
+			<classpath location="${sdp.bluecove.bluecove}" />
+			<classpath location="${sdp.bluecove.bluecove-gpl}" />
+		</javac>
+		
+		<mkdir dir="${sdp.control.comms.output.jars}" />
+		
+		<jar destfile="${sdp.control.comms.output.jars}/${sdp.control.comms.simpleproxy.jar}" basedir="${sdp.control.comms.output.classes}">
+			<manifest>
+				<attribute name="Main-Class" value="${sdp.control.comms.simpleproxy.entrypoint}" />
+			</manifest>
+		</jar>
+		
+	</target>
+	
+	<target name="notbuilt">
+		<condition property="sdp.control.comms.simpleproxy.notbuilt">
+			<not>
+				<available file="${sdp.control.comms.output.classes}/${sdp.control.comms.simpleproxy.class}" />
+			</not>
+		</condition>
+	</target>
+	
+	<!-- only build if not already built -->
+	<target name="build" depends="notbuilt" if="sdp.control.comms.simpleproxy.notbuilt">
+		<antcall target="rebuild" />
+	</target>
+	
+</project>
