@@ -4,12 +4,17 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+ * Manages a connection to the robot
+*/
 public class Connection implements RobotCallback
 {
 	
 	// constants
+	/**
+	 * The size of opcodes to send and receive (in bytes)
+	*/
 	private final int PACKET_SIZE = 4; // sizeof(int)
-	private final int ROBOT_COMMAND_COMPLETE = 0x01;
 	
 	// connection details
 	private Socket clientSocket = null;
@@ -27,6 +32,12 @@ public class Connection implements RobotCallback
 	private ArrayList<RobotCallback> subscribers = new ArrayList<RobotCallback>();
 	private Object subscriberLock = new Object();
 	
+	/**
+	 * Connect to the proxy
+	 * @param host The host the proxy is running on
+	 * @param port The port the proxy is listening on
+	 * @return Whether the connection is established
+	*/
 	public boolean connect(String host, int port)
 	{
 		
@@ -95,6 +106,9 @@ public class Connection implements RobotCallback
 		return true;
 	}
 	
+	/**
+	 * Disconnect from the proxy
+	*/
 	public void disconnect()
 	{
 		
@@ -126,6 +140,10 @@ public class Connection implements RobotCallback
 		}
 	}
 	
+	/**
+	 * Queue a command
+	 * @return Whether the command was successfully queued
+	*/
 	public boolean queueCommand(Message cmd)
 	{
 		synchronized (queueLock)
@@ -134,6 +152,11 @@ public class Connection implements RobotCallback
 		}
 	}
 	
+	/**
+	 * Checks the command queue empty state
+	 * @param wait If wait is true, this method blocks until the queue is empty
+	 * @return Whether the command queue is empty
+	*/
 	public boolean isQueueEmpty(boolean wait)
 	{
 		
@@ -188,6 +211,9 @@ public class Connection implements RobotCallback
 		
 	}
 	
+	/**
+	 * Empty the command queue
+	*/
 	public void clearQueue()
 	{
 		synchronized (queueLock)
@@ -196,6 +222,11 @@ public class Connection implements RobotCallback
 		}
 	}
 	
+	/**
+	 * Use the robot callback mechanism to receive robot data
+	 * @param rc A class implementing RobotCallback
+	 * @see comms.robot.connection.RobotCallback
+	*/
 	public void subscribe(RobotCallback rc)
 	{
 		synchronized (subscriberLock)
@@ -204,6 +235,11 @@ public class Connection implements RobotCallback
 		}
 	}
 	
+	/**
+	 * Use the robot callback mechanism to stop receiving robot data
+	 * @param rc A class implementing RobotCallback which has already subscribed
+	 * @see comms.robot.connection.RobotCallback
+	*/
 	public void unsubscribe(RobotCallback rc)
 	{
 		synchronized (subscriberLock)

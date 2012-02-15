@@ -4,9 +4,15 @@ import java.io.*;
 
 import comms.robot.*;
 
+/**
+ * Entrypoint to give direct access to robot through command line style interface 
+*/
 public class CommandLine
 {
 	
+	/**
+	 * The port to connect to the proxy on
+	*/
 	private static final int PORT = 9899;
 	
 	private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -89,12 +95,12 @@ public class CommandLine
 		
 	}
 	
-	public static void print(String s)
+	private static void print(String s)
 	{
 		System.out.println(s);
 	}
 	
-	public static String readLine()
+	private static String readLine()
 	{
 		try 
 		{
@@ -106,7 +112,7 @@ public class CommandLine
 		}
 	}
 	
-	public static String readLine(String cmd)
+	private static String readLine(String cmd)
 	{
 		print(cmd);
 		return readLine();

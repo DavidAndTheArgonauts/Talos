@@ -2,6 +2,9 @@ package strategy.world;
 
 import comms.vision.*;
 
+/**
+ * Contains the objects in the world 
+*/
 public class World
 {
 	
@@ -10,6 +13,9 @@ public class World
 	
 	private VisionReceiver vision;
 	
+	/**
+	 * Creates a world with 2 robots and a ball
+	*/
 	public World()
 	{
 		
@@ -20,6 +26,11 @@ public class World
 		
 	}
 	
+	/**
+	 * The world will use a vision receiver to update itself
+	 * @param port The port to listen on
+	 * @see comms.vision.VisionReceiver
+	*/
 	public void listenForVision(int port)
 	{
 		
@@ -27,16 +38,28 @@ public class World
 		
 	}
 	
+	/**
+	 * Gets the blue robot object
+	 * @return The blue robot
+	*/
 	public Robot getBlueRobot()
 	{
 		return blueRobot;
 	}
 	
+	/**
+	 * Gets the yellow robot object
+	 * @return The yellow robot
+	*/
 	public Robot getYellowRobot()
 	{
 		return yellowRobot;
 	}
 	
+	/**
+	 * Gets the ball object
+	 * @return The ball
+	*/
 	public Ball getBall()
 	{
 		return ball;

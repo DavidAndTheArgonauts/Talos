@@ -26,6 +26,11 @@ public class VisionReceiver
 
 	private int msg = 0;
 	
+	/**
+	 * Listens for vision data and updates world when available
+	 * @param port The port to listen on
+	 * @param world A world which should be updated with vision data
+	*/
 	public VisionReceiver(int port, final World world) {
 		
 		try {
@@ -114,6 +119,9 @@ public class VisionReceiver
 		receiver.startListening();
 	}
 
+	/**
+	 * Stops listening for vision data
+	*/
 	public void close() {
 		receiver.stopListening();
 		receiver.close();

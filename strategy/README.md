@@ -18,3 +18,7 @@ Stop the robot
 
 	ant stop
 
+Builds the javadocs
+_Note: these aren't built automatically_
+
+	ant javadoc

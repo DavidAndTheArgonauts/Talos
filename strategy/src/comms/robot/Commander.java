@@ -2,16 +2,38 @@ package comms.robot;
 
 import comms.robot.connection.*;
 
+/**
+ * Provides full control of the robot and sensor values
+*/
 public class Commander implements RobotCallback
 {
 	
 	/* constants */
+	
+	/**
+	 * Fast speed mode
+	*/
 	public static final int SPEED_FAST = 1;
+	/**
+	 * Medium speed mode
+	*/
 	public static final int SPEED_MEDIUM = 2;
+	/**
+	 * Slow speed mode
+	*/
 	public static final int SPEED_SLOW = 3;
 	
+	/**
+	 * Fast speed value
+	*/
 	private static final int FAST = 90;
+	/**
+	 * Medium speed value
+	*/
 	private static final int MEDIUM = 55;
+	/**
+	 * Slow speed value
+	*/
 	private static final int SLOW = 15;
 	
 	private int lWheelSpeed = 0, rWheelSpeed = 0, lWheelSetSpeed = 0, rWheelSetSpeed = 0;
@@ -29,6 +51,11 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Create a commander and connect
+	 * @param host The host computer the proxy is running on
+	 * @param port The port to use
+	*/
 	public Commander(String host, int port)
 	{
 		
@@ -36,13 +63,11 @@ public class Commander implements RobotCallback
 		
 	}
 	
-	public void reconnect()
-	{
-		
-		connected = connection.connect(host,port);
-		
-	}
-	
+	/**
+	 * Connect to a different host and port
+	 * @param host The host computer the proxy is running on
+	 * @param port The port to use
+	*/
 	public void connect(String host,int port)
 	{
 		
@@ -58,6 +83,9 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * If connected, disconnect
+	*/
 	public void disconnect()
 	{
 		if (connected)
@@ -67,11 +95,18 @@ public class Commander implements RobotCallback
 		}
 	}
 	
+	/**
+	 * @return Returns connection state
+	*/
 	public boolean isConnected()
 	{
 		return connected;
 	}
 	
+	/**
+	 * Drives in a straight(ish) line
+	 * @param mode The speed mode to use
+	*/
 	public void drive(int mode)
 	{
 		
@@ -90,6 +125,9 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Stops the robot
+	*/
 	public void stop()
 	{
 		
@@ -98,6 +136,9 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Operates the kicker
+	*/
 	public void kick()
 	{
 		
@@ -106,6 +147,10 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Turns to the left
+	 * @param mode The speed mode to use
+	*/
 	public void turnLeft(int mode)
 	{
 		
@@ -124,6 +169,10 @@ public class Commander implements RobotCallback
 	
 	}
 	
+	/**
+	 * Turns to the right
+	 * @param mode The speed mode to use
+	*/
 	public void turnRight(int mode)
 	{
 		
@@ -142,6 +191,10 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Turns to the left on the spot
+	 * @param mode The speed mode to use
+	*/
 	public void spinLeft(int mode)
 	{
 		
@@ -160,6 +213,10 @@ public class Commander implements RobotCallback
 	
 	}
 	
+	/**
+	 * Turns to the right on the spot
+	 * @param mode The speed mode to use
+	*/
 	public void spinRight(int mode)
 	{
 		
@@ -178,6 +235,11 @@ public class Commander implements RobotCallback
 	
 	}
 	
+	/**
+	 * Set the speed of the wheels individually
+	 * @param left The left wheel speed (percentage)
+	 * @param right The right wheel speed (percentage)
+	*/
 	public void setSpeed(int left, int right)
 	{
 		
@@ -195,6 +257,7 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	
 	private void clearQueue()
 	{
 		
@@ -202,6 +265,11 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Use the robot callback mechanism to receive robot data
+	 * @param rc A class implementing RobotCallback
+	 * @see comms.robot.connection.RobotCallback
+	*/
 	public void subscribe(RobotCallback rc)
 	{
 		
@@ -209,6 +277,11 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * Use the robot callback mechanism to stop receiving robot data
+	 * @param rc A class implementing RobotCallback which has already subscribed
+	 * @see comms.robot.connection.RobotCallback
+	*/
 	public void unsubscribe(RobotCallback rc)
 	{
 		
@@ -216,36 +289,57 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	/**
+	 * @return Whether the left touch sensor is pushed
+	*/
 	public boolean isLeftSensorPushed()
 	{
 		return lSensorTouched;
 	}
 	
+	/**
+	 * @return Whether the right touch sensor is pushed
+	*/
 	public boolean isRightSensorPushed()
 	{
 		return rSensorTouched;
 	}
 	
+	/**
+	 * @return The actual left wheel speed
+	*/
 	public int getLeftWheelSpeed()
 	{
 		return lWheelSpeed;
 	}
 	
+	/**
+	 * @return The actual right wheel speed
+	*/
 	public int getRightWheelSpeed()
 	{
 		return rWheelSpeed;
 	}
 	
+	/**
+	 * @return The number of times the left sensor has been touched
+	*/
 	public int getLeftTouchCount()
 	{
 		return lTouchCount;
 	}
 	
+	/**
+	 * @return The number of times the right sensor has been touched
+	*/
 	public int getRightTouchCount()
 	{
 		return rTouchCount;
 	}
 	
+	/**
+	 * Blocks until the queue is empty
+	*/
 	public void waitForQueueToEmpty()
 	{
 		connection.isQueueEmpty(true);

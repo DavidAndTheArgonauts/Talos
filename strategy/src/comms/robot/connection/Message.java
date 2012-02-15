@@ -1,16 +1,24 @@
 package comms.robot.connection;
 
+/**
+ * Stores a packet to send to the robot 
+*/
 public class Message
 {
 	
 	private final int cmd;
 	
+	/**
+	 * Create a message with only an opcode
+	*/
 	public Message(int cmd)
 	{
 		this.cmd = cmd;
 	}
 	
-	// save message with 1 argument
+	/**
+	 * Create a message with an opcode and one argument
+	*/
 	public Message(int cmd, int arg1)
 	{
 		
@@ -18,7 +26,9 @@ public class Message
 		
 	}
 	
-	// save message with 2 arguments
+	/**
+	 * Create a message with an opcode and two arguments
+	*/
 	public Message(int cmd, int arg1, int arg2)
 	{
 		
@@ -40,11 +50,19 @@ public class Message
 		
 	}
 	
+	/**
+	 * Get the command to be sent
+	 * @return Returns the raw command
+	*/
 	public int getCommand()
 	{
 		return cmd;
 	}
 	
+	/**
+	 * Filters out the opcode part
+	 * @return Returns the opcode of the message
+	*/
 	public int getOpcode()
 	{
 		
@@ -53,6 +71,11 @@ public class Message
 		
 	}
 	
+	/**
+	 * Gets the arguments stored in a message
+	 * @param count The number of arguments expected
+	 * @return Returns an integer array of lenth count, of the arguments
+	*/
 	public int[] getArguments(int count)
 	{
 		
