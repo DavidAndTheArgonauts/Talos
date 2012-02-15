@@ -1,4 +1,3 @@
-
 package controller;
 
 import lejos.nxt.*;
@@ -61,7 +60,12 @@ public class Driver implements ConnectionInterface
 					rightTachoCount = Motor.C.getTachoCount();
 					timer = System.currentTimeMillis();
 					// Send message
-					connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, leftRotPerSec, rightRotPerSec));
+					
+					if (Math.abs(leftRotPerSec) > 2 && Math.abs(rightRotPerSec) > 2)
+					{
+						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, leftRotPerSec, rightRotPerSec));
+					}
+					
 				}
 			}
 		});
@@ -87,14 +91,15 @@ public class Driver implements ConnectionInterface
 
 			// Check if motors are meant to go forwards or backwards
 			if (leftSpeed < 0){
-			Motor.B.backward();
+				Motor.B.forward();
 			} else {
-			Motor.B.forward();
+				Motor.B.backward();
 			}
+			
 			if (rightSpeed < 0){
-				Motor.C.backward();
-			} else {
 				Motor.C.forward();
+			} else {
+				Motor.C.backward();
 			}
 			
 		}
@@ -102,4 +107,3 @@ public class Driver implements ConnectionInterface
 	}
 	
 }
-
