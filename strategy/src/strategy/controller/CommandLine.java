@@ -14,7 +14,7 @@ public class CommandLine
 	public static void main(String[] args)
 	{
 		
-		Commander c = new Commander();
+		final Commander c = new Commander();
 		
 		do
 		{
@@ -31,6 +31,25 @@ public class CommandLine
 		
 		print("Connected!");
 		
+		Thread touchThread = new Thread()
+		{
+			
+			public void run()
+			{
+				while (!Thread.interrupted())
+				{
+					if (c.isLeftSensorPushed() || c.isRightSensorPushed())
+					{
+						c.stop();
+					}
+					
+					Thread.yield();
+				}
+			}
+			
+		};
+		touchThread.start();
+		
 		while (true)
 		{
 			
@@ -45,9 +64,28 @@ public class CommandLine
 			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
-			else if (cmd.equals("quit")) System.exit(0);
+			else if (cmd.equals("quit")) 
+			{
+				c.waitForQueueToEmpty();
+				break;
+			}
 			
 		}
+		
+		while (touchThread.isAlive())
+		{
+			try
+			{
+				touchThread.interrupt();
+				touchThread.join();
+			}
+			catch (InterruptedException ie)
+			{
+				
+			}
+		}
+		
+		c.disconnect();
 		
 	}
 	

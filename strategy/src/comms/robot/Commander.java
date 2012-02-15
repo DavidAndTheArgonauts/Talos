@@ -14,8 +14,9 @@ public class Commander implements RobotCallback
 	private static final int MEDIUM = 55;
 	private static final int SLOW = 15;
 	
-	private int lWheelSpeed = 0, rWheelSpeed = 0;
+	private int lWheelSpeed = 0, rWheelSpeed = 0, lWheelSetSpeed = 0, rWheelSetSpeed = 0;
 	private boolean lSensorTouched = false, rSensorTouched = false;
+	private int lTouchCount = 0, rTouchCount = 0;
 	
 	private Connection connection = new Connection();
 	
@@ -50,6 +51,20 @@ public class Commander implements RobotCallback
 		this.host = host;
 		this.port = port;
 		
+		if (connected)
+		{
+			connection.subscribe(this);
+		}
+		
+	}
+	
+	public void disconnect()
+	{
+		if (connected)
+		{
+			connection.disconnect();
+			System.out.println("Disconnected");
+		}
 	}
 	
 	public boolean isConnected()
@@ -166,6 +181,15 @@ public class Commander implements RobotCallback
 	public void setSpeed(int left, int right)
 	{
 		
+		// if we are sending the same wheel speed command
+		if (left == lWheelSetSpeed && right == rWheelSetSpeed)
+		{
+			return;
+		}
+		
+		lWheelSetSpeed = left;
+		rWheelSetSpeed = right;
+		
 		clearQueue();
 		connection.queueCommand(new Message(Opcodes.SET_SPEED,left,right));
 		
@@ -192,6 +216,41 @@ public class Commander implements RobotCallback
 		
 	}
 	
+	public boolean isLeftSensorPushed()
+	{
+		return lSensorTouched;
+	}
+	
+	public boolean isRightSensorPushed()
+	{
+		return rSensorTouched;
+	}
+	
+	public int getLeftWheelSpeed()
+	{
+		return lWheelSpeed;
+	}
+	
+	public int getRightWheelSpeed()
+	{
+		return rWheelSpeed;
+	}
+	
+	public int getLeftTouchCount()
+	{
+		return lTouchCount;
+	}
+	
+	public int getRightTouchCount()
+	{
+		return rTouchCount;
+	}
+	
+	public void waitForQueueToEmpty()
+	{
+		connection.isQueueEmpty(true);
+	}
+	
 	public void robotCallback(Message response)
 	{
 		
@@ -213,6 +272,7 @@ public class Commander implements RobotCallback
 				if (states[0] == 1)
 				{
 					lSensorTouched = true;
+					lTouchCount++;
 				}
 				else
 				{
@@ -222,6 +282,7 @@ public class Commander implements RobotCallback
 				if (states[1] == 1)
 				{
 					rSensorTouched = true;
+					rTouchCount++;
 				}
 				else
 				{

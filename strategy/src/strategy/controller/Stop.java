@@ -35,7 +35,9 @@ public class Stop
 		
 		c.stop();
 		
-		System.exit(0);
+		c.waitForQueueToEmpty();
+		
+		c.disconnect();
 		
 	}
 	
