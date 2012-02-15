@@ -47,7 +47,14 @@ class OutputStreamRunnable implements Runnable
 				
 				synchronized (lock)
 				{
-					lock.wait();
+					try
+					{
+						lock.wait();
+					}
+					catch (InterruptedException ie)
+					{
+						return;
+					}
 				}
 				
 			}
