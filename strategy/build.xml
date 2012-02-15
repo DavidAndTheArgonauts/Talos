@@ -3,7 +3,7 @@
 	<property name="strategy.libs.javaosc" value="libs/osc" />
 	<property name="strategy.src" value="src" />
 	<property name="strategy.build" value="build" />
-	<property name="strategy.milestone.entrypoint" value="Entrypoint" />
+	
 	<property name="strategy.cmd.stop" value="strategy.controller.Stop" />
 	<property name="strategy.cmd.cmdline" value="strategy.controller.CommandLine" />
 	
@@ -29,12 +29,6 @@
 	<target name="cmd" depends="build">
 		
 		<java fork="true" classname="${strategy.cmd.cmdline}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
-		
-	</target>
-	
-	<target name="milestone" depends="build">
-		
-		<java fork="true" classname="${strategy.entrypoint}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
 		
 	</target>
 	
