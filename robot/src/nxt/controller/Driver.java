@@ -7,7 +7,7 @@ import connection.*;
 import java.lang.*;
 
 /*
-	Code that operates the driver motor (Motor A as of 08/02/2012)
+	Code that operates the driver motor
 */
 public class Driver implements ConnectionInterface
 {

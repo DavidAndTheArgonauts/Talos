@@ -7,7 +7,7 @@ import connection.*;
 import java.lang.*;
 
 /*
-	Code that operates the kicker motor (Motor B & C as of 03/02/2012)
+	Code that operates the kicker motor
 */
 public class Kicker implements ConnectionInterface
 {
