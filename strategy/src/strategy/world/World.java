@@ -15,6 +15,7 @@ public class World
 	private WorldState partialState;
 	private boolean blueRobot = true;
 	private int updateCount = 0;
+
 	
 
 	public World() {
@@ -39,6 +40,9 @@ public class World
 		blueRobot = areWeBlue;
 	}
 
+	/**
+	* Returns Partial state of world. Should only be used by vision Receiver!!
+	*/
 	public WorldState getPartialState(){
 		if (updateCount == 13) {
 			worldStates.add(partialState);
@@ -49,7 +53,31 @@ public class World
 		return partialState;
 	}
 	
-
+	/**
+	* Returns latest complete state of world
+	*/
+	public WorldState getWorldState() {
+		return worldStates.get(worldStates.size()-1);
+	}
+	
+	/**Returns the state x states ago.
+	* Eg, if there are 500 stored states, and 
+	*/
+	public WorldState getPastState(int x) { 
+		int temp = worldStates.size() - x; 
+		if (temp < 0) { 
+			return worldStates.get(0);
+		} else {
+			return worldStates.get(temp);
+		}
+		
+	}
+	
+	public int get historySize() {
+		return worldStates.size();
+	}
+	
+	
 	
 
 

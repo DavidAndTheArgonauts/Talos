@@ -22,6 +22,9 @@ public class WorldState {
 	private double yellowDX;
 	private double yellowDY;
 	private int yellowVisible;
+	
+	//Special
+	
 
 	//Setters
 
