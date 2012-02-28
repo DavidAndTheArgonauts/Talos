@@ -40,67 +40,67 @@ public class VisionReceiver
 		}
 		lBlueX = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBlueRobot().setX((Float) message.getArguments()[0]);
+				world.getPartialState().setBlueX((Float) message.getArguments()[0]);
 			}
 		};
 		lBlueY = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBlueRobot().setY((Float) message.getArguments()[0]);
+				world.getPartialState().setBlueY((Float) message.getArguments()[0]);
 			}
 		};
 		lBlueDX = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBlueRobot().setDX((Float) message.getArguments()[0]);
+				world.getPartialState().setBlueDX((Float) message.getArguments()[0]);
 			}
 		};
 		lBlueDY = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBlueRobot().setDY((Float) message.getArguments()[0]);
+				world.getPartialState().setBlueDY((Float) message.getArguments()[0]);
 			}
 		};
 		lBlueV = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBlueRobot().setVisible((Integer) message.getArguments()[0]);
+				world.getPartialState().setBlueVisible((Integer) message.getArguments()[0]);
 			}
 		};
 		lYellowX = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getYellowRobot().setX((Float) message.getArguments()[0]);
+				world.getPartialState().setYellowX((Float) message.getArguments()[0]);
 			}
 		};
 		lYellowY = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getYellowRobot().setY((Float) message.getArguments()[0]);
+				world.getPartialState().setYellowY((Float) message.getArguments()[0]);
 			}
 		};
 		lYellowDX = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getYellowRobot().setDX((Float) message.getArguments()[0]);
+				world.getPartialState().setYellowDX((Float) message.getArguments()[0]);
 			}
 		};
 		lYellowDY = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getYellowRobot().setDY((Float) message.getArguments()[0]);
+				world.getPartialState().setYellowDY((Float) message.getArguments()[0]);
 			}
 		};
 		lYellowV = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getYellowRobot().setVisible((Integer) message.getArguments()[0]);
+				world.getPartialState().setYellowVisible((Integer) message.getArguments()[0]);
 			}
 		};
 		lRedX = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBall().setX((Float) message.getArguments()[0]);
+				world.getPartialState().setBallX((Float) message.getArguments()[0]);
 			}
 		};
 		lRedY = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBall().setY((Float) message.getArguments()[0]);
+				world.getPartialState().setBallY((Float) message.getArguments()[0]);
 			}
 		};
 		lRedV = new OSCListener() {
 			public void acceptMessage(java.util.Date time, OSCMessage message) {
-				world.getBall().setVisible((Integer) message.getArguments()[0]);
+				world.getPartialState().setBallVisible((Integer) message.getArguments()[0]);
 			}
 		};
 		receiver.addListener("/table/blue/posx", lBlueX);
