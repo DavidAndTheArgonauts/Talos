@@ -14,7 +14,7 @@ int driveLeft, driveRight;
 	}
 	
 	protected void plan() {
-	
+		/*
 		prevX = Robot.getX();
 		prevY = Robot.getY();
 		while(this.getLoop()){
@@ -94,6 +94,6 @@ int driveLeft, driveRight;
 
 			prevX = robotX;
 			prevY = robotY;
-		}
+		}*/
 	}
 }

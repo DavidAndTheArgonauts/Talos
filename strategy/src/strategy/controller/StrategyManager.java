@@ -37,7 +37,7 @@ public class StrategyManager {
 	}
 	
 	//For use of waypoints. Double precision
-	public static ArrayList<Point2D.Double> wayPoints = new ArrayList<Point2d.Double>();
+	//public static ArrayList<Point2D> wayPoints = new ArrayList<Point2d>();
 	
 	//Single Commander for all planners. 
 	private static Commander commander = new Commander("localhost", 9899);
@@ -49,7 +49,7 @@ public class StrategyManager {
 		
 		world = new World();
 		vision = new VisionReceiver(5500, world);
-		Values.setBlue(false); // set to false if using yellow... later on it should be GUI coded.
+		world.setBlue(false); // set to false if using yellow... later on it should be GUI coded.
 		
 		//For future. Ignore for now.
 		//planners.get(current).execute();
@@ -58,7 +58,7 @@ public class StrategyManager {
 		ZPlanner examplePlanner = new ZPlanner();
 		examplePlanner.execute();
 
-		vision.close()
+		vision.close();
 	}
 
 	//Planners cna use this to pass control to other strategies. 

@@ -1,31 +1,28 @@
 package strategy.world;
 
 import comms.vision.*;
+import java.util.*;
 
-/**
- * Contains the objects in the world 
+/*
+* Contains the world states
 */
 public class World
 {
 	
-	private Robot blueRobot, yellowRobot;
-	private Ball ball;
 	
+	private ArrayList<WorldState> worldStates; 
 	private VisionReceiver vision;
+	private WorldState partialState;
+	private boolean blueRobot = true;
+	private int updateCount = 0;
 	
-	/**
-	 * Creates a world with 2 robots and a ball
-	*/
-	public World()
-	{
-		
-		blueRobot = new Robot();
-		yellowRobot = new Robot();
-		
-		ball = new Ball();
+
+	public World() {
+		worldStates = new ArrayList<WorldState>();
+		partialState = new WorldState();
 		
 	}
-	
+		
 	/**
 	 * The world will use a vision receiver to update itself
 	 * @param port The port to listen on
@@ -37,32 +34,23 @@ public class World
 		vision = new VisionReceiver(port, this);
 		
 	}
-	
-	/**
-	 * Gets the blue robot object
-	 * @return The blue robot
-	*/
-	public Robot getBlueRobot()
-	{
-		return blueRobot;
+
+	public void setBlue(boolean areWeBlue){
+		blueRobot = areWeBlue;
+	}
+
+	public WorldState getPartialState(){
+		if (updateCount == 13) {
+			worldStates.add(partialState);
+			partialState = new WorldState();
+			updateCount= 0;
+		}
+
+		return partialState;
 	}
 	
-	/**
-	 * Gets the yellow robot object
-	 * @return The yellow robot
-	*/
-	public Robot getYellowRobot()
-	{
-		return yellowRobot;
-	}
+
 	
-	/**
-	 * Gets the ball object
-	 * @return The ball
-	*/
-	public Ball getBall()
-	{
-		return ball;
-	}
-	
+
+
 }

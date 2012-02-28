@@ -26,6 +26,7 @@ public abstract class AbstractPlanner {
 		this.loopback = false;
 	}
 	
+	/*
 	public double angleBetween2Lines(double prevX, double prevY, double currentX, double currentY) {
 		double angle1 = Math.atan2(currentY - Ball.getY(),
 		                           currentX - Ball.getX());
@@ -33,6 +34,7 @@ public abstract class AbstractPlanner {
 		                           currentX - prevX);
 		return angle1-angle2;
 	}
+	*/
 	
 	/**
 	* Used to check if the current planner should continue running. 

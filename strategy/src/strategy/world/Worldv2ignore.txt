@@ -1,0 +1,187 @@
+package strategy.world;
+
+import comms.vision.*;
+
+/**
+ * Contains the objects in the world 
+*/
+public class World
+{
+	//Ball Data
+	private ArrayList<Double> ballXData;
+	private ArrayList<Double> ballYData;
+	private int ballVisible = 1;
+
+	//Blue Robot Data
+	private ArrayList<Double> blueXData;
+	private ArrayList<Double> blueYData;
+	private ArrayList<Double> blueDXData;
+	private ArrayList<Double> blueDYData;
+	private int blueVisible = 1;
+
+	//Yellow Robot Data
+	private ArrayList<Double> yellowXData;
+	private ArrayList<Double> yellowYData;
+	private ArrayList<Double> yellowDXData;
+	private ArrayList<Double> yellowDYData;
+	private int yellowVisible =1;
+	
+	private VisionReceiver vision;
+	
+	/**
+	 * Creates a world with 2 robots and a ball
+	*/
+	public World()
+	{
+		
+		ballXData = ArrayList<Double>();
+		ballYData = ArrayList<Double>();
+		
+
+		blueXData = ArrayList<Double>();
+		blueYData = ArrayList<Double>();
+		blueDYData = ArrayList<Double>();
+		blueDYData = ArrayList<Double>();
+	
+
+		yellowXData = ArrayList<Double>();
+		yellowYData = ArrayList<Double>();
+		yellowDYData = ArrayList<Double>();
+		yellowDYData = ArrayList<Double>();
+	
+		
+	}
+	
+	/**
+	 * The world will use a vision receiver to update itself
+	 * @param port The port to listen on
+	 * @see comms.vision.VisionReceiver
+	*/
+	public void listenForVision(int port)
+	{
+		
+		vision = new VisionReceiver(port, this);
+		
+	}
+	
+	//Setters
+
+	//Ball
+	public void setBallX(double newx) {
+		ballXData.add(newx);
+
+	}
+	
+	public void setBallY(double newy) {
+		ballYData.add(newy);
+	}
+
+	public void setBallVisible(int vis) {
+		ballVisible = vis;
+	}
+	
+	//Blue Robot
+	public void setBlueX(double newx) {
+		blueXData.add(newx);
+	}
+	
+	public void setBlueY(double newy) {
+		blueYData.add(newy);
+	}
+
+	public void setBlueDX(double newdx) {
+		blueDXData.add(newdx);
+	}
+	
+	public void setBlueDY(double newdy) {
+		blueDYData.add(newy);
+	}
+	
+	public void setBlueVisible(int vis) {
+		blueVisible = vis;
+	}
+
+	//Yellow Robot
+	public void setYellowX(double newx) {
+		yellowXData.add(newx);
+	}
+	
+	public void setYellowY(double newy) {
+		yellowYData.add(newy);
+	}
+
+	public void setYellowDX(double newdx) {
+		yellowDXData.add(newdx);
+	}
+	
+	public void setYellowDY(double newdy) {
+		yellowDYData.add(newy);
+	}
+	
+	public void setYellowVisible(int vis) {
+		yellowVisible = vis;
+	}
+
+	//Getters
+
+	//Ball
+	public void getBallX(double newx) {
+		ballXData.add(newx);
+	}
+	
+	public void getBallY(double newy) {
+		ballYData.add(newy);
+	}
+
+	public int getBallVisible() {
+		return ballVisible;
+	}
+	
+	//Blue Robot
+	public void getBlueX(double newx) {
+		blueXData.add(newx);
+	}
+	
+	public void getBlueY(double newy) {
+		blueYData.add(newy);
+	}
+
+	public void getBlueDX(double newdx) {
+		blueDXData.add(newdx);
+	}
+	
+	public void getBlueDY(double newdy) {
+		blueDYData.add(newy);
+	}
+	
+	public int getBlueVisible() {
+		return blueVisible;
+	}
+
+	//Yellow Robot
+	public void getYellowX(double newx) {
+		yellowXData.add(newx);
+	}
+	
+	public void getYellowY(double newy) {
+		yellowYData.add(newy);
+	}
+
+	public void getYellowDX(double newdx) {
+		yellowDXData.add(newdx);
+	}
+	
+	public void getYellowDY(double newdy) {
+		yellowDYData.add(newy);
+	}
+	
+	public int getYellowVisible() {
+		return yellowVisible;
+	}
+
+		
+	
+	
+
+	
+}
