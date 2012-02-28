@@ -2,6 +2,7 @@ package strategy.controller;
 
 import java.io.*;
 import comms.robot.*;
+import comms.vision.*;
 import strategy.world.*;
 
 import java.util.EnumMap;
@@ -40,12 +41,14 @@ public class StrategyManager {
 	
 	//Single Commander for all planners. 
 	private static Commander commander = new Commander("localhost", 9899);
-	private static Networking network; 
-	
+	private static VisionReceiver vision; 
+	private static World world;
 	public static void main(){
 		
-		Gui gui = new Gui();
-		networking = new Networking(5500);
+		//Gui gui = new Gui();
+		
+		world = new World();
+		vision = new VisionReceiver(5500, world);
 		Values.setBlue(false); // set to false if using yellow... later on it should be GUI coded.
 		
 		//For future. Ignore for now.
@@ -55,7 +58,7 @@ public class StrategyManager {
 		ZPlanner examplePlanner = new ZPlanner();
 		examplePlanner.execute();
 
-		networking.close()
+		vision.close()
 	}
 
 	//Planners cna use this to pass control to other strategies. 
@@ -67,6 +70,10 @@ public class StrategyManager {
 	
 	public static Commander getCommand(){
 		return commander;
+	}
+
+	public static World getWorld(){
+		return world;
 	}
 
 }
