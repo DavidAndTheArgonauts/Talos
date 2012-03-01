@@ -73,7 +73,7 @@ public class World
 		
 	}
 	
-	public int get historySize() {
+	public int getHistorySize() {
 		return worldStates.size();
 	}
 	
