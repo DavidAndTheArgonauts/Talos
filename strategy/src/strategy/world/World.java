@@ -49,7 +49,9 @@ public class World
 			partialState = new WorldState();
 			updateCount= 0;
 		}
-
+		
+		updateCount++;
+		
 		return partialState;
 	}
 	
@@ -57,6 +59,10 @@ public class World
 	* Returns latest complete state of world
 	*/
 	public WorldState getWorldState() {
+		
+		if (worldStates.size() == 0)
+			return null;
+		
 		return worldStates.get(worldStates.size()-1);
 	}
 	

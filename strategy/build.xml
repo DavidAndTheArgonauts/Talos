@@ -7,6 +7,7 @@
 	
 	<property name="strategy.cmd.stop" value="strategy.controller.Stop" />
 	<property name="strategy.cmd.cmdline" value="strategy.controller.CommandLine" />
+	<property name="strategy.cmd.zplan" value="strategy.controller.ZPlan" />
 	
 	<target name="clean">
 		
@@ -31,6 +32,12 @@
 	<target name="cmd" depends="build">
 		
 		<java fork="true" classname="${strategy.cmd.cmdline}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
+		
+	</target>
+	
+	<target name="zplan" depends="build">
+		
+		<java fork="true" classname="${strategy.cmd.zplan}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
 		
 	</target>
 	
