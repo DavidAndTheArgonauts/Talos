@@ -13,8 +13,13 @@ public abstract class AbstractMode
 		this.commander = commander;
 	}
 	
-	public abstract double getViability(World world);
+	public double getViability(World world)
+	{
+		return -1;
+	}
 	
+	public abstract boolean complete();
+	public abstract void reset(World world);
 	public abstract void update(World world);
 	
 }

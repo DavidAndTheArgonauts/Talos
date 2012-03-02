@@ -10,8 +10,8 @@ public class WaypointMode extends AbstractMode
 	private static final int MODE_DRIVE = 1;
 	private static final int MODE_COMPLETE = 2;
 	
-	private static final double DESTINATION_TOLERENCE = 30;
-	private static final double TURN_TOLERENCE = 5;
+	private static final double DESTINATION_TOLERENCE = 2;
+	private static final double TURN_TOLERENCE = 10;
 	
 	private double targetX, targetY;
 	private long lastUpdate = -1;
@@ -26,30 +26,28 @@ public class WaypointMode extends AbstractMode
 		this.targetY = targetY;
 	}
 	
-	public double getViability(World world)
+	public void reset(World world)
 	{
-		return -1;
+		
+		mode = MODE_TURN;
+		
 	}
 	
 	public void update(World world)
 	{
 		
-		WorldState prev = world.getPastState(1);
-		// if we haven't been called continuously
-		// reset our mode to turning
-		if (prev.getCreatedMillis() != lastUpdate)
-		{
-			mode = MODE_TURN;
-		}
-		
 		if (mode == MODE_COMPLETE)
 		{
+			System.out.println("Completed...");
 			commander.stop();
 			return;
 		}
 		
 		// calculate angle between robot and point
 		WorldState state = world.getWorldState();
+		
+		//targetX = state.getBallX();
+		//targetY = state.getBallY();
 		
 		lastUpdate = state.getCreatedMillis();
 		
@@ -59,6 +57,7 @@ public class WaypointMode extends AbstractMode
 		// catch the case that we have reached our destination (since angle isn't important)
 		if (Math.abs(x - targetX) < DESTINATION_TOLERENCE && Math.abs(y - targetY) < DESTINATION_TOLERENCE)
 		{
+			System.out.println("Complete");
 			mode = MODE_COMPLETE;
 			commander.stop();
 			return;
@@ -79,14 +78,7 @@ public class WaypointMode extends AbstractMode
 	
 	public boolean complete()
 	{
-		if (mode == MODE_COMPLETE)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return mode == MODE_COMPLETE;
 	}
 	
 	private void modeTurn(World world)
@@ -95,23 +87,12 @@ public class WaypointMode extends AbstractMode
 		
 		WorldState state = world.getWorldState();
 		
-		double angleToPoint = Math.toDegrees(Math.atan2(state.getRobotX(world.getColor()) - state.getBallX(), state.getRobotY(world.getColor()) - state.getBallY()));
-		double robotAngle = Math.toDegrees(Math.atan2(state.getRobotDX(world.getColor()),state.getRobotDY(world.getColor())));
-		
-		System.out.println("angleToPoint = " + angleToPoint + "; robotAngle = " + robotAngle + " (" + state.getRobotDX(world.getColor()) + "," + state.getRobotDY(world.getColor()) + ");");
-		
-		double diff = angleToPoint - robotAngle;
-		
-		diff -= 180;
-		
-		if (diff < -180) diff += 360;
-		if (diff > 180) diff -= 360;
-		
-		System.out.println("Diff = " + diff);
+		double diff = angleDiff(world);
 		
 		if (Math.abs(diff) < TURN_TOLERENCE)
 		{
-			commander.stop();
+			System.out.println("Switching to drive");
+			//commander.stop();
 			mode = MODE_DRIVE;
 			modeDrive(world);
 			return;
@@ -137,12 +118,37 @@ public class WaypointMode extends AbstractMode
 		
 		WorldState state = world.getWorldState();
 		
-		double dx = state.getRobotX(world.getColor()) - state.getBallY();
-		double dy = state.getRobotY(world.getColor()) - state.getBallY();
+		double dx = state.getRobotX(world.getColor()) - targetX;
+		double dy = state.getRobotY(world.getColor()) - targetY;
 		
 		double dist = Math.sqrt((dx * dx) + (dy * dy));
 		
-		System.out.println("Dist = " + dist);
+		/* set speed modifier for minor corrections */
+		double diff = angleDiff(world);
+		
+		if (diff > 60)
+		{
+			mode = MODE_TURN;
+			modeTurn(world);
+			return;
+		}
+		
+		double speedDiff = 0;
+		if (Math.abs(diff) > TURN_TOLERENCE)
+		{
+			
+			if (diff < 0)
+			{
+				speedDiff = -0.1;
+			}
+			else
+			{
+				speedDiff = 0.1;
+			}
+			
+		}
+				
+		//System.out.println("Dist = " + dist);
 		
 		if (dist < DESTINATION_TOLERENCE)
 		{
@@ -153,9 +159,46 @@ public class WaypointMode extends AbstractMode
 		
 		int speed = (int)dist;
 		if (speed > 20) speed = 20;
-		if (speed == 10) speed = 1;
+		if (speed < 10) speed = 1;
 		
-		commander.setSpeed(speed,speed);
+		int lSpeed = (int)Math.ceil((-speedDiff) * speed) + speed;
+		int rSpeed = (int)Math.ceil(speedDiff * speed) + speed;
+		
+		System.out.println("(" + state.getRobotX(world.getColor()) + "," + state.getRobotY(world.getColor()) +") -> (" + targetX + "," + targetY +") at (" + lSpeed + "," + rSpeed + ")");
+		
+		commander.setSpeed(lSpeed, rSpeed);
+		
+	}
+	
+	private double angleToPoint(World world)
+	{
+	
+		WorldState state = world.getWorldState();
+		
+		return Math.toDegrees(Math.atan2(state.getRobotX(world.getColor()) - targetX, state.getRobotY(world.getColor()) - targetY));
+		
+	}
+	
+	private double robotAngle(World world)
+	{
+	
+		WorldState state = world.getWorldState();
+		
+		return Math.toDegrees(Math.atan2(state.getRobotDX(world.getColor()),state.getRobotDY(world.getColor())));
+	
+	}
+	
+	private double angleDiff(World world)
+	{
+		
+		double diff = angleToPoint(world) - robotAngle(world);
+		
+		diff -= 180;
+		
+		if (diff < -180) diff += 360;
+		if (diff > 180) diff -= 360;
+		
+		return diff;
 		
 	}
 	

@@ -111,6 +111,9 @@ public class GameController extends Thread
 		c.stop();
 		c.waitForQueueToEmpty();
 		
+		// close world connection
+		w.close();
+		
 		c.disconnect();
 		
 	}
@@ -155,6 +158,12 @@ public class GameController extends Thread
 						maxViability = viability;
 					}
 					
+				}
+				
+				// call reset when changing mode
+				if (currentMode != null && newMode != null && !currentMode.equals(newMode))
+				{
+					newMode.reset(world);
 				}
 				
 				currentMode = newMode;

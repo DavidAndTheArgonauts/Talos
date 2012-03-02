@@ -151,6 +151,68 @@ public class WorldState {
 		}
 	}
 	
+	// enemy
+	
+	public double getEnemyX(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueX();
+		}
+		else
+		{
+			return getYellowX();
+		}
+	}
+	
+	public double getEnemyDY(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueDY();
+		}
+		else
+		{
+			return getYellowDY();
+		}
+	}
+	
+	public double getEnemyDX(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueDX();
+		}
+		else
+		{
+			return getYellowDX();
+		}
+	}
+	
+	public double getEnemyY(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueY();
+		}
+		else
+		{
+			return getYellowY();
+		}
+	}
+	
+	public double getEnemyDir(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueDir();
+		}
+		else
+		{
+			return getYellowDir();
+		}
+	}
+	
 	//Ball
 	public double getBallX() {
 		return ballX;

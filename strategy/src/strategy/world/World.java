@@ -108,8 +108,10 @@ public class World
 		
 	}
 	
-	
-	
+	public void close()
+	{
+		vision.close();
+	}
 
 
 }

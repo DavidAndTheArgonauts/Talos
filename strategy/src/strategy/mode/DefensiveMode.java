@@ -18,10 +18,22 @@ public class DefensiveMode extends AbstractMode
 		
 	}
 	
-	public void update(World world)
+	public void reset(World world)
 	{
 		
 		
+		
+	}
+	
+	public boolean complete()
+	{
+		return false;
+	}
+	
+	public void update(World world)
+	{
+		
+		commander.setSpeed(20,20);
 		
 	}
 	
