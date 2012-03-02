@@ -8,6 +8,7 @@
 	<property name="strategy.cmd.stop" value="strategy.controller.Stop" />
 	<property name="strategy.cmd.cmdline" value="strategy.controller.CommandLine" />
 	<property name="strategy.cmd.zplan" value="strategy.controller.ZPlan" />
+	<property name="strategy.cmd.game" value="strategy.controller.GameController" />
 	
 	<target name="clean">
 		
@@ -19,7 +20,7 @@
 	<target name="build" depends="clean">
 		
 		<mkdir dir="${strategy.build}" />
-		<javac srcdir="${strategy.src}" destdir="${strategy.build}" classpath="${strategy.libs.javaosc}" />
+		<javac srcdir="${strategy.src}" destdir="${strategy.build}" classpath="${strategy.libs.javaosc}" debug="on" debuglevel="lines,vars,source" />
 		
 	</target>
 	
@@ -38,6 +39,17 @@
 	<target name="zplan" depends="build">
 		
 		<java fork="true" classname="${strategy.cmd.zplan}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
+		
+	</target>
+	
+	<target name="game" depends="build">
+		
+		<java fork="true" classname="${strategy.cmd.game}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
+			<arg value="localhost" />
+			<arg value="9899" />
+			<arg value="5500" />
+			<arg value="blue" />
+		</java>
 		
 	</target>
 	

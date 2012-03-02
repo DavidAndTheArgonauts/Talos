@@ -2,6 +2,7 @@
 *~
 *.swp
 *.class
+*.jar
 
 #
 src/control/comms/controller/autoctest

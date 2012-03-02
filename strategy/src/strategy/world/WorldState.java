@@ -24,10 +24,15 @@ public class WorldState {
 	private int yellowVisible;
 	
 	//Special
-	
+	private long created = -1;
+
+	public long getCreatedMillis()
+	{
+		return created;
+	}
 
 	//Setters
-
+	
 	//Ball
 	public void setBallX(double newx) {
 		ballX = newx;
@@ -52,7 +57,7 @@ public class WorldState {
 	}
 
 	public void setBlueDX(double newdx) {
-		blueDY = newdx;
+		blueDX = newdx;
 	}
 	
 	public void setBlueDY(double newdy) {
@@ -73,7 +78,7 @@ public class WorldState {
 	}
 
 	public void setYellowDX(double newdx) {
-		yellowDY = newdx;
+		yellowDX = newdx;
 	}
 	
 	public void setYellowDY(double newdy) {
@@ -85,7 +90,67 @@ public class WorldState {
 	}
 
 	//Getters
-
+	
+	public double getRobotX(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueX();
+		}
+		else
+		{
+			return getYellowX();
+		}
+	}
+	
+	public double getRobotDY(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueDY();
+		}
+		else
+		{
+			return getYellowDY();
+		}
+	}
+	
+	public double getRobotDX(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueDX();
+		}
+		else
+		{
+			return getYellowDX();
+		}
+	}
+	
+	public double getRobotY(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueY();
+		}
+		else
+		{
+			return getYellowY();
+		}
+	}
+	
+	public double getRobotDir(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueDir();
+		}
+		else
+		{
+			return getYellowDir();
+		}
+	}
+	
 	//Ball
 	public double getBallX() {
 		return ballX;
@@ -148,6 +213,13 @@ public class WorldState {
 	public double getYellowDir() {
 		return Math.toDegrees(Math.atan2(yellowDX,yellowDY));
 	}
-
+	
+	public void setTime()
+	{
+		if (created == -1)
+		{
+			created = System.currentTimeMillis();
+		}
+	}
 	
 }

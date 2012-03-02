@@ -9,19 +9,21 @@ import java.util.*;
 public class World
 {
 	
+	public static final int ROBOT_YELLOW = 0;
+	public static final int ROBOT_BLUE = 1;
 	
 	private ArrayList<WorldState> worldStates; 
 	private VisionReceiver vision;
 	private WorldState partialState;
 	private boolean blueRobot = true;
 	private int updateCount = 0;
-
+	private int color;
 	
 
-	public World() {
+	public World(int color) {
 		worldStates = new ArrayList<WorldState>();
 		partialState = new WorldState();
-		
+		this.color = color;
 	}
 		
 	/**
@@ -35,24 +37,31 @@ public class World
 		vision = new VisionReceiver(port, this);
 		
 	}
-
-	public void setBlue(boolean areWeBlue){
-		blueRobot = areWeBlue;
+	
+	public int getColor()
+	{
+		return color;
 	}
-
+	
 	/**
 	* Returns Partial state of world. Should only be used by vision Receiver!!
 	*/
 	public WorldState getPartialState(){
-		if (updateCount == 13) {
-			worldStates.add(partialState);
-			partialState = new WorldState();
-			updateCount= 0;
+		synchronized (worldStates)
+		{
+			if (updateCount == 14) {
+				partialState.setTime();
+				worldStates.add(partialState);
+				partialState = new WorldState();
+				updateCount= 0;
+			}
+		
+			updateCount++;
+			
+			return partialState;
+			
 		}
 		
-		updateCount++;
-		
-		return partialState;
 	}
 	
 	/**
@@ -60,27 +69,43 @@ public class World
 	*/
 	public WorldState getWorldState() {
 		
-		if (worldStates.size() == 0)
-			return null;
+		synchronized (worldStates)
+		{		
+
+			if (worldStates.size() == 0)
+				return null;
 		
-		return worldStates.get(worldStates.size()-1);
+			return worldStates.get(worldStates.size()-1);
+		
+		}
 	}
 	
 	/**Returns the state x states ago.
 	* Eg, if there are 500 stored states, and 
 	*/
 	public WorldState getPastState(int x) { 
-		int temp = worldStates.size() - x; 
-		if (temp < 0) { 
-			return worldStates.get(0);
-		} else {
-			return worldStates.get(temp);
+		
+		synchronized (worldStates)
+		{
+		
+			int temp = worldStates.size() - x; 
+			if (temp < 0) { 
+				return worldStates.get(0);
+			} else {
+				return worldStates.get(temp);
+			}
+		
 		}
 		
 	}
 	
 	public int getHistorySize() {
-		return worldStates.size();
+		
+		synchronized (worldStates)
+		{
+			return worldStates.size();
+		}
+		
 	}
 	
 	

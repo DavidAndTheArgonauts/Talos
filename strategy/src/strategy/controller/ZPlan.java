@@ -12,12 +12,9 @@ public class ZPlan
 	*/
 	private static final int PORT = 9899;
 	
-	private static final int YELLOW = 0;
-	private static final int BLUE = 1;
-	
 	private Thread touchThread;
 	private final Commander c;
-	private World w = new World();
+	private World w;
 	private int color;
 	
 	private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -25,7 +22,7 @@ public class ZPlan
 	public static void main(String[] args)
 	{
 		
-		ZPlan z = new ZPlan(YELLOW);
+		ZPlan z = new ZPlan(World.ROBOT_YELLOW);
 		
 		z.run();
 		
@@ -37,6 +34,7 @@ public class ZPlan
 		this.color = color;
 		
 		c = new Commander();
+		w = new World(color);
 		
 		do
 		{
@@ -234,42 +232,21 @@ public class ZPlan
 	public double getX()
 	{
 		
-		if (color == YELLOW)
-		{
-			return w.getWorldState().getYellowX();
-		}
-		else
-		{
-			return w.getWorldState().getBlueX();
-		}
+		return w.getWorldState().getRobotX(color);
 		
 	}
 	
 	public double getY()
 	{
 		
-		if (color == YELLOW)
-		{
-			return w.getWorldState().getYellowY();
-		}
-		else
-		{
-			return w.getWorldState().getBlueY();
-		}
+		return w.getWorldState().getRobotY(color);
 		
 	}
 	
 	public double getDir()
 	{
 		
-		if (color == YELLOW)
-		{
-			return w.getWorldState().getYellowDir();
-		}
-		else
-		{
-			return w.getWorldState().getBlueDir();
-		}
+		return w.getWorldState().getRobotDir(color);
 		
 	}
 	

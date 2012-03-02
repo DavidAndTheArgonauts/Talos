@@ -26,15 +26,15 @@ public class Commander implements RobotCallback
 	/**
 	 * Fast speed value
 	*/
-	private static final int FAST = 90;
+	public static final int FAST = 90;
 	/**
 	 * Medium speed value
 	*/
-	private static final int MEDIUM = 55;
+	public static final int MEDIUM = 55;
 	/**
 	 * Slow speed value
 	*/
-	private static final int SLOW = 15;
+	public static final int SLOW = 15;
 	
 	private int lWheelSpeed = 0, rWheelSpeed = 0, lWheelSetSpeed = 0, rWheelSetSpeed = 0;
 	private boolean lSensorTouched = false, rSensorTouched = false;
