@@ -1,0 +1,189 @@
+package processing;
+
+import java.math.*;
+import processing.movement.MovementController;
+import processing.processing.planning.*;
+
+class Milestone {
+
+private static MovementController movement = new MovementController("localhost", 9899);
+
+	public static double vecSize( double x, double y ) {
+		return Math.sqrt( ( Math.pow( x, 2 ) + Math.pow( y, 2 ) ) );
+	}
+	
+
+
+	public static void main(String[] args) {
+		Networking network = new Networking(5500);
+		
+
+
+
+
+
+        Values.setBlue(false);
+        
+
+
+
+
+
+        movement.subscribe();
+		
+		if (args.length < 1)
+		{
+			System.out.println("One argument required");
+			System.exit(0);
+		}
+		
+        if (args[0].equals("zsolt")){
+
+            double prevX, prevY, endX, endY, dirX, dirY, dirNorm, ballX, ballY, dirBallX, dirBallY, robotX, robotY, robotDir, dirBallNorm,dirBallAngle, dirRoboBall, rightMotor, leftMotor, speedDelta, dirAngle, motorFullSpeed;
+ 			int driveLeft, driveRight;
+    
+            System.out.println("start");
+			while ( Robot.getX() == 0 ) {
+				try{
+		            Thread.sleep(100);
+					System.out.println("waiting for vision"); 
+		        }
+		        catch(Exception e){
+		        }
+
+			}
+
+			prevX = Robot.getX();
+            prevY = Robot.getY();
+			
+   			while (true) {
+
+				robotX = Robot.getX();
+				robotY = Robot.getY();
+				robotDir = Robot.getDir();
+
+				// direction from movement
+				dirX = robotX - prevX;
+	            dirY = robotY - prevY;
+				dirNorm = vecSize(dirX, dirY);
+				dirAngle = Math.toDegrees( Math.atan2(dirX, dirY) );
+			
+				//System.out.println("dirNorm: " + dirNorm);
+				// if change of movement > 1, use direction from movement instead of from vision
+				if ( dirNorm > 0.5 ) {
+					robotDir = dirAngle;
+				}
+				
+
+		        ballX = Ball.getX();
+		        ballY = Ball.getY();
+			
+		        dirBallX = ballX - robotX;
+		        dirBallY = ballY - robotY;
+				dirBallNorm = vecSize(dirBallX, dirBallY);
+				dirBallAngle = Math.toDegrees( Math.atan2(dirBallX, dirBallY) );
+				
+				dirRoboBall = dirBallAngle - robotDir;
+
+				if ( dirRoboBall > 180 ) {
+					dirRoboBall -= 360;
+				}
+
+				else if ( dirRoboBall < -180 ) {
+					dirRoboBall += 360;
+				}
+
+				System.out.println("dirRoboBall: " + dirRoboBall);
+
+
+				// if < -30 or > 30 then spin
+				if ( dirRoboBall > 60 ) {
+					leftMotor = -1;
+					rightMotor = 1;
+					speedDelta = 1;
+				}
+
+				else if ( dirRoboBall < -60 ) {
+					leftMotor = 1;
+					rightMotor = -1;
+					speedDelta = 1;
+				}
+
+				else {
+
+					// set motor speeds based on the direction between robot and ball
+					if ( dirRoboBall < 0 ) {
+						leftMotor = 1;
+						rightMotor = 1 - Math.abs(dirRoboBall) / 90.;
+					}	
+
+					else {
+						rightMotor = 1;
+						leftMotor = 1 - Math.abs(dirRoboBall) / 90.;
+					};
+
+
+					// normalize motor speed based on the distance between the robot and the ball
+					if (dirBallNorm > 50) {
+						speedDelta = 1;
+					} else if (dirBallNorm > 20) {
+						speedDelta = dirBallNorm / 50f;
+					} else {
+						speedDelta = 0;
+                        System.out.println("kick!!!");
+						movement.kick();
+						movement.waitForRobot();
+					}
+	
+				}
+				
+
+
+
+
+
+
+				
+				//System.out.println("leftMotor: " + leftMotor);
+				//System.out.println("rightMotor: " + rightMotor);
+
+				//System.out.println("dirBallNorm: " + dirBallNorm);
+
+				
+
+
+				//System.out.println("speedDelta: " + speedDelta);
+				motorFullSpeed = 50;
+
+				driveLeft = (int) Math.round( leftMotor * motorFullSpeed * speedDelta );
+				driveRight = (int) Math.round( rightMotor * motorFullSpeed * speedDelta );
+
+				//System.out.println("driveLeft: " + driveLeft);
+				//System.out.println("driveRight: " + driveRight);
+
+				movement.drive( driveLeft, driveRight );
+				movement.waitForRobot();
+			
+
+				// run at 10 FPS, for the movement from robot function to work
+				try{Thread.sleep(100);}
+		        catch(Exception e){}
+				
+				prevX = robotX;
+				prevY = robotY;
+			}
+	    } 
+
+        if (args[0].equals("stop")){
+
+            System.out.println("stop!!!!!");
+		    movement.stop();
+			movement.waitForRobot();
+            network.close();
+			System.exit(0);
+        } 
+
+		network.close();
+	}
+}
+

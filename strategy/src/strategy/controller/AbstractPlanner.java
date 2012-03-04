@@ -24,6 +24,8 @@ public abstract class AbstractPlanner {
 	*/
 	public void halt() {
 		this.loopback = false;
+		StrategyManager.getCommand().stop();
+		StrategyManager.getCommand().waitForQueueToEmpty();
 	}
 	
 	/*

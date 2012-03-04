@@ -20,7 +20,7 @@ public class World
 
 	public World() {
 		worldStates = new ArrayList<WorldState>();
-		partialState = new WorldState();
+		partialState = new WorldState(blueRobot);
 		
 	}
 		
@@ -46,7 +46,7 @@ public class World
 	public WorldState getPartialState(){
 		if (updateCount == 13) {
 			worldStates.add(partialState);
-			partialState = new WorldState();
+			partialState = new WorldState(blueRobot);
 			updateCount= 0;
 		}
 

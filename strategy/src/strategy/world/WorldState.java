@@ -24,7 +24,12 @@ public class WorldState {
 	private int yellowVisible;
 	
 	//Special
+
+	private boolean weAreBlue;
 	
+	public WorldState(boolean areWeBlue){
+		weAreBlue = areWeBlue;
+	}
 
 	//Setters
 
@@ -99,55 +104,108 @@ public class WorldState {
 		return ballVisible;
 	}
 	
-	//Blue Robot
-	public double getBlueX() {
-		return blueX;
+	// Robots
+	// All methods have parameter getUs
+	// Input true to return data for our robot. 
+
+	public double getRobotX(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return blueX;
+			} else {
+				return yellowX;
+			}
+		} else {
+			if (!weAreBlue){
+				 return blueX;
+			} else {
+				return yellowX;
+			}
+		}
+
 	}
 	
-	public double getBlueY() {
-		return blueY;
+	public double getRobotY(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return blueY;
+			} else {
+				return yellowY;
+			}
+		} else {
+			if (!weAreBlue){
+				 return blueY;
+			} else {
+				return yellowY;
+			}
+		}
 	}
 
-	public double getBlueDX() {
-		return blueDX;
+	public double getRobotDX(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return blueDX;
+			} else {
+				return yellowDX;
+			}
+		} else {
+			if (!weAreBlue){
+				 return blueDX;
+			} else {
+				return yellowDX;
+			}
+		}
 	}
 	
-	public double getBlueDY() {
-		return blueDY;
+	public double getRobotDY(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return blueDY;
+			} else {
+				return yellowDY;
+			}
+		} else {
+			if (!weAreBlue){
+				 return blueDY;
+			} else {
+				return yellowDY;
+			}
+		}
 	}
 	
-	public int getBlueVisible() {
-		return blueVisible;
+	public int getRobtVisible(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return blueVisible;
+			} else {
+				return yellowVisible;
+			}
+		} else {
+			if (!weAreBlue){
+				 return blueVisible;
+			} else {
+				return yellowVisible;
+			}
+		}
 	}
 
-	public double getBlueDir() {
-		return Math.toDegrees(Math.atan2(blueDX,blueDY));
+	public double getRobotDir(boolean getUs) {
+		if (getUs){
+			if (weAreBlue){
+				 return Math.toDegrees(Math.atan2(blueDX,blueDY));
+			} else {
+				return Math.toDegrees(Math.atan2(yellowDX,yellowDY));
+			}
+		} else {
+			if (!weAreBlue){
+				 return Math.toDegrees(Math.atan2(blueDX,blueDY));
+			} else {
+				return Math.toDegrees(Math.atan2(yellowDX,yellowDY));
+			}
+		}
+
 	}
 
-	//Yellow Robot
-	public double getYellowX() {
-		return yellowX;
-	}
-	
-	public double getYellowY() {
-		return yellowY;
-	}
-
-	public double getYellowDX() {
-		return yellowDX;
-	}
-	
-	public double getYellowDY() {
-		return yellowDY;
-	}
-	
-	public int getYellowVisible() {
-		return yellowVisible;
-	}
-
-	public double getYellowDir() {
-		return Math.toDegrees(Math.atan2(yellowDX,yellowDY));
-	}
 
 	
 }

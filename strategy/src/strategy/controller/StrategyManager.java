@@ -4,6 +4,7 @@ import java.io.*;
 import comms.robot.*;
 import comms.vision.*;
 import strategy.world.*;
+import strategy.gui.*;
 
 import java.util.EnumMap;
 import java.awt.geom.*;
@@ -33,11 +34,12 @@ public class StrategyManager {
 	static {
 		planners.put(PlannerEnum.REACTIVE, new ReactivePlanner());
 		planners.put(PlannerEnum.DEDUCTIVE, new DeductivePlanner());
-		current = PlannerEnum.REACTIVE;
+		planners.put(PlannerEnum.ZPLANNER, new ZPlanner());
+		current = PlannerEnum.ZPLANNER;
 	}
 	
 	//For use of waypoints. Double precision
-	//public static ArrayList<Point2D> wayPoints = new ArrayList<Point2d>();
+	public static ArrayList<Point2D> wayPoints = new ArrayList<Point2D>();
 	
 	//Single Commander for all planners. 
 	private static Commander commander = new Commander("localhost", 9899);
@@ -45,27 +47,28 @@ public class StrategyManager {
 	private static World world;
 	public static void main(){
 		
-		//Gui gui = new Gui();
+		Gui gui = new Gui(current);
+		gui.createGui();
 		
 		world = new World();
 		vision = new VisionReceiver(5500, world);
-		world.setBlue(false); // set to false if using yellow... later on it should be GUI coded.
 		
-		//For future. Ignore for now.
+		commander.subscribe(commander);
+		
 		//planners.get(current).execute();
-		
-		//Example planner start. Only one planner should be running at anytime. 
-		ZPlanner examplePlanner = new ZPlanner();
-		examplePlanner.execute();
 
-		vision.close();
+		//vision.close();
 	}
 
 	//Planners cna use this to pass control to other strategies. 
 	//They should halt their own running before calling this. 
 	
-	public static void switchStrategy(PlannerEnum e){
+	public static void startStrategy(PlannerEnum e){
 		planners.get(e).execute();
+	}
+
+	public static void haltStrategy(PlannerEnum e) {
+		planners.get(e).halt();
 	}
 	
 	public static Commander getCommand(){
@@ -74,6 +77,10 @@ public class StrategyManager {
 
 	public static World getWorld(){
 		return world;
+	}
+
+	public static VisionReceiver getVision(){
+		return vision;
 	}
 
 }

@@ -2,5 +2,6 @@ package strategy.controller;
 
 public enum PlannerEnum{
 	REACTIVE,
-	DEDUCTIVE;
+	DEDUCTIVE,
+	ZPLANNER;
 }

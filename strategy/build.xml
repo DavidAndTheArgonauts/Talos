@@ -7,6 +7,7 @@
 	
 	<property name="strategy.cmd.stop" value="strategy.controller.Stop" />
 	<property name="strategy.cmd.cmdline" value="strategy.controller.CommandLine" />
+	<property name="strategy.cmd.manager" value="strategy.controller.StrategyManager"/>
 	
 	<target name="clean">
 		
@@ -32,6 +33,11 @@
 		
 		<java fork="true" classname="${strategy.cmd.cmdline}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
 		
+	</target>
+
+	<target name="main" depends="build">
+		
+		<java fork="true" classname="${strategy.cmd.manager}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}"/>
 	</target>
 	
 	<target name="javadoc" depends="clean">
