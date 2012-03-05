@@ -6,7 +6,7 @@ import comms.robot.*;
 public class DriveMode extends AbstractMode
 {
 	
-	public static final double DESTINATION_TOLERENCE = 2;
+	public static final double DESTINATION_TOLERENCE = 4;
 
 	private double targetX, targetY;
 	private boolean complete = false;
@@ -49,16 +49,18 @@ public class DriveMode extends AbstractMode
 			
 			if (diff < 0)
 			{
-				speedDiff = -(n/10.0);
+				//speedDiff = -(n/10.0);
+				speedDiff = -0.1;
 			}
 			else
 			{
-				speedDiff = n/10.0;
+				//speedDiff = n/10.0;
+				speedDiff = 0.1;
 			}
 			
 		}
 
-		System.out.println("Speeddiff = " + speedDiff);
+		System.out.println("angle diff = " + diff + ", Speeddiff = " + speedDiff);
 		
 		//System.out.println("Dist = " + dist);
 		
@@ -71,7 +73,11 @@ public class DriveMode extends AbstractMode
 		
 		int speed = (int)dist;
 		if (speed > 20) speed = 20;
-		if (speed < 10) speed = 1;
+		if (speed < 10) 
+		{
+			speed = 1;
+			speedDiff = 0;
+		}
 		
 		int lSpeed = (int)Math.ceil((-speedDiff) * speed) + speed;
 		int rSpeed = (int)Math.ceil(speedDiff * speed) + speed;

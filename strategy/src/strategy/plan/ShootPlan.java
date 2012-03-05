@@ -10,20 +10,14 @@ import java.awt.*;
 public class ShootPlan extends AbstractPlan
 {
 
-	private World world;
-	private Commander commander;
-
-	public ShootPlan(World world, Commander commander)
+	public ShootPlan(Commander commander, World world)
 	{
-		this.world = world;
-		this.commander = commander;
+		super(commander,world);
 	}
 
 	public AbstractMode[] plan()
 	{
-		
-		double[] goal = World.RIGHT_GOAL_CENTER;
-		
+
 		WorldState state = world.getWorldState();
 
 		System.out.println("Ball coord: (" + (int)state.getBallX() + "," + (int)state.getBallY() + ")");
@@ -32,8 +26,8 @@ public class ShootPlan extends AbstractPlan
 		Point wayPoint;
 
 		// If the ball is nearer the goal than the robot
-		if (euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()),goal[0],goal[1])>
-		euclDistance(state.getBallX(),state.getBallY(),goal[0],goal[1])){
+		if (euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()),130,40)>
+		euclDistance(state.getBallX(),state.getBallY(),130,40)){
 			System.out.println("Ball is nearer the goal than the robot");
 			wayPoint = calculateWaypoint(state.getRobotX(world.getColor()), 
 					state.getRobotY(world.getColor()), 
@@ -53,13 +47,13 @@ public class ShootPlan extends AbstractPlan
 			}
 		}
 
-		Point p = calculateDestination(state.getBallX(),state.getBallY(),goal[0],goal[1],20);
-		Point q = calculateDestination(state.getBallX(),state.getBallY(),goal[0],goal[1],10);
+		Point p = calculateDestination(state.getBallX(),state.getBallY(),130,40,20);
+		Point q = calculateDestination(state.getBallX(),state.getBallY(),130,40,10);
 
 		AbstractMode avoidancePoint = new WaypointMode(commander, wayPoint.getX(), wayPoint.getY());
 		AbstractMode shootPoint = new WaypointMode(commander,p.getX(), p.getY());
 		AbstractMode ballPoint = new WaypointMode(commander,q.getX(), q.getY());
-		AbstractMode goalPoint = new WaypointMode(commander, goal[0],goal[1]);
+		AbstractMode goalPoint = new WaypointMode(commander, 120, 40);
 
 
 
@@ -106,7 +100,7 @@ public class ShootPlan extends AbstractPlan
 			destinationY = ballY;
 
 		}else{
-			//calculate the vector from goal to balls
+			//calculate the vector from goal to ball
 			double vectorx = (ballX-goalX);
 			double vectory = (ballY-goalY);
 
