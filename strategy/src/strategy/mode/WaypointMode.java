@@ -22,6 +22,8 @@ public class WaypointMode extends AbstractMode
 	{
 		super(commander);
 		
+		System.out.println("Target coord: (" + targetX + "," + targetY + ")");
+		
 		this.targetX = targetX;
 		this.targetY = targetY;
 	}

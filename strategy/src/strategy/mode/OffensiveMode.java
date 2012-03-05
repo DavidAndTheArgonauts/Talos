@@ -8,8 +8,16 @@ import comms.robot.*;
 public class OffensiveMode extends AbstractMode
 {
 	
+	private static final double FINAL_DISTANCE = 15;
+	
 	private AbstractMode[] plan = new AbstractMode[0];
 	private int idx = 0;
+	
+	private double[] ballPos = new double[0];
+	
+	private boolean complete = false;
+	
+	private int wheelSpeed = 0;
 	
 	public OffensiveMode(Commander commander)
 	{
@@ -34,11 +42,14 @@ public class OffensiveMode extends AbstractMode
 	
 	public boolean complete()
 	{
-		return false;
+		return complete;
 	}
 	
 	public void update(World world)
 	{
+		
+		if (complete())
+			return;
 		
 		if (plan.length == 0)
 		{
@@ -48,8 +59,35 @@ public class OffensiveMode extends AbstractMode
 		// if we're complete
 		if (idx >= plan.length)
 		{
-			commander.stop();
-			commander.kick();
+			
+			if (wheelSpeed < 40)
+			{
+				wheelSpeed += 3;
+				commander.setSpeed(wheelSpeed,wheelSpeed);
+			}
+			
+			WorldState state = world.getWorldState();
+			
+			if (ballPos.length == 0)
+			{
+				ballPos = new double[2];
+				ballPos[0] = world.getWorldState().getBallX();
+				ballPos[1] = world.getWorldState().getBallY();
+			}
+			
+			double distPastBall = ShootPlan.euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()), ballPos[0], ballPos[1]);
+			double distToGoal = ShootPlan.euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()), World.LEFT_GOAL_CENTER[0], World.LEFT_GOAL_CENTER[1]);
+			
+			if (distPastBall > FINAL_DISTANCE || distToGoal < 40)
+			{
+				
+				commander.kick();
+				commander.waitForQueueToEmpty();
+				commander.stop();
+				complete = true;
+				
+			}
+			
 			return;
 		}
 		

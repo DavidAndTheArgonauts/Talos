@@ -12,6 +12,9 @@ public class World
 	public static final int ROBOT_YELLOW = 0;
 	public static final int ROBOT_BLUE = 1;
 	
+	public static final double[] LEFT_GOAL_CENTER = { 0, 40 };
+	public static final double[] RIGHT_GOAL_CENTER = { 130, 40 };
+	
 	private ArrayList<WorldState> worldStates; 
 	private VisionReceiver vision;
 	private WorldState partialState;
