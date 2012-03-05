@@ -106,7 +106,7 @@ public class ShootPlan extends AbstractPlan
 			destinationY = ballY;
 
 		}else{
-			//calculate the vector from goal to ball
+			//calculate the vector from goal to balls
 			double vectorx = (ballX-goalX);
 			double vectory = (ballY-goalY);
 
