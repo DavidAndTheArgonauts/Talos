@@ -22,7 +22,7 @@ public class ShootPlan extends AbstractPlan
 	public AbstractMode[] plan()
 	{
 		
-		double[] goal = World.LEFT_GOAL_CENTER;
+		double[] goal = World.RIGHT_GOAL_CENTER;
 		
 		WorldState state = world.getWorldState();
 
