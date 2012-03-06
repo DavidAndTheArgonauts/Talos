@@ -3,6 +3,4 @@
 *.swp
 *.class
 
-#
-src/control/comms/controller/autoctest
 
