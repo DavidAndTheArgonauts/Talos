@@ -4,7 +4,7 @@ import lejos.nxt.*;
 import connection.*;
 
 /*
-	Code that handles responses from the touch sensor (only sensor ports 1 & 2)
+	Code that handles responses from the touch sensor (only sensor ports 1 & 2 as of 27/02/12)
 */
 public class Touch implements Runnable
 {

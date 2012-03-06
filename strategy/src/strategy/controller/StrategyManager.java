@@ -45,7 +45,7 @@ public class StrategyManager {
 	private static Commander commander = new Commander("localhost", 9899);
 	private static VisionReceiver vision; 
 	private static World world;
-	public static void main(){
+	public static void main(String[] args){
 		
 		Gui gui = new Gui(current);
 		gui.createGui();
