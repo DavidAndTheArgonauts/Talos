@@ -249,7 +249,7 @@ public class AStarPlan extends AbstractPlan
 			worldY = (y * cellHeight) + (cellHeight / 2);
 		
 		// robot & ball
-		if (Math.abs(worldX - state.getBallX()) < 20 && Math.abs(worldY - state.getBallY()) < 20)
+		if (Math.abs(worldX - state.getBallX()) < 10 && Math.abs(worldY - state.getBallY()) < 10)
 		{
 			System.out.println("(" + worldX + "," + worldY + ") is on ball (ball at [" + state.getBallX() + "," + state.getBallY() + "]");
 			return -1;
@@ -258,7 +258,7 @@ public class AStarPlan extends AbstractPlan
 		double robotX = state.getEnemyX(world.getColor()),
 			robotY = state.getEnemyY(world.getColor());
 		
-		if (Math.abs(worldX - robotX) < 20 && Math.abs(worldY - robotY) < 20)
+		if (Math.abs(worldX - robotX) < 15 && Math.abs(worldY - robotY) < 15)
 		{
 			System.out.println("(" + x + "," + y + ") is enemy robot");
 			return -1;

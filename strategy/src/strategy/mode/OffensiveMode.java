@@ -36,9 +36,11 @@ public class OffensiveMode extends AbstractMode
 	public void reset(World world)
 	{
 		
+		WorldState state = world.getWorldState();
+		
 		idx = 0;
 		
-		AbstractPlan p = new AStarPlan(commander,world,110,40);
+		AbstractPlan p = new ShootPlan(commander,world);
 		plan = p.plan();
 		
 	}

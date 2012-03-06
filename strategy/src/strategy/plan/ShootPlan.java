@@ -49,13 +49,24 @@ public class ShootPlan extends AbstractPlan
 
 		Point p = calculateDestination(state.getBallX(),state.getBallY(),0,40,20);
 		Point q = calculateDestination(state.getBallX(),state.getBallY(),0,40,8);
-
+		
+		/*
 		AbstractMode avoidancePoint = new WaypointMode(commander, wayPoint.getX(), wayPoint.getY());
 		AbstractMode shootPoint = new WaypointMode(commander,p.getX(), p.getY());
 		AbstractMode ballPoint = new WaypointMode(commander,q.getX(), q.getY());
+		*/
+		
+		AStarPlan astarplan = new AStarPlan(commander,world,p.getX(),p.getY());
+		AbstractMode[] aplan = astarplan.plan();
+		
 		AbstractMode ballFace = new TurnMode(commander, 0, 40);
 
-
+		AbstractMode[] planb = new AbstractMode[aplan.length+1];
+		for (int i = 0; i < aplan.length; i++)
+		{
+			planb[i] = aplan[i];
+		}
+		planb[planb.length-1] = ballFace;
 
 		/*
 		AbstractMode avoidancePoint = new WaypointMode(commander, p.getX(), p.getY());
@@ -68,15 +79,16 @@ public class ShootPlan extends AbstractPlan
 
 		System.out.println("Final waypoint: (" + p.getX() + "," + p.getY() + ")");
 		 */
-
+		/*
 		AbstractMode[] plan = {
 				avoidancePoint,
 				shootPoint,
 				ballPoint,
 				ballFace
 		};
-
-		return plan;
+		*/
+		
+		return planb;
 
 	}
 
