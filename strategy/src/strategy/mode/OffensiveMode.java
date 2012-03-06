@@ -29,7 +29,7 @@ public class OffensiveMode extends AbstractMode
 	public double getViability(World world)
 	{
 		
-		return 1;
+		return 0;
 		
 	}
 	
@@ -42,6 +42,9 @@ public class OffensiveMode extends AbstractMode
 		
 		AbstractPlan p = new ShootPlan(commander,world);
 		plan = p.plan();
+		
+		// set interrupt for touch sensor
+		commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_TOUCH,InterruptManager.MODE_EITHER);
 		
 	}
 	
@@ -110,5 +113,14 @@ public class OffensiveMode extends AbstractMode
 		plan[idx].update(world);
 		
 	}
+	
+	public void handleInterrupt(World world,int interrupt)
+	{
+		
+		System.out.println(" << INTERRUPT TRIGGERED >> ");
+		commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_TOUCH,InterruptManager.MODE_EITHER);
+		
+	}
+	
 	
 }

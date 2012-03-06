@@ -362,7 +362,10 @@ public class Commander implements RobotCallback
 	*/
 	public boolean isLeftSensorPushed()
 	{
-		return lSensorTouched;
+		synchronized (this)
+		{
+			return lSensorTouched;
+		}
 	}
 	
 	/**
@@ -370,7 +373,10 @@ public class Commander implements RobotCallback
 	*/
 	public boolean isRightSensorPushed()
 	{
-		return rSensorTouched;
+		synchronized (this)
+		{
+			return rSensorTouched;
+		}
 	}
 	
 	/**
@@ -378,7 +384,10 @@ public class Commander implements RobotCallback
 	*/
 	public long getLeftRevolution()
 	{
-		return lRevCount;
+		synchronized (this)
+		{
+			return lRevCount;
+		}
 	}
 	
 	/**
@@ -386,7 +395,10 @@ public class Commander implements RobotCallback
 	*/
 	public long getRightRevolution()
 	{
-		return rRevCount;
+		synchronized (this)
+		{
+			return rRevCount;
+		}
 	}
 	
 	/**
@@ -394,7 +406,10 @@ public class Commander implements RobotCallback
 	*/
 	public int getLeftTouchCount()
 	{
-		return lTouchCount;
+		synchronized (this)
+		{
+			return lTouchCount;
+		}
 	}
 	
 	/**
@@ -402,17 +417,34 @@ public class Commander implements RobotCallback
 	*/
 	public int getRightTouchCount()
 	{
-		return rTouchCount;
+		synchronized (this)
+		{
+			return rTouchCount;
+		}
 	}
 
 	public double getLeftSpeed()
 	{
-		return lWheelSpeed;
+		synchronized (this)
+		{
+			return lWheelSpeed;
+		}
 	}
 	
 	public double getRightSpeed()
 	{
-		return rWheelSpeed;
+		synchronized (this)
+		{
+			return rWheelSpeed;
+		}
+	}
+	
+	public long getWheelUpdateTime()
+	{
+		synchronized (this)
+		{
+			return wheelUpdateTime;
+		}
 	}
 	
 	/**
@@ -426,53 +458,63 @@ public class Commander implements RobotCallback
 	public void robotCallback(Message response)
 	{
 		
-		switch (response.getOpcode())
+		synchronized (this)
 		{
-			// Updates the number of revolutions each wheel has travelled
-			case Opcodes.WHEEL_FEEDBACK:
-				
-				int[] tachoCount = response.getArguments(2);
-
-				if (wheelUpdateTime != -1)
-				{
-					long dt = System.currentTimeMillis() - wheelUpdateTime;
-					lWheelSpeed = tachoCount[0]/(int)dt;
-					rWheelSpeed = tachoCount[1]/(int)dt;
-				}
-
-				lRevCount += tachoCount[0];
-				rRevCount += tachoCount[1];
-
-				wheelUpdateTime = System.currentTimeMillis();
-				
-				break;
-				
-			// Updates sensor state
-			case Opcodes.SENSOR_TOUCHED:
+			switch (response.getOpcode())
+			{
 			
-				int[] states = response.getArguments(2);
+				// Updates the number of revolutions each wheel has travelled
+				case Opcodes.WHEEL_FEEDBACK:
 				
-				if (states[0] == 1)
-				{
-					lSensorTouched = true;
-					lTouchCount++;
-				}
-				else
-				{
-					lSensorTouched = false;
-				}
+					int[] tachoCount = response.getArguments(2);
 				
-				if (states[1] == 1)
-				{
-					rSensorTouched = true;
-					rTouchCount++;
-				}
-				else
-				{
-					rSensorTouched = false;
-				}
+					if (wheelUpdateTime != -1)
+					{
+						int dt = (int)(System.currentTimeMillis() - wheelUpdateTime);
+					
+						if (dt != 0)
+						{
+							lWheelSpeed = tachoCount[0]/dt;
+							rWheelSpeed = tachoCount[1]/dt;
+						}
+					
+					}
 				
-				break;
+					lRevCount += tachoCount[0];
+					rRevCount += tachoCount[1];
+				
+				
+					wheelUpdateTime = System.currentTimeMillis();
+				
+					break;
+				
+				// Updates sensor state
+				case Opcodes.SENSOR_TOUCHED:
+			
+					int[] states = response.getArguments(2);
+				
+					if (states[0] == 1)
+					{
+						lSensorTouched = true;
+						lTouchCount++;
+					}
+					else
+					{
+						lSensorTouched = false;
+					}
+				
+					if (states[1] == 1)
+					{
+						rSensorTouched = true;
+						rTouchCount++;
+					}
+					else
+					{
+						rSensorTouched = false;
+					}
+				
+					break;
+			}
 		}
 		
 	}

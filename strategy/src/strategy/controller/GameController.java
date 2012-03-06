@@ -6,7 +6,7 @@ import strategy.mode.*;
 
 import java.io.*;
 
-public class GameController extends Thread
+public class GameController extends AbstractController
 {
 	
 	private static final int CONTROL_TIMEOUT = 1000;
@@ -78,7 +78,11 @@ public class GameController extends Thread
 		System.out.println("World data found!");
 		
 		// create controller thread and begin
-		Thread gcThread = new GameController(w,c);
+		GameController gcThread = new GameController(w,c);
+		
+		// register the controller for interrupts
+		c.registerController(gcThread);
+		
 		gcThread.start();
 		
 		System.out.println("Press <enter> to quit");
@@ -94,7 +98,11 @@ public class GameController extends Thread
 		}
 		
 		// interrupt and wait for thread to die
-		gcThread.interrupt();
+		while (!gcThread.controllerInterrupt(InterruptManager.INTERRUPT_QUIT,-1))
+		{
+			Thread.yield();
+		}
+		
 		while (gcThread.isAlive())
 		{
 			try
@@ -138,8 +146,36 @@ public class GameController extends Thread
 		
 		long lastChange = -1, lastUpdate = -1;
 		
-		while (!Thread.interrupted())
+		/* coding here */
+		while (true)
 		{
+		
+			if (currentMode != null && controllerInterrupted())
+			{
+				
+				if (isQuitInterrupt())
+				{
+					return;
+				}
+				
+				int interrupt = getControllerInterrupt();
+				 
+				currentMode.handleInterrupt(world,interrupt);
+				 
+			}
+			else if (controllerInterrupted())
+			{
+				
+				
+				
+				if (isQuitInterrupt())
+				{
+					return;
+				}
+				
+				int interrupt = getControllerInterrupt();
+				
+			}
 			
 			if (System.currentTimeMillis() - lastChange > CONTROL_TIMEOUT)
 			{
@@ -163,6 +199,7 @@ public class GameController extends Thread
 				// call reset when changing mode
 				if (currentMode != null && newMode != null && !currentMode.equals(newMode))
 				{
+					commander.getInterruptManager().clearInterrupts();
 					newMode.reset(world);
 				}
 				
@@ -178,12 +215,19 @@ public class GameController extends Thread
 			{
 				
 				// we could block forever if we have been given the kill command
-				if (Thread.interrupted())
+				if (controllerInterrupted())
 				{
-					return;
+					 
+					 if (isQuitInterrupt())
+					 {
+					 	return;
+					 }
+					 
+					 int interrupt = getControllerInterrupt();
+					 
+					 currentMode.handleInterrupt(world,interrupt);
+					 
 				}
-				
-				Thread.yield();
 				
 			}
 			

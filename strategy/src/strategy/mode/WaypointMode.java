@@ -123,4 +123,9 @@ public class WaypointMode extends AbstractMode
 
 	}
 	
+	public void handleInterrupt(World world,int interrupt)
+	{
+		
+	}
+	
 }

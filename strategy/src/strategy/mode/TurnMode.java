@@ -88,5 +88,9 @@ public class TurnMode extends AbstractMode
 		return diff;
 		
 	}
-
+	
+	public void handleInterrupt(World world,int interrupt)
+	{
+		
+	}
 }

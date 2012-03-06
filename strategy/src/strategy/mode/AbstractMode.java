@@ -21,5 +21,6 @@ public abstract class AbstractMode
 	public abstract boolean complete();
 	public abstract void reset(World world);
 	public abstract void update(World world);
+	public abstract void handleInterrupt(World world, int interrupt);
 	
 }

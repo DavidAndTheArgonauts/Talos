@@ -164,5 +164,10 @@ public class DriveMode extends AbstractMode
 		return diff;
 		
 	}
+	
+	public void handleInterrupt(World world,int interrupt)
+	{
+		
+	}
 
 }
