@@ -10,12 +10,22 @@ public class DriveMode extends AbstractMode
 
 	private double targetX, targetY;
 	private boolean complete = false;
+	private int maxSpeed = 20;
+	private int speed = 0;
 	
 	public DriveMode(Commander commander, double targetX, double targetY)
 	{
 		super(commander);
 		this.targetX = targetX;
 		this.targetY = targetY;
+	}
+
+	public DriveMode(Commander commander, double targetX, double targetY, int maxSpeed)
+	{
+		super(commander);
+		this.targetX = targetX;
+		this.targetY = targetY;
+		this.maxSpeed = maxSpeed;
 	}
 	
 	public boolean complete()
@@ -25,7 +35,9 @@ public class DriveMode extends AbstractMode
 
 	public void reset(World world)
 	{
-	
+
+		speed = 0;	
+
 	}
 	
 	public void update(World world)
@@ -69,16 +81,48 @@ public class DriveMode extends AbstractMode
 			commander.stop();
 			complete = true;
 			return;
+		
+		}
+
+
+		if (this.speed < maxSpeed)
+		{
+			this.speed += 2;
+			speed = this.speed;
 		}
 		
-		int speed = (int)dist;
-		if (speed > 20) speed = 20;
-		if (speed < 10) 
+		if (dist < 10)
 		{
 			speed = 1;
 			speedDiff = 0;
 		}
 		
+		/*
+		int speed = (int)dist;
+		
+		if (speed > maxSpeed) {
+	
+
+			final int startSpeed = maxSpeed - 20;
+			
+		  	this.speed++;
+
+			//speed = startSpeed + iterator;
+		
+		}
+	
+		else if (this.speed<maxSpeed){
+
+		speed = this.speed++;
+
+		}
+
+		if (speed < 10) 
+		{
+			speed = 1;
+			speedDiff = 0;
+		}
+		*/
 		int lSpeed = (int)Math.ceil((-speedDiff) * speed) + speed;
 		int rSpeed = (int)Math.ceil(speedDiff * speed) + speed;
 		

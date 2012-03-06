@@ -8,7 +8,7 @@ import comms.robot.*;
 public class OffensiveMode extends AbstractMode
 {
 	
-	private static final double FINAL_DISTANCE = 15;
+	private static final double FINAL_DISTANCE = 30;
 	
 	private AbstractMode[] plan = new AbstractMode[0];
 	private int idx = 0;
@@ -18,6 +18,8 @@ public class OffensiveMode extends AbstractMode
 	private boolean complete = false;
 	
 	private int wheelSpeed = 0;
+
+	private DriveMode drivemode = null;
 	
 	public OffensiveMode(Commander commander)
 	{
@@ -35,7 +37,7 @@ public class OffensiveMode extends AbstractMode
 	{
 		
 		idx = 0;
-		ShootPlan sp = new ShootPlan(world,commander);
+		ShootPlan sp = new ShootPlan(commander,world);
 		plan = sp.plan();
 		
 	}
@@ -60,11 +62,11 @@ public class OffensiveMode extends AbstractMode
 		if (idx >= plan.length)
 		{
 			
-			if (wheelSpeed < 40)
+			/*if (wheelSpeed < 40)
 			{
 				wheelSpeed += 3;
 				commander.setSpeed(wheelSpeed,wheelSpeed);
-			}
+			}*/
 			
 			WorldState state = world.getWorldState();
 			
@@ -73,21 +75,25 @@ public class OffensiveMode extends AbstractMode
 				ballPos = new double[2];
 				ballPos[0] = world.getWorldState().getBallX();
 				ballPos[1] = world.getWorldState().getBallY();
+
+				drivemode = new DriveMode(commander, 0, 40, 40);
 			}
 			
 			double distPastBall = ShootPlan.euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()), ballPos[0], ballPos[1]);
 			double distToGoal = ShootPlan.euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()), World.LEFT_GOAL_CENTER[0], World.LEFT_GOAL_CENTER[1]);
 			
-			if (distPastBall > FINAL_DISTANCE || distToGoal < 40)
+			if (distPastBall > FINAL_DISTANCE || distToGoal < 30)
 			{
 				
 				commander.kick();
 				commander.waitForQueueToEmpty();
 				commander.stop();
 				complete = true;
-				
+				return;
+
 			}
 			
+			drivemode.update(world);
 			return;
 		}
 		

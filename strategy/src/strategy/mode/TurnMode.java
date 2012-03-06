@@ -6,7 +6,7 @@ import comms.robot.*;
 public class TurnMode extends AbstractMode
 {
 	
-	public static final double TURN_TOLERENCE = 10;
+	public static final double TURN_TOLERENCE = 5;
 
 	private double targetX, targetY;
 	private boolean complete = false;
