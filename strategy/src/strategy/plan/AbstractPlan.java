@@ -1,6 +1,8 @@
 package strategy.plan;
 
+import comms.robot.*;
 import strategy.mode.*;
+import strategy.world.*;
 
 public abstract class AbstractPlan
 {

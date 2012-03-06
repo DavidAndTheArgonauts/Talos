@@ -35,8 +35,8 @@ public class OffensiveMode extends AbstractMode
 	{
 		
 		idx = 0;
-		ShootPlan sp = new ShootPlan(world,commander);
-		plan = sp.plan();
+		AbstractPlan p = new AStarPlan(commander,world,110,40);
+		plan = p.plan();
 		
 	}
 	

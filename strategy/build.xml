@@ -45,10 +45,10 @@
 	<target name="game" depends="build">
 		
 		<java fork="true" classname="${strategy.cmd.game}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
-			<arg value="localhost" />
+			<arg value="kilbride" />
 			<arg value="9899" />
 			<arg value="5500" />
-			<arg value="yellow" />
+			<arg value="blue" />
 		</java>
 		
 	</target>

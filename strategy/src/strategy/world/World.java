@@ -15,6 +15,8 @@ public class World
 	public static final double[] LEFT_GOAL_CENTER = { 0, 40 };
 	public static final double[] RIGHT_GOAL_CENTER = { 130, 40 };
 	
+	public static final double WORLD_HEIGHT = 80, WORLD_WIDTH = 130;
+	
 	private ArrayList<WorldState> worldStates; 
 	private VisionReceiver vision;
 	private WorldState partialState;
