@@ -26,7 +26,7 @@ public class ShootPlan extends AbstractPlan
 		Point wayPoint;
 
 		// If the ball is nearer the goal than the robot
-		if (euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()),130,40)>
+		if (euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()),0,40)>
 		euclDistance(state.getBallX(),state.getBallY(),130,40)){
 			System.out.println("Ball is nearer the goal than the robot");
 			wayPoint = calculateWaypoint(state.getRobotX(world.getColor()), 
@@ -41,19 +41,19 @@ public class ShootPlan extends AbstractPlan
 			// If the robot is nearer the goal than the ball
 			System.out.println("Robot is nearer the goal than the ball");
 			if (state.getBallY()<40){
-				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())+20);
+				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())+25);
 			} else {
-				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())-20);
+				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())-25);
 			}
 		}
 
-		Point p = calculateDestination(state.getBallX(),state.getBallY(),130,40,20);
-		Point q = calculateDestination(state.getBallX(),state.getBallY(),130,40,10);
+		Point p = calculateDestination(state.getBallX(),state.getBallY(),0,40,20);
+		Point q = calculateDestination(state.getBallX(),state.getBallY(),0,40,8);
 
 		AbstractMode avoidancePoint = new WaypointMode(commander, wayPoint.getX(), wayPoint.getY());
 		AbstractMode shootPoint = new WaypointMode(commander,p.getX(), p.getY());
 		AbstractMode ballPoint = new WaypointMode(commander,q.getX(), q.getY());
-		AbstractMode goalPoint = new WaypointMode(commander, 120, 40);
+		AbstractMode ballFace = new TurnMode(commander, 0, 40);
 
 
 
@@ -72,8 +72,8 @@ public class ShootPlan extends AbstractPlan
 		AbstractMode[] plan = {
 				avoidancePoint,
 				shootPoint,
-				ballPoint
-				//goalPoint
+				ballPoint,
+				ballFace
 		};
 
 		return plan;
@@ -110,9 +110,36 @@ public class ShootPlan extends AbstractPlan
 			double unitVectorx = vectorx/i;
 			double unitVectory = vectory/i;
 
-			//calculate destination by adding multiples of the unit vector
+			//calculate destination by adding multiples of the uWnit vector
+			// Handling out of bounds
+			
+			
 			destinationX = (ballX + (distance*unitVectorx));
 			destinationY = (ballY + (distance*unitVectory));
+
+			/*if(destinationX>120){
+				while (destinationX>120){
+					destinationX-=5;
+					System.out.println("David");
+				}	
+			} else {
+				while (destinationX<10){
+					destinationX+=5;
+					System.out.println("Ewing");
+				}
+			}
+			if (destinationY>70){
+				while (destinationY>70){
+					destinationY-=5;
+					System.out.println("Rankin");
+				}
+			} else {
+				while (destinationY<10){
+					destinationY+=5;
+					System.out.println("Dickface");
+				}
+			}*/
+			
 		}
 
 		//System.out.println("X: " + destinationX + " Y: " + destinationY);
@@ -139,11 +166,11 @@ public class ShootPlan extends AbstractPlan
 		// distance is the distance between enemy robot to robot - ball vector
 		double distance = holder/Math.sqrt((ballX-robotX)*(ballX-robotX) + (ballY - robotY)*(ballY - robotY));
 
-		int distance_threshold = 30;
+		int distance_threshold = 27;
 
 		if(distance<distance_threshold){
 			// Enemy robot is close from robot - ball vector	
-			if (robotY>40){
+			if (enemyY>40){
 				// Robot is in top half
 				/*
 				if (robotX<20){
@@ -159,7 +186,7 @@ public class ShootPlan extends AbstractPlan
 				
 				System.out.println("Top half - distance");
 				distance-=distance_threshold;
-			} else if (robotY<=40){
+			} else if (enemyY<=40){
 				// Robot is in bottom half
 				/*
 				if (robotX>110){
@@ -197,23 +224,34 @@ public class ShootPlan extends AbstractPlan
 				angle = Math.PI+angle;
 		}
 
-		System.out.println("Angle RAD: " + angle);
 		System.out.println("Angle DEGREES: " + Math.toDegrees(angle));
 
 		double addX = Math.sin(angle)*distance;
 		double addY = Math.cos(angle)*distance;
 
+		System.out.println("old distance: " + distance);
+
 		// Super hacky fix to get round out of bound coordinates
 		if (((enemyX + addX)>130)||(enemyX + addX)<0){
-			System.out.println("adas");
+			System.out.println("X axis out of bounds");
 			addX = addX*-1;
 			addY = addY*-1;
+			/*
+			addX = Math.sin(angle)*-distance;
+			addY = Math.cos(angle)*-distance;
+			*/
 		}
 		if (((enemyY + addY)>80)||(enemyY + addY)<0){
-			System.out.println("adasasdas");
+			System.out.println("Y axis out of bounds");
 			addX = addX*-1;
 			addY = addY*-1;
+			/*
+			addX = Math.sin(angle)*-distance;
+			addY = Math.cos(angle)*-distance;
+			*/
 		}
+
+		System.out.println("new distance: " + distance);
 
 		Point wayPoint = new Point((int)Math.round(enemyX + addX), (int)Math.round(enemyY + addY));
 		return wayPoint;
