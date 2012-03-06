@@ -1,6 +1,7 @@
 package comms.robot;
 
 import comms.robot.connection.*;
+import strategy.controller.*;
 
 /**
  * Provides full control of the robot and sensor values
@@ -9,6 +10,16 @@ public class Commander implements RobotCallback
 {
 	
 	/* constants */
+	
+	/**
+	 * Wheel diameter 
+	*/
+	public static final double WHEEL_DIAMETER = 8.16;
+	
+	/** 
+	 * Distance between wheels
+	*/
+	public static final double WHEEL_SEPARATION = 14.45;
 	
 	/**
 	 * Fast speed mode
@@ -45,6 +56,8 @@ public class Commander implements RobotCallback
 	private boolean connected = false;
 	private String host;
 	private int port;
+	
+	private InterruptManager interruptManager = null;
 	
 	public Commander()
 	{
@@ -93,6 +106,60 @@ public class Commander implements RobotCallback
 			connection.disconnect();
 			System.out.println("Disconnected");
 		}
+		
+		if (interruptManager != null)
+		{
+			
+			interruptManager.interrupt();
+			
+			while (interruptManager.isAlive())
+			{
+				
+				try
+				{
+					interruptManager.join();
+				}
+				catch (InterruptedException ie)
+				{
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * Register an interrupt manager
+	 * @param AbstractController The controller to notify
+	 * @return Whether the operation was successful
+	 * @see strategy.controller.AbstractController
+	*/
+	public boolean registerController(AbstractController controller)
+	{
+		
+		if (interruptManager != null && interruptManager.isAlive())
+		{
+			return false;
+		}
+		interruptManager = new InterruptManager(this,controller);
+		interruptManager.start();
+		return true;
+		
+	}
+	
+	/** 
+	 * Gets the interrupt manager, returns interrupt manager or null if no controller registered or if interrupt manager failed
+	 * @return The interrupt manager associated with this commander
+	 * @see comms.robot.InterruptManager
+	*/
+	public InterruptManager getInterruptManager()
+	{
+		if (interruptManager.isAlive())
+			return interruptManager;
+		else
+			return null;
 	}
 	
 	/**
