@@ -46,8 +46,8 @@ public class Driver implements ConnectionInterface
 					}
 					
 					// Update counters
-					int leftTachoCount = Motor.B.getTachoCount();
-					int rightTachoCount = Motor.C.getTachoCount();
+					int leftTachoCount = -Motor.B.getTachoCount();
+					int rightTachoCount = -Motor.C.getTachoCount();
 
 					// Send message
 					if ((Motor.B.getSpeed()!=0) && (Motor.C.getSpeed()!=0))
