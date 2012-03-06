@@ -4,15 +4,6 @@ import time, operator, cv, os, sys, json, colorsys, OSC, socket
 from SimpleCV import *
 ##import numpy as np
 
-imagecapture = "mplayer"
-#imagecapture = "staticfile"
-imagecapture = "camera"
-
-folder = "/tmp/sdp_group3_capture3/"
-
-room = "small"
-room = "big"
-
 if len(sys.argv) == 1:
     host = 'localhost'
 else:
@@ -21,8 +12,8 @@ else:
 c = OSC.OSCClient()
 c.connect( ( host, 5500 ) )
 
-table_width = 243.84
-table_height = 121.92
+table_width = 130
+table_height = 80
 
 mask_switch = 0
 
@@ -30,6 +21,17 @@ color_default_value = 100
 color_default_value_hue = 30
 
 savevalues = ['th_blue','th_yellow','th_red','min_blue','min_yellow','min_red','cropl','cropt','cropr','cropb','color_blue_hue','color_blue_sat','color_blue_val','color_yellow_hue','color_yellow_sat','color_yellow_val','color_red_hue','color_red_sat','color_red_val','avg_blue','avg_yellow','avg_red']
+
+
+vision_save_files = "/group/teaching/sdp/sdp3/secure/vision_save_files"
+if os.path.isdir( vision_save_files ):
+    imagecapture = "camera"
+else:
+    imagecapture = "staticfile"
+
+savefile = "cfg_" + socket.gethostname().split('.')[0] + ".txt"
+
+
 
 def save_state(savefile):
     f = open(savefile,'w')
@@ -46,15 +48,13 @@ def load_state(savefile):
         globals()[val] = json.loads(strval)
     f.close()
 
-
-savefile = "cfg_" + socket.gethostname().split('.')[0] + ".txt"
-
 if not os.path.isfile( savefile ):
     load_state("cfg.txt")
     save_state(savefile)
 else:
     load_state(savefile)
 
+## GUI stuff
 
 def control_th_blue(th):
     global th_blue
@@ -178,22 +178,6 @@ def avg_colors(colors):
         return 0
     return [i / count for i in new]
 
-
-def get_last_frame(folder, previousfile):
- 
-    while True:
-        if os.path.isfile( folder + "%08d.png" % (previousfile) ):
-            previousfile += 1
-        else:
-            return previousfile - 2
-
-
-
-       #frame = len(files)-1
-    #if os.path.isfile( folder + "%08d.png" % (frame-100) ):
-        #os.remove ( folder + "%08d.png" % (frame-100) )
-    #return folder + "%08d.png" % frame
-
 def initialize_color_stacks():
     global blue, yellow, red
 
@@ -206,8 +190,10 @@ def initialize_color_stacks():
         yellow.append(0)
         red.append(0)
 
-def save_values():
-    True
+def get_direction_from_blob( blob ):
+    center = blob.centroid()
+    sorted_points = sorted( blob.mConvexHull, key=lambda point: spsd.euclidean(center, point), reverse = True )
+    return np.subtract( sorted_points[0], center )
 
 
 cv.NamedWindow("control")
@@ -243,30 +229,15 @@ cv.CreateTrackbar( "red sat", "ctr_red", color_red_sat, 2*color_default_value, c
 cv.CreateTrackbar( "red val", "ctr_red", color_red_val, 2*color_default_value, control_color_red_val )
 
 
-## Mplayer input
-if imagecapture == "mplayer":
-    frame = 3
-    frame = get_last_frame(folder, frame)
-    #print frame
-    file = folder + "%08d.png" % (frame)
-    img = Image(file)
-
 ## Static file input
-elif imagecapture == "staticfile":
-    #file = "shot0001.png"
-    #file = "00012345.jpg"
-    file = "debug.jpg"
+if imagecapture == "staticfile":
+    file = "shot0002.png"
     img = Image(file)
 
 ## Camera input
 elif imagecapture == "camera":
-    cam = Camera()
+    cam = Camera(prop_set = {"width": 768, "height": 576})
     img = cam.getImage()
-
-
-
-
-
 
 ## Start processing
 
@@ -293,7 +264,6 @@ finalTime = 1
 
 
 
-
 ## BIG LOOP
 
 while not display.isDone():
@@ -317,55 +287,24 @@ while not display.isDone():
 
     if keyinput[pg.K_f] and not frozen:
         frozen = True
+        if imagecapture == "camera":
+            frozen_cam = cam.getImage()
         index = 1
         mode = "null"
 
 ## Live feed
 
-    if imagecapture == "mplayer" and not frozen:
-        frame = get_last_frame(folder, frame)
-        #print frame
-        file = folder + "%08d.png" % (frame)
-        img = Image(file)
-        os.remove( folder + "%08d.png" % (frame-1) )
+    if imagecapture == "camera":
+        if not frozen:
+            img = cam.getImage()
+        else:
+            img = frozen_cam
 
-    elif imagecapture == "camera":
-        img = cam.getImage()
-
-    else:
+    if imagecapture == "staticfile":
         img = Image(file)
-    
-    
+
+
     img = img.crop( x=int( cropl ), y=int( cropt ), w=int( img.width-cropl-cropr ), h=int( img.height-cropb-cropt ) )
-    #print (img.width, img.height)
-
-    #x = int( cropl )
-    #y = int( cropt )
-    #w = int( img.width-cropl-cropr )
-    #h = int( img.height-cropb-cropt )
-    
-    #x = 38
-    #y = 95
-    #w = 648
-    #h = 392
-
-    #rectangle = (x, y, w, h)
-    #print rectangle
-
-    #img_cv = cv.CreateImage( ( img.width, img.height ), cv.IPL_DEPTH_8U, 3 )
-    #cv.Copy( img.getBitmap(), img_cv )
-   
-    #cropped = cv.CreateImage((w, h), cv.IPL_DEPTH_8U, 3)
-    #cv.SetImageROI( img_cv, rectangle )
-    #cv.Copy( img_cv, cropped )
-    #img = Image(cropped)
-    
-    #cropped = cv.CreateImage((w, h), cv.IPL_DEPTH_8U, 3)
-    #cv.SetImageROI( img.getBitmap(), rectangle )
-    #cv.Copy( img.getBitmap(), cropped )
-    #cv.ResetImageROI( img.getBitmap() )
-    #img = Image(cropped)
-
     dl = DrawingLayer( ( img.width, img.height ) )
 
 
@@ -412,14 +351,14 @@ while not display.isDone():
             cv.SetTrackbarPos(mode + " hue", "ctr_" + mode, color_default_value_hue )
             cv.SetTrackbarPos(mode + " sat", "ctr_" + mode, color_default_value )
             cv.SetTrackbarPos(mode + " val", "ctr_" + mode, color_default_value )
-      
+
 
 ## Clean red point
 
         red[3] = 0
         red[4] = 0
 
-## Dray points on screen and calculating the average colors
+## Draw points on screen and calculating the average colors
 
         bluecolors = []
         yellowcolors = []
@@ -460,8 +399,6 @@ while not display.isDone():
     mask_yellow = img.colorDistance(color=mod_yellow).binarize(th_yellow)
     mask_red = img.colorDistance(color=mod_red).binarize(th_red)
 
-    #mask_blue=mask_yellow=mask_red=img
-
     bm = BlobMaker()
 
     blobs_blue = bm.extractFromBinary(mask_blue,mask_blue,minsize=min_blue)
@@ -473,11 +410,11 @@ while not display.isDone():
     blobs_red = sorted( blobs_red, key=lambda k: k.area(), reverse = True )
 
 
-## Start OSC stuff
 
 
+## Start OSC
     bundle = OSC.OSCBundle()
-    bundle.append( {'addr':"/table/room", 'args':["big"]} )
+    #bundle.append( {'addr':"/table/room", 'args':["big"]} )
 
 
     if len(blobs_blue) == 0:
@@ -486,14 +423,19 @@ while not display.isDone():
     else:
         blue_visible = True
         bundle.append( {'addr':"/table/blue/visible", 'args':[1]} )
-        
+
         blob_blue = blobs_blue[0]
         bundle.append( {'addr':"/table/blue/posx", 'args':[blob_blue.centroid()[0]*table_width/img.width] } )
         bundle.append( {'addr':"/table/blue/posy", 'args':[blob_blue.centroid()[1]*table_height/img.height] } )
-        
-        blob_blue.drawOutline(color = Color.BLUE, layer=dl,width=2)
-        dl.circle((int(blob_blue.centroid()[0]),int(blob_blue.centroid()[1])),30,Color.BLUE,width=3)
 
+        blob_blue.drawOutline(color = Color.BLUE, layer=dl,width=2)
+        #blob_blue.drawHull(color = Color.BLUE, layer=dl,width=2)
+        dl.circle((int(blob_blue.centroid()[0]),int(blob_blue.centroid()[1])),30,Color.BLUE,width=3)
+        blue_direction =  get_direction_from_blob( blob_blue )
+        arrow_blue = dl.line( blob_blue.centroid(), np.add( blob_blue.centroid(), blue_direction ), color = Color.YELLOW, width = 3 )
+
+        bundle.append( {'addr':"/table/blue/dirx", 'args':[ blue_direction[0]/np.linalg.norm(blue_direction) ] } )
+        bundle.append( {'addr':"/table/blue/diry", 'args':[ blue_direction[1]/np.linalg.norm(blue_direction) ] } )
 
 
     if len(blobs_yellow) == 0:
@@ -502,14 +444,20 @@ while not display.isDone():
     else:
         yellow_visible = True
         bundle.append( {'addr':"/table/yellow/visible", 'args':[1]} )
-        
+
         blob_yellow = blobs_yellow[0]
         bundle.append( {'addr':"/table/yellow/posx", 'args':[blob_yellow.centroid()[0]*table_width/img.width] } )
         bundle.append( {'addr':"/table/yellow/posy", 'args':[blob_yellow.centroid()[1]*table_height/img.height] } )
-        
+
         blob_yellow.drawOutline(color = Color.YELLOW, layer=dl,width=2)
+        #blob_yellow.drawHull(color = Color.YELLOW, layer=dl,width=2)
         dl.circle((int(blob_yellow.centroid()[0]),int(blob_yellow.centroid()[1])),30,Color.YELLOW,width=3)
 
+        yellow_direction =  get_direction_from_blob( blob_yellow )
+        arrow_yellow = dl.line( blob_yellow.centroid(), np.add( blob_yellow.centroid(), yellow_direction ), color = Color.BLUE, width = 3 )
+
+        bundle.append( {'addr':"/table/yellow/dirx", 'args':[ yellow_direction[0]/np.linalg.norm(yellow_direction) ] } )
+        bundle.append( {'addr':"/table/yellow/diry", 'args':[ yellow_direction[1]/np.linalg.norm(yellow_direction) ] } )
 
 
     if len(blobs_red) == 0:
@@ -518,25 +466,21 @@ while not display.isDone():
     else:
         red_visible = True
         bundle.append( {'addr':"/table/red/visible", 'args':[1]} )
-        
+
         blob_red = blobs_red[0]
         bundle.append( {'addr':"/table/red/posx", 'args':[blob_red.centroid()[0]*table_width/img.width] } )
         bundle.append( {'addr':"/table/red/posy", 'args':[blob_red.centroid()[1]*table_height/img.height] } )
-        
+
         blob_red.drawOutline(color = Color.RED, layer=dl,width=2)
         dl.circle((int(blob_red.centroid()[0]),int(blob_red.centroid()[1])),30,Color.RED,width=3)
+
 
     try:
         c.send(bundle,timeout=None)
     except OSC.OSCClientError,e:
         print str(count) + " error",e
 
-
-
-##c.send(bundle)
-    
-
-## End OSC stuff
+## End OSC
 
 
 
@@ -556,6 +500,8 @@ while not display.isDone():
 ## Applying overlays to the main channel
 
     out.addDrawingLayer(dl)
+    if finalTime == 0:
+        finaltTime = 1
     out.dl().ezViewText("FPS %0.1f" % (1/finalTime), (0,0))
     if frozen:
         out.dl().ezViewText("frozen", (80,0))
@@ -568,6 +514,7 @@ while not display.isDone():
 ##    dl.rectangle( (540,0),(20,20), mod_red, filled=True )
 
     out_overlay = out.applyLayers()
+    #out_overlay.save("out.jpg")
 
     display.writeFrame(out_overlay)
 
