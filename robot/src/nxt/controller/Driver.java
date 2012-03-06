@@ -32,16 +32,10 @@ public class Driver implements ConnectionInterface
 		// Thread to handle wheel feedback
 		response = new Thread(new Runnable(){
 
-			// Keeps track of current time
-			private long timer;
-			private int leftTachoCount;
-			private int rightTachoCount;
-			
 			public void run(){
 				// TachoCount is the number of degrees wheel has rotated
 				Motor.B.resetTachoCount();
 				Motor.C.resetTachoCount();
-				timer = System.currentTimeMillis();
 				while(!Thread.interrupted()){
 					// Wait ~100ms
 					try{
@@ -50,26 +44,21 @@ public class Driver implements ConnectionInterface
 					catch (Exception e)
 					{
 					}
-					// Get number of seconds that have passed by
-					double dt = (System.currentTimeMillis() - timer)/1000.0;
-					// Convert TachoCount to degrees rotated per second
-					int leftRotPerSec = (int)((double)(Motor.B.getTachoCount() - leftTachoCount)/(dt*9.0));
-					int rightRotPerSec =  (int)((double)(Motor.C.getTachoCount() - rightTachoCount)/(dt*9.0));
+					
 					// Update counters
-					leftTachoCount = Motor.B.getTachoCount();
-					rightTachoCount = Motor.C.getTachoCount();
-					timer = System.currentTimeMillis();
+					int leftTachoCount = Motor.B.getTachoCount();
+					int rightTachoCount = Motor.C.getTachoCount();
+
 					// Send message
-					
-					if (Math.abs(leftRotPerSec) > 2 && Math.abs(rightRotPerSec) > 2)
+					if ((Motor.B.getSpeed()!=0) && (Motor.C.getSpeed()!=0))
 					{
-						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, leftRotPerSec, rightRotPerSec));
+						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, leftTachoCount, rightTachoCount));
 					}
-					
+					Motor.B.resetTachoCount();
+					Motor.C.resetTachoCount();
 				}
 			}
 		});
-		// Start thread
 		response.start();
 	}
 	

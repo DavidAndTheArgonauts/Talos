@@ -47,7 +47,9 @@ public class Commander implements RobotCallback
 	*/
 	public static final int SLOW = 15;
 	
-	private int lWheelSpeed = 0, rWheelSpeed = 0, lWheelSetSpeed = 0, rWheelSetSpeed = 0;
+	private long lRevCount = 0, rRevCount = 0, wheelUpdateTime = -1;
+	private double lWheelSpeed = 0, rWheelSpeed = 0;
+	private int lWheelSetSpeed = 0, rWheelSetSpeed = 0;
 	private boolean lSensorTouched = false, rSensorTouched = false;
 	private int lTouchCount = 0, rTouchCount = 0;
 	
@@ -374,17 +376,17 @@ public class Commander implements RobotCallback
 	/**
 	 * @return The actual left wheel speed
 	*/
-	public int getLeftWheelSpeed()
+	public long getLeftRevolution()
 	{
-		return lWheelSpeed;
+		return lRevCount;
 	}
 	
 	/**
 	 * @return The actual right wheel speed
 	*/
-	public int getRightWheelSpeed()
+	public long getRightRevolution()
 	{
-		return rWheelSpeed;
+		return rRevCount;
 	}
 	
 	/**
@@ -402,6 +404,16 @@ public class Commander implements RobotCallback
 	{
 		return rTouchCount;
 	}
+
+	public double getLeftSpeed()
+	{
+		return lWheelSpeed;
+	}
+	
+	public double getRightSpeed()
+	{
+		return rWheelSpeed;
+	}
 	
 	/**
 	 * Blocks until the queue is empty
@@ -416,15 +428,26 @@ public class Commander implements RobotCallback
 		
 		switch (response.getOpcode())
 		{
+			// Updates the number of revolutions each wheel has travelled
 			case Opcodes.WHEEL_FEEDBACK:
 				
-				int[] speeds = response.getArguments(2);
-				
-				lWheelSpeed = speeds[0];
-				rWheelSpeed = speeds[1];
+				int[] tachoCount = response.getArguments(2);
+
+				if (wheelUpdateTime != -1)
+				{
+					long dt = System.currentTimeMillis() - wheelUpdateTime;
+					lWheelSpeed = tachoCount[0]/(int)dt;
+					rWheelSpeed = tachoCount[1]/(int)dt;
+				}
+
+				lRevCount += tachoCount[0];
+				rRevCount += tachoCount[1];
+
+				wheelUpdateTime = System.currentTimeMillis();
 				
 				break;
 				
+			// Updates sensor state
 			case Opcodes.SENSOR_TOUCHED:
 			
 				int[] states = response.getArguments(2);
