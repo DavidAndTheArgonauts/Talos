@@ -1,16 +1,7 @@
-# Vision
+### Vision
 
-## Start
+Spending my time on development rather then on Git. Latest version is in this dir:
 
-Always open a terminal and start from there.
-You can either start using:
-
-	./vision.py [hostname]
+	/group/teaching/sdp/sdp3/secure/vision_new
 	
-or
-
-	./inf-vision.sh [hostname]
-	
-	
-The latter will start vision in an infinite loop, terminating only if you X the terminal window. It is needed because of a bug in SimpleCV.
-
+http://amplicate.com/hate/git?sort=featured
