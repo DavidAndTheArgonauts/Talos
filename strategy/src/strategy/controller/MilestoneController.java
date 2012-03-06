@@ -7,7 +7,7 @@ import java.lang.reflect.Constructor;
 
 import java.io.*;
 
-public class MilestoneController extends Thread
+public class MilestoneController extends AbstractController
 {
 	
 	private static final int CONTROL_TIMEOUT = 1000;
@@ -103,8 +103,10 @@ public class MilestoneController extends Thread
 		System.out.println("World data found!");
 		
 		// create controller thread and begin
-		Thread gcThread = new MilestoneController(w,c, reflectMode);
+		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
 		gcThread.start();
+		
+		c.registerController(gcThread);
 		
 		System.out.println("Press <enter> to quit");
 		
@@ -159,7 +161,34 @@ public class MilestoneController extends Thread
 		currentMode.reset(world);
 		while (!Thread.interrupted())
 		{
-
+			
+			if (currentMode != null && controllerInterrupted())
+			{
+				
+				if (isQuitInterrupt())
+				{
+					return;
+				}
+				
+				int interrupt = getControllerInterrupt();
+				 
+				currentMode.handleInterrupt(world,interrupt);
+				 
+			}
+			else if (controllerInterrupted())
+			{
+				
+				
+				
+				if (isQuitInterrupt())
+				{
+					return;
+				}
+				
+				int interrupt = getControllerInterrupt();
+				
+			}
+			
 			// update
 			currentMode.update(world);
 			
@@ -168,12 +197,19 @@ public class MilestoneController extends Thread
 			{
 				
 				// we could block forever if we have been given the kill command
-				if (Thread.interrupted())
+				if (controllerInterrupted())
 				{
-					return;
+					 
+					 if (isQuitInterrupt())
+					 {
+					 	return;
+					 }
+					 
+					 int interrupt = getControllerInterrupt();
+					 
+					 currentMode.handleInterrupt(world,interrupt);
+					 
 				}
-				
-				Thread.yield();
 				
 			}
 			

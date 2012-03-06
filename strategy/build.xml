@@ -9,6 +9,7 @@
 	<property name="strategy.cmd.cmdline" value="strategy.controller.CommandLine" />
 	<property name="strategy.cmd.zplan" value="strategy.controller.ZPlan" />
 	<property name="strategy.cmd.game" value="strategy.controller.GameController" />
+	<property name="strategy.cmd.mode" value="strategy.controller.MilestoneController" />
 	
 	<target name="clean">
 		
@@ -49,6 +50,20 @@
 			<arg value="9899" />
 			<arg value="5500" />
 			<arg value="yellow" />
+		</java>
+		
+	</target>
+	
+	<target name="mode" depends="build">
+		
+		<input message="Please enter mode:" addproperty="talos.mode" />
+		
+		<java fork="true" classname="${strategy.cmd.mode}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
+			<arg value="localhost" />
+			<arg value="9899" />
+			<arg value="5500" />
+			<arg value="yellow" />
+			<arg value="${talos.mode}" />
 		</java>
 		
 	</target>
