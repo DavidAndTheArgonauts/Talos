@@ -63,12 +63,13 @@ public class MilestoneController extends AbstractController
 		
 		System.out.println("Connected to proxy");
 		AbstractMode reflectMode = null;
+		Class cls;
 		
 		try {
 			//reflectmode = Class.forName
 			//reflectMode = Constructor.forName(args[4]).newInstance(c);
-			
-			Constructor[] ctors = AbstractMode.class.getDeclaredConstructors();
+			cls = Class.forName("strategy.mode." + args[4]);
+			Constructor[] ctors = cls.getDeclaredConstructors();
 			Constructor ctor = null;
 			for (int i = 0; i < ctors.length; i++) {
 				ctor = ctors[i];
@@ -76,11 +77,15 @@ public class MilestoneController extends AbstractController
 				break;
 			}
 			
+			ctor = cls.getDeclaredConstructor(Commander.class);
+			
 			ctor.setAccessible(true);
+			//reflectMode = new OffensiveMode(c);
  	    	reflectMode = (AbstractMode)ctor.newInstance(c);
 	
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("HELLLO");
 		}
 		
 		// create world and listen for vision
