@@ -77,17 +77,26 @@ public class Driver implements ConnectionInterface
 			int rightSpeed = (int)(Driver.args[1]*0.01*900);
 			Motor.B.setSpeed(leftSpeed);
 			Motor.C.setSpeed(rightSpeed);
-
+		
 			// Check if motors are meant to go forwards or backwards
 			if (leftSpeed < 0){
 				Motor.B.forward();
+			} 	
+			else if (leftSpeed == 0)
+			{
+				Motor.B.stop();
 			} else {
 				Motor.B.backward();
 			}
 			
 			if (rightSpeed < 0){
 				Motor.C.forward();
-			} else {
+			} 	
+			else if (rightSpeed == 0)
+			{
+				Motor.C.stop();
+			}
+			else {
 				Motor.C.backward();
 			}
 			
