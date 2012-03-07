@@ -182,7 +182,7 @@ public class MilestoneController extends AbstractController
 	{
 			
 		long lastChange = -1, lastUpdate = -1;
-		currentMode.reset(world);
+		
 		while (true)
 		{
 			

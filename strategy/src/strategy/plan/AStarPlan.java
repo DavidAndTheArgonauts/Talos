@@ -11,8 +11,8 @@ public class AStarPlan extends AbstractPlan
 {
 	
 	// number of cells in each direction
-	private static final int CELLS_X = 26;
-	private static final int CELLS_Y = 14;
+	private static final int CELLS_X = 52;
+	private static final int CELLS_Y = 28;
 	
 	private double targetX, targetY;
 	
@@ -88,7 +88,7 @@ public class AStarPlan extends AbstractPlan
 			{
 				
 				coord = closedList.get(i).getCell();
-				thisEuclid = ShootPlan.euclDistance(coord[0],coord[1],gCoord[0],gCoord[1]);
+				thisEuclid = euclDistance(coord[0],coord[1],gCoord[0],gCoord[1]);
 				
 				if (cell == null || thisEuclid < euclid)
 				{
@@ -290,13 +290,20 @@ public class AStarPlan extends AbstractPlan
 		double robotX = state.getEnemyX(world.getColor()),
 			robotY = state.getEnemyY(world.getColor());
 		
-		if ((state.getEnemyVisible(world.getColor())) && (Math.abs(worldX - robotX) < 15 && Math.abs(worldY - robotY) < 15))
+		if ((state.getEnemyVisible(world.getColor())) && (Math.abs(worldX - robotX) < 20 && Math.abs(worldY - robotY) < 20))
 		{
 			System.out.println("(" + x + "," + y + ") is enemy robot");
 			return -1;
 		}
 		
-		return parent.getG() + 1;
+		int[] pCoords = parent.getCell();
+		
+		if (x != pCoords[0] && y != pCoords[1])
+		{
+			return parent.getG() + 14;
+		}
+		
+		return parent.getG() + 10;
 		
 	}
 	
@@ -469,6 +476,12 @@ public class AStarPlan extends AbstractPlan
 		}
 		return false;
 		
+	}
+	
+	public static double euclDistance(double Ax, double Ay, double Bx, double By){
+		double x = Math.pow(Ax-Bx, 2);
+		double y = Math.pow(Ay-By, 2);
+		return (Math.sqrt(x+y));
 	}
 	
 }
