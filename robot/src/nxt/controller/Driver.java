@@ -20,7 +20,9 @@ public class Driver implements ConnectionInterface
 	private Object lock = new Object();
 
 	private Thread response;
-
+	
+	private int lSpeed = 0, rSpeed = 0;
+	
 	/**
 	* @param(connection): passes the connection from Connection class to receive and send messages
 	*/
@@ -33,15 +35,14 @@ public class Driver implements ConnectionInterface
 		response = new Thread(new Runnable(){
 
 			// Keeps track of current time
-			private long timer;
-			private int leftTachoCount;
-			private int rightTachoCount;
+			//private long timer;
+			private int leftTachoCount = 0, rightTachoCount = 0;
 
 			public void run(){
 				// TachoCount is the number of degrees wheel has rotated
 				Motor.B.resetTachoCount();
 				Motor.C.resetTachoCount();
-				timer = System.currentTimeMillis();
+				//timer = System.currentTimeMillis();
 				while(!Thread.interrupted()){
 					// Wait ~100ms
 					try{
@@ -51,21 +52,24 @@ public class Driver implements ConnectionInterface
 					{
 					}
 					// Get number of seconds that have passed by
-					double dt = (System.currentTimeMillis() - timer)/1000.0;
+					//double dt = (System.currentTimeMillis() - timer)/1000.0;
 					// Convert TachoCount to degrees rotated per second
-					int leftRotPerSec = (int)((double)(Motor.B.getTachoCount() - leftTachoCount)/(dt*9.0));
-					int rightRotPerSec =  (int)((double)(Motor.C.getTachoCount() - rightTachoCount)/(dt*9.0));
+					//int leftRotPerSec = (int)((double)(Motor.B.getTachoCount() - leftTachoCount)/(dt*9.0));
+					//int rightRotPerSec =  (int)((double)(Motor.C.getTachoCount() - rightTachoCount)/(dt*9.0));
 					// Update counters
-					leftTachoCount = Motor.B.getTachoCount();
-					rightTachoCount = Motor.C.getTachoCount();
-					timer = System.currentTimeMillis();
+					int lTC = Motor.B.getTachoCount();
+					int rTC = Motor.C.getTachoCount();
+					//timer = System.currentTimeMillis();
 					// Send message
-
-					if (Math.abs(leftRotPerSec) > 2 && Math.abs(rightRotPerSec) > 2)
+					
+					if (lSpeed != 0 || rSpeed != 0)
 					{
-						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, leftRotPerSec, rightRotPerSec));
+						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, -1 * (lTC - leftTachoCount), -1 * (rTC - rightTachoCount)));
 					}
-
+					
+					leftTachoCount = lTC;
+					rightTachoCount = rTC;
+					
 				}
 			}
 		});
@@ -88,7 +92,10 @@ public class Driver implements ConnectionInterface
 			int rightSpeed = (int)(Driver.args[1]*0.01*900);
 			Motor.B.setSpeed(leftSpeed);
 			Motor.C.setSpeed(rightSpeed);
-
+			
+			lSpeed = leftSpeed;
+			rSpeed = rightSpeed;
+			
 			// Check if motors are meant to go forwards or backwards
 			if (leftSpeed < 0){
 				Motor.B.forward();
