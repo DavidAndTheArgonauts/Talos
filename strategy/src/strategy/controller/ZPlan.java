@@ -34,7 +34,7 @@ public class ZPlan
 		this.color = color;
 		
 		c = new Commander();
-		w = new World(color);
+		w = new World(color,World.GOAL_LEFT);
 		
 		do
 		{

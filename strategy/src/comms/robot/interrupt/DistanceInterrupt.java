@@ -37,12 +37,19 @@ public class DistanceInterrupt extends AbstractInterrupt
 			rWheelDiff += commander.getRightSpeed() * timeDiff;
 		}
 		
-		double maxDistCovered = Math.max(((double)lWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER, ((double)rWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER);
-		
-		//System.out.println("maxDistCovered = " + maxDistCovered + " (l = " + lWheelDiff + ", r  = " + rWheelDiff + ")");
+		double maxDistCovered = 0;
+		if (value > 0)
+		{
+			maxDistCovered = Math.max(((double)lWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER, ((double)rWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER);
+		}
+		else
+		{
+			maxDistCovered = Math.min(((double)lWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER, ((double)rWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER);
+		}
 		
 		if ((value > 0 && maxDistCovered >= value) || (value < 0 && maxDistCovered <= value))
 		{
+			System.out.println("maxDistCovered = " + maxDistCovered + " (l = " + lWheelDiff + ", r  = " + rWheelDiff + ")");
 			return true;
 		}
 		

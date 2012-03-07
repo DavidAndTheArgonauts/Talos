@@ -20,12 +20,15 @@ public class AStarPlan extends AbstractPlan
 	private ArrayList<Cell> 	openList = new ArrayList<Cell>(),
 						closedList = new ArrayList<Cell>();
 	
-	public AStarPlan(Commander commander, World world, double targetX, double targetY)
+	private boolean nearestCell;
+	
+	public AStarPlan(Commander commander, World world, double targetX, double targetY, boolean nearestCell)
 	{
 		
 		super(commander,world);
 		this.targetX = targetX;
 		this.targetY = targetY;
+		this.nearestCell = nearestCell;
 		
 	}	
 	
@@ -50,14 +53,14 @@ public class AStarPlan extends AbstractPlan
 		
 		openList.add(ourCell);
 		
-		if (calculateG(goalCell,ourCell) == -1)
+		if (calculateG(goalCell,ourCell) == -1 && !nearestCell)
 		{
 			System.out.println("Goal cell unobtainable");
 			return new AbstractMode[0];
 		}
 		
 		Cell cheapestCell;
-		while(!cellInList(goalCell,closedList) && !openList.isEmpty())
+		while((nearestCell || !cellInList(goalCell,closedList)) && !openList.isEmpty())
 		{
 			
 			// get cheapest cell
@@ -74,7 +77,31 @@ public class AStarPlan extends AbstractPlan
 			
 		}
 		
-		if (openList.isEmpty())
+		// if we didn't find the goal cell select the nearest
+		if (nearestCell && !cellInList(goalCell,closedList))
+		{
+			
+			double euclid = -1, thisEuclid;
+			Cell cell = null;
+			int[] gCoord = goalCell.getCell(), coord;
+			for (int i = 0; i < closedList.size(); i++)
+			{
+				
+				coord = closedList.get(i).getCell();
+				thisEuclid = ShootPlan.euclDistance(coord[0],coord[1],gCoord[0],gCoord[1]);
+				
+				if (cell == null || thisEuclid < euclid)
+				{
+					cell = closedList.get(i);
+					euclid = thisEuclid;
+				}
+				
+			}
+			
+			goalCell = cell;
+			
+		}
+		else if (!nearestCell && !cellInList(goalCell,closedList))
 		{
 			System.out.println("Open list empty");
 			return new AbstractMode[0];
@@ -150,6 +177,11 @@ public class AStarPlan extends AbstractPlan
 	
 	private int getDirection(Cell a, Cell b)
 	{
+		
+		if (a == null || b == null)
+		{
+			return -1;
+		}
 		
 		int[] ac = a.getCell(),
 			bc = b.getCell();
@@ -249,7 +281,7 @@ public class AStarPlan extends AbstractPlan
 			worldY = (y * cellHeight) + (cellHeight / 2);
 		
 		// robot & ball
-		if (Math.abs(worldX - state.getBallX()) < 10 && Math.abs(worldY - state.getBallY()) < 10)
+		if ((state.getBallVisible()) && (Math.abs(worldX - state.getBallX()) < 10 && Math.abs(worldY - state.getBallY()) < 10))
 		{
 			System.out.println("(" + worldX + "," + worldY + ") is on ball (ball at [" + state.getBallX() + "," + state.getBallY() + "]");
 			return -1;
@@ -258,7 +290,7 @@ public class AStarPlan extends AbstractPlan
 		double robotX = state.getEnemyX(world.getColor()),
 			robotY = state.getEnemyY(world.getColor());
 		
-		if (Math.abs(worldX - robotX) < 15 && Math.abs(worldY - robotY) < 15)
+		if ((state.getEnemyVisible(world.getColor())) && (Math.abs(worldX - robotX) < 15 && Math.abs(worldY - robotY) < 15))
 		{
 			System.out.println("(" + x + "," + y + ") is enemy robot");
 			return -1;
@@ -422,6 +454,11 @@ public class AStarPlan extends AbstractPlan
 	
 	public boolean cellEquals(Cell a, Cell b)
 	{
+		
+		if (a == null || b == null)
+		{
+			return false;
+		}
 		
 		int[] ac = a.getCell(),
 			bc = b.getCell();

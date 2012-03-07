@@ -10,7 +10,7 @@ public class DriveMode extends AbstractMode
 
 	private double targetX, targetY;
 	private boolean complete = false;
-	private int maxSpeed = 20;
+	private int maxSpeed = 40;
 	private int speed = 0;
 	
 	public DriveMode(Commander commander, double targetX, double targetY)
@@ -87,11 +87,11 @@ public class DriveMode extends AbstractMode
 
 		if (this.speed < maxSpeed)
 		{
-			this.speed += 2;
+			this.speed += 5;
 			speed = this.speed;
 		}
 		
-		if (dist < 10)
+		if (dist < 5)
 		{
 			speed = 1;
 			speedDiff = 0;

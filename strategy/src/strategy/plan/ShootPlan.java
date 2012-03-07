@@ -14,7 +14,7 @@ public class ShootPlan extends AbstractPlan
 	{
 		super(commander,world);
 	}
-
+	
 	public AbstractMode[] plan()
 	{
 
@@ -23,75 +23,84 @@ public class ShootPlan extends AbstractPlan
 		System.out.println("Ball coord: (" + (int)state.getBallX() + "," + (int)state.getBallY() + ")");
 		System.out.println("Enemy coord: (" + (int)state.getEnemyX(world.getColor()) + "," + (int)state.getEnemyY(world.getColor()) + ")");
 
-		Point wayPoint;
-
-		// If the ball is nearer the goal than the robot
-		if (euclDistance(state.getRobotX(world.getColor()),state.getRobotY(world.getColor()),0,40)>
-		euclDistance(state.getBallX(),state.getBallY(),130,40)){
-			System.out.println("Ball is nearer the goal than the robot");
-			wayPoint = calculateWaypoint(state.getRobotX(world.getColor()), 
-					state.getRobotY(world.getColor()), 
-					state.getBallX(), 
-					state.getBallY(),
-					state.getEnemyX(world.getColor()),
-					state.getEnemyY(world.getColor()));
-
-		} else {
-
-			// If the robot is nearer the goal than the ball
-			System.out.println("Robot is nearer the goal than the ball");
-			if (state.getBallY()<40){
-				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())+25);
-			} else {
-				wayPoint = new Point((int)Math.round(state.getBallX()), (int)Math.round(state.getBallY())-25);
-			}
+		double[] goalCoords = world.getGoalCoords();
+		
+		Point p = calculateDestination(state.getBallX(),state.getBallY(),goalCoords[0],goalCoords[1],16);
+		
+		boolean finalArc = false;
+		
+		if (p.getY() < 10)
+		{
+			p.setLocation(p.getX(), 10);
+			finalArc = true;
 		}
-
-		Point p = calculateDestination(state.getBallX(),state.getBallY(),0,40,20);
-		Point q = calculateDestination(state.getBallX(),state.getBallY(),0,40,8);
+		else if (p.getY() > 70)
+		{	
+			p.setLocation(p.getX(), 70);
+			finalArc = true;
+		}
 		
-		/*
-		AbstractMode avoidancePoint = new WaypointMode(commander, wayPoint.getX(), wayPoint.getY());
-		AbstractMode shootPoint = new WaypointMode(commander,p.getX(), p.getY());
-		AbstractMode ballPoint = new WaypointMode(commander,q.getX(), q.getY());
-		*/
-		
-		AStarPlan astarplan = new AStarPlan(commander,world,p.getX(),p.getY());
+		AStarPlan astarplan = new AStarPlan(commander,world,p.getX(),p.getY(), true);
 		AbstractMode[] aplan = astarplan.plan();
 		
-		AbstractMode ballFace = new TurnMode(commander, 0, 40);
-
-		AbstractMode[] planb = new AbstractMode[aplan.length+1];
+		AbstractMode[] planb = new AbstractMode[0];
+		
+		AbstractMode ballFace = new TurnMode(commander, state.getBallX(),state.getBallY());
+		
+		planb = new AbstractMode[aplan.length+1];
 		for (int i = 0; i < aplan.length; i++)
 		{
 			planb[i] = aplan[i];
 		}
 		planb[planb.length-1] = ballFace;
+		
+		if (finalArc)
+		{
+			
+			System.out.println("ARC PLANNED");
+			
+			double[] gCoords = world.getGoalCoords();
+			
+			double ballY = gCoords[1],
+					robotY = state.getBallY(),
+					ballX = gCoords[0],
+					robotX = state.getBallX();
+			
+			double gradient = (ballY-robotY)/(ballX-robotX);
 
-		/*
-		AbstractMode avoidancePoint = new WaypointMode(commander, p.getX(), p.getY());
+			// Gets angle between robot and ball vector, and X axis
+			double angle = Math.atan2(robotY - ballY, robotX - ballX);
+			angle = Math.abs(angle);
 
-		System.out.println("First waypoint: (" + p.getX() + "," + p.getY() + ")");
+			if (gradient<0){
+				if(angle>(Math.PI/2))
+					angle = Math.PI-angle;
+			} else if (gradient>0){
+				if(angle>(Math.PI/2))
+					angle = Math.PI+angle;
+			}
 
-		p = calculateDestination(state.getBallX(), state.getBallY(), 130, 40, 5);
-
-		AbstractMode ballPoint = new WaypointMode(commander, p.getX(), p.getY());
-
-		System.out.println("Final waypoint: (" + p.getX() + "," + p.getY() + ")");
-		 */
-		/*
-		AbstractMode[] plan = {
-				avoidancePoint,
-				shootPoint,
-				ballPoint,
-				ballFace
-		};
-		*/
+			System.out.println("Angle DEGREES: " + Math.toDegrees(angle));
+			
+			if (Math.toDegrees(angle) > 180)
+				angle = (Math.PI * 2) - angle;
+			
+			AbstractMode arcmode = new ArcMode(commander, 40, Math.toDegrees(angle) * 0.75, 50);
+			
+			AbstractMode[] planc = new AbstractMode[planb.length+1];
+			for (int i = 0; i < aplan.length; i++)
+			{
+				planc[i] = planb[i];
+			}
+			planc[planc.length-1] = arcmode;
+			
+			planb = planc;
+			
+		}
 		
 		return planb;
 
 	}
-
 
 	/***
 	 * Calculates the waypoint to be in ideal shooting position from ball to goal

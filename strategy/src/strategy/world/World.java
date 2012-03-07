@@ -12,8 +12,8 @@ public class World
 	public static final int ROBOT_YELLOW = 0;
 	public static final int ROBOT_BLUE = 1;
 	
-	public static final double[] LEFT_GOAL_CENTER = { 0, 40 };
-	public static final double[] RIGHT_GOAL_CENTER = { 130, 40 };
+	public static final double[] GOAL_LEFT = { 0, 40 };
+	public static final double[] GOAL_RIGHT = { 130, 40 };
 	
 	public static final double WORLD_HEIGHT = 80, WORLD_WIDTH = 130;
 	
@@ -23,12 +23,13 @@ public class World
 	private boolean blueRobot = true;
 	private int updateCount = 0;
 	private int color;
-	
+	private double[] goal;
 
-	public World(int color) {
+	public World(int color, double[] goal) {
 		worldStates = new ArrayList<WorldState>();
 		partialState = new WorldState();
 		this.color = color;
+		this.goal = goal;
 	}
 		
 	/**
@@ -46,6 +47,11 @@ public class World
 	public int getColor()
 	{
 		return color;
+	}
+	
+	public double[] getGoalCoords()
+	{
+		return goal;
 	}
 	
 	/**

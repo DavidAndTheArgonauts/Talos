@@ -50,8 +50,8 @@ public class TurnMode extends AbstractMode
 			directionModifier = -1;
 		}
 		
-		int speed = (int)(((Math.abs(diff) / 180.0) * 15.0) + 1);
-		System.out.println("Speed = " + speed);
+		int speed = (int)(((Math.abs(diff) / 180.0) * 30.0) + 1);
+		//System.out.println("Speed = " + speed);
 		
 		commander.setSpeed(directionModifier * -1 * speed, directionModifier * speed);
 		

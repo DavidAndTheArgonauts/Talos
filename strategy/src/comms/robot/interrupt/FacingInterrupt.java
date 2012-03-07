@@ -27,7 +27,7 @@ public class FacingInterrupt extends AbstractInterrupt
 		// wheel diff
 		long lWheelDiff = commander.getLeftRevolution() - lWheelRev,
 			rWheelDiff = commander.getRightRevolution() - rWheelRev;
-		
+		/*
 		long wheelUpdateTime = commander.getWheelUpdateTime();
 		
 		if (wheelUpdateTime > 0)
@@ -38,11 +38,13 @@ public class FacingInterrupt extends AbstractInterrupt
 			rWheelDiff += commander.getRightSpeed() * timeDiff;
 		}
 		
+		*/
+		
 		double turnDiff = ((double)rWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER - ((double)lWheelDiff / 360.0) * Math.PI * Commander.WHEEL_DIAMETER;
 		
 		double angleTurned = Math.toDegrees(turnDiff / Commander.WHEEL_SEPARATION)/2.0;
 		
-		System.out.println("angle turned = " + angleTurned + "(lWheelDiff = " + lWheelDiff + ",rWheelDiff = " + rWheelDiff + ")");
+		//System.out.println("angle turned = " + angleTurned + " [value = " + value + "] (lWheelDiff = " + lWheelDiff + ",rWheelDiff = " + rWheelDiff + ")");
 		
 		if (value > 0 && angleTurned > value)
 		{

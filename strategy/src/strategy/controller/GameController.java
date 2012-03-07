@@ -59,7 +59,22 @@ public class GameController extends AbstractController
 		System.out.println("Connected to proxy");
 		
 		// create world and listen for vision
-		World w = new World(color);
+		double[] goal = new double[2];
+		
+		if (args[4].equals("right"))
+		{
+			goal = World.GOAL_RIGHT;
+		}
+		else if (args[4].equals("left"))
+		{
+			goal = World.GOAL_LEFT;
+		}
+		else
+		{
+			System.out.println("Enter a valid goal (left or right)");
+		}
+		
+		World w = new World(color, goal);
 		w.listenForVision(visionPort);
 		
 		// wait until world is giving real states

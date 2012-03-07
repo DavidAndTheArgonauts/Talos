@@ -31,7 +31,7 @@
 		
 	</target>
 	
-	<target name="cmd" depends="build">
+	<target name="cmd">
 		
 		<java fork="true" classname="${strategy.cmd.cmdline}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
 		
@@ -50,6 +50,7 @@
 			<arg value="9899" />
 			<arg value="5500" />
 			<arg value="yellow" />
+			<arg value="left" />
 		</java>
 		
 	</target>
@@ -57,6 +58,7 @@
 	<target name="mode" depends="build">
 		
 		<input message="Please enter mode:" addproperty="talos.mode" />
+		<input message="Please enter goal (left/right):" addproperty="talos.goal" />
 		
 		<java fork="true" classname="${strategy.cmd.mode}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
 			<arg value="localhost" />
@@ -64,6 +66,7 @@
 			<arg value="5500" />
 			<arg value="yellow" />
 			<arg value="${talos.mode}" />
+			<arg value="${talos.goal}" />
 		</java>
 		
 	</target>

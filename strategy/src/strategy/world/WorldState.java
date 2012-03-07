@@ -7,21 +7,21 @@ public class WorldState {
 	//Ball Data
 	private double ballX;
 	private double ballY;
-	private int ballVisible;
+	private boolean ballVisible;
 
 	//Blue Robot Data
 	private double blueX;
 	private double blueY;
 	private double blueDX;
 	private double blueDY;
-	private int blueVisible;
+	private boolean blueVisible;
 
 	//Yellow Robot Data
 	private double yellowX;
 	private double yellowY;
 	private double yellowDX;
 	private double yellowDY;
-	private int yellowVisible;
+	private boolean yellowVisible;
 	
 	//Special
 	private long created = -1;
@@ -44,7 +44,7 @@ public class WorldState {
 	}
 
 	public void setBallVisible(int vis) {
-		ballVisible = vis;
+		ballVisible = (vis != 0);
 	}
 	
 	//Blue Robot
@@ -65,7 +65,7 @@ public class WorldState {
 	}
 	
 	public void setBlueVisible(int vis) {
-		blueVisible = vis;
+		blueVisible = (vis != 0);
 	}
 
 	//Yellow Robot
@@ -86,7 +86,7 @@ public class WorldState {
 	}
 	
 	public void setYellowVisible(int vis) {
-		yellowVisible = vis;
+		yellowVisible = (vis != 0);
 	}
 
 	//Getters
@@ -213,6 +213,30 @@ public class WorldState {
 		}
 	}
 	
+	public boolean getEnemyVisible(int color)
+	{
+		if (color == World.ROBOT_YELLOW)
+		{
+			return getBlueVisible();
+		}
+		else
+		{
+			return getYellowVisible();
+		}
+	}
+	
+	public boolean getRobotVisible(int color)
+	{
+		if (color == World.ROBOT_BLUE)
+		{
+			return getBlueVisible();
+		}
+		else
+		{
+			return getYellowVisible();
+		}
+	}
+	
 	//Ball
 	public double getBallX() {
 		return ballX;
@@ -222,7 +246,7 @@ public class WorldState {
 		return ballY;
 	}
 
-	public int getBallVisible() {
+	public boolean getBallVisible() {
 		return ballVisible;
 	}
 	
@@ -243,7 +267,7 @@ public class WorldState {
 		return blueDY;
 	}
 	
-	public int getBlueVisible() {
+	public boolean getBlueVisible() {
 		return blueVisible;
 	}
 
@@ -268,7 +292,7 @@ public class WorldState {
 		return yellowDY;
 	}
 	
-	public int getYellowVisible() {
+	public boolean getYellowVisible() {
 		return yellowVisible;
 	}
 

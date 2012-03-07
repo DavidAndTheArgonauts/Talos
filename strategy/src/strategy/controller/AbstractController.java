@@ -21,10 +21,12 @@ public abstract class AbstractController extends Thread
 			interruptCode = code;
 			interruptId = id;
 			
+			System.out.println("Storing controller interrupt (code = " + code + ", id = " + id + ")");
+			
 			interrupt();
+			
+			return true;
 		}
-		
-		return true;
 		
 	}
 	
@@ -37,6 +39,9 @@ public abstract class AbstractController extends Thread
 			{
 				return false;
 			}
+			
+			System.out.println("Abstract controller found interrupt");
+			
 			return true;
 		}
 		

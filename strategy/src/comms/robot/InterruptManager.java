@@ -120,7 +120,19 @@ public class InterruptManager extends Thread
 						System.out.println("Interrupt manager - interrupt triggered (id = " + interrupt.getId() + ")");
 						
 						// interrupt controller
-						controller.controllerInterrupt(INTERRUPT_INTERRUPTED,interrupt.getId());
+						while (!controller.controllerInterrupt(INTERRUPT_INTERRUPTED,interrupt.getId()))
+						{
+							System.out.println("Retrying to send interrupt...");
+							
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (Exception e)
+							{
+								
+							}
+						}
 						
 					}
 					

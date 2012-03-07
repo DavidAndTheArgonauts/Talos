@@ -89,7 +89,22 @@ public class MilestoneController extends AbstractController
 		}
 		
 		// create world and listen for vision
-		World w = new World(color);
+		double[] goal = new double[2];
+		
+		if (args[5].equals("right"))
+		{
+			goal = World.GOAL_RIGHT;
+		}
+		else if (args[5].equals("left"))
+		{
+			goal = World.GOAL_LEFT;
+		}
+		else
+		{
+			System.out.println("Enter a valid goal (left or right)");
+		}
+		
+		World w = new World(color,goal);
 		w.listenForVision(visionPort);
 		
 		// wait until world is giving real states
@@ -111,7 +126,11 @@ public class MilestoneController extends AbstractController
 		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
 		gcThread.start();
 		
-		c.registerController(gcThread);
+		System.out.println("Registering controller");
+		if (!c.registerController(gcThread))
+		{
+			System.out.println("Unable to register controller");
+		}
 		
 		System.out.println("Press <enter> to quit");
 		
@@ -164,11 +183,13 @@ public class MilestoneController extends AbstractController
 			
 		long lastChange = -1, lastUpdate = -1;
 		currentMode.reset(world);
-		while (!Thread.interrupted())
+		while (true)
 		{
 			
 			if (currentMode != null && controllerInterrupted())
 			{
+				
+				System.out.println("Controller found interrupt");
 				
 				if (isQuitInterrupt())
 				{
@@ -180,16 +201,17 @@ public class MilestoneController extends AbstractController
 				currentMode.handleInterrupt(world,interrupt);
 				 
 			}
-			else if (controllerInterrupted())
+			else if (currentMode == null && controllerInterrupted())
 			{
 				
-				
+				System.out.println("Controller found interrupt");
 				
 				if (isQuitInterrupt())
 				{
 					return;
 				}
 				
+				// clear interrupt
 				int interrupt = getControllerInterrupt();
 				
 			}
@@ -204,6 +226,8 @@ public class MilestoneController extends AbstractController
 				// we could block forever if we have been given the kill command
 				if (controllerInterrupted())
 				{
+					 
+					 System.out.println("Controller found interrupt");
 					 
 					 if (isQuitInterrupt())
 					 {

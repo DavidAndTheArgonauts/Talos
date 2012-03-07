@@ -158,10 +158,30 @@ public class Commander implements RobotCallback
 	*/
 	public InterruptManager getInterruptManager()
 	{
+		if (interruptManager == null)
+		{
+			return null;
+		}
+		
 		if (interruptManager.isAlive())
 			return interruptManager;
 		else
 			return null;
+	}
+	
+	public boolean interruptManagerAvailable()
+	{
+		
+		if (interruptManager == null)
+		{
+			return false;
+		}
+		
+		if (interruptManager.isAlive())
+			return true;
+		else
+			return false;
+		
 	}
 	
 	/**
