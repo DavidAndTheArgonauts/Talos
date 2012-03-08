@@ -9,7 +9,7 @@ public class WaypointMode extends AbstractMode
 {
 	
 	private static final double TURN_TOLERENCE = 5;
-	private static final double DRIVE_TOLERENCE = 5;
+	private static final double DRIVE_TOLERENCE = 7;
 	
 	private static final int MODE_TURN = 0;
 	private static final int MODE_DRIVE = 1;

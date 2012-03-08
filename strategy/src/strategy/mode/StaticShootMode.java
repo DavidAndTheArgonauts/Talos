@@ -42,6 +42,8 @@ public class StaticShootMode extends AbstractMode
 		
 	}
 	
+	private int speed = 0;
+	
 	public void update(World world)
 	{
 		
@@ -57,6 +59,27 @@ public class StaticShootMode extends AbstractMode
 		
 		if (follower.complete())
 		{
+			
+			if (speed < 90) speed += 10;
+			
+			WorldState state = world.getWorldState();
+			double[] gCoord = world.getGoalCoords();
+			
+			double dist = AStarPlan.euclDistance(state.getRobotX(world.getColor()), state.getRobotY(world.getColor()), gCoord[0], gCoord[1]);
+			
+			double angle = angleDiff(world, gCoord[0], gCoord[1]);
+			
+			double speedModifier = (angle / 5.0);
+			
+			commander.setSpeed((int)Math.ceil(speed - speedModifier),(int)Math.ceil(speed + speedModifier));
+			
+			if (speed < 90 && dist > 40)
+			{
+				
+				return;
+				
+			}
+			
 			commander.kick();
 			commander.waitForQueueToEmpty();
 			commander.stop();
@@ -101,6 +124,38 @@ public class StaticShootMode extends AbstractMode
 			follower.handleInterrupt(world,interrupt);			
 		}
 		
+	}
+	
+	private double angleToPoint(World world, double targetX, double targetY)
+	{
+
+		WorldState state = world.getWorldState();
+
+		return Math.toDegrees(Math.atan2(state.getRobotX(world.getColor()) - targetX, state.getRobotY(world.getColor()) - targetY));
+
+	}
+
+	private double robotAngle(World world)
+	{
+
+		WorldState state = world.getWorldState();
+
+		return Math.toDegrees(Math.atan2(state.getRobotDX(world.getColor()),state.getRobotDY(world.getColor())));
+
+	}
+
+	private double angleDiff(World world, double targetX, double targetY)
+	{
+
+		double diff = angleToPoint(world, targetX, targetY) - robotAngle(world);
+
+		diff -= 180;
+
+		if (diff < -180) diff += 360;
+		if (diff > 180) diff -= 360;
+
+		return diff;
+
 	}
 	
 }

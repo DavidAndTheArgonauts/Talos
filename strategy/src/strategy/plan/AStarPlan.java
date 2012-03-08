@@ -281,7 +281,7 @@ public class AStarPlan extends AbstractPlan
 			worldY = (y * cellHeight) + (cellHeight / 2);
 		
 		// robot & ball
-		if ((state.getBallVisible()) && (Math.abs(worldX - state.getBallX()) < 10 && Math.abs(worldY - state.getBallY()) < 10))
+		if ((state.getBallVisible()) && (Math.abs(worldX - state.getBallX()) < 12 && Math.abs(worldY - state.getBallY()) < 12))
 		{
 			System.out.println("(" + worldX + "," + worldY + ") is on ball (ball at [" + state.getBallX() + "," + state.getBallY() + "]");
 			return -1;

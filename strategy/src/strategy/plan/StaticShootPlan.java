@@ -22,7 +22,7 @@ public class StaticShootPlan extends AbstractPlan
 		// calculate target point
 		double[] gCoords = world.getGoalCoords();
 		
-		Point2D aStarEnd = calculateDestination(state.getBallX(),state.getBallY(),gCoords[0],gCoords[1],15);
+		Point2D aStarEnd = calculateDestination(state.getBallX(),state.getBallY(),gCoords[0],gCoords[1],20);
 		
 		if (aStarEnd.getY() < 10)
 		{
