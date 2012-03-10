@@ -1,0 +1,30 @@
+<project name="sdp-predictor">
+	
+	<property name="strategy.libs.javaosc" value="libs/javaosc.jar" />
+	<property name="strategy.src" value="src" />
+	<property name="strategy.build" value="build" />
+	<property name="strategy.docs" value="docs" />
+	
+	<property name="strategy.cmd.start" value="org.talos.predictor.Predictor" />
+	
+	<target name="clean">
+		
+		<delete dir="${strategy.docs}" />
+		<delete dir="${strategy.build}" />
+		
+	</target>
+	
+	<target name="build" depends="clean">
+		
+		<mkdir dir="${strategy.build}" />
+		<javac srcdir="${strategy.src}" destdir="${strategy.build}" debug="true" debuglevel="lines,vars,source" classpath="${strategy.libs.javaosc}" />
+		
+	</target>
+	
+	<target name="start" depends="build">
+		
+		<java fork="true" classname="${strategy.cmd.start}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}" />
+		
+	</target>
+	
+</project>
