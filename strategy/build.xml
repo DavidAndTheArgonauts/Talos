@@ -55,7 +55,7 @@
 		
 	</target>
 	
-	<target name="mode">
+	<target name="mode" depends="build">
 		
 		<input message="Please enter mode:" addproperty="talos.mode" />
 		<input message="Please enter goal (left/right):" addproperty="talos.goal" />

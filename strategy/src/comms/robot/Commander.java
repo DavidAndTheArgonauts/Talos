@@ -467,6 +467,22 @@ public class Commander implements RobotCallback
 		}
 	}
 	
+	public int getLeftWheelSetSpeed()
+	{
+		synchronized(this)
+		{
+			return lWheelSetSpeed;
+		}
+	}
+	
+	public int getRightWheelSetSpeed()
+	{
+		synchronized(this)
+		{
+			return rWheelSetSpeed;
+		}
+	}
+	
 	/**
 	 * Blocks until the queue is empty
 	*/
