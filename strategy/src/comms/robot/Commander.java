@@ -344,8 +344,20 @@ public class Commander implements RobotCallback
 		connection.queueCommand(new Message(Opcodes.SET_SPEED,left,right));
 		
 	}
+
+	public void penaltyKick()
+	{
+		clearQueue();
+		connection.queueCommand(new Message(Opcodes.PENALTY_KICK));
+	}
 	
 	
+	public void penaltyDefend()
+	{
+		clearQueue();
+		connection.queueCommand(new Message(Opcodes.PENALTY_DEFENSE));
+	}
+
 	private void clearQueue()
 	{
 		

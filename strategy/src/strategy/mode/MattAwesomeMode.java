@@ -11,7 +11,7 @@ public class MattAwesomeMode extends AbstractMode
 	private boolean complete = false;
 	private int interruptTouch = -1, interruptReverse = -1;
 	
-	public StaticShootMode(Commander commander)
+	public MattAwesomeMode(Commander commander)
 	{
 		super(commander);
 	}
@@ -60,7 +60,8 @@ public class MattAwesomeMode extends AbstractMode
 		if (follower.complete())
 		{
 			
-			if (speed < 90) speed = speed * 1.2;
+			//if (speed < 90) speed = speed * 1.2;
+			if (speed < 90) speed = speed * 1;
 			
 			WorldState state = world.getWorldState();
 			double[] gCoord = world.getGoalCoords();

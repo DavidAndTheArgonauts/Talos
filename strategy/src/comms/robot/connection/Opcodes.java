@@ -15,6 +15,14 @@ public abstract class Opcodes
 	 * Operates the kicker 
 	*/
 	public static final int KICK = 0x02;
+	/**
+	 * Starts the penalty kick algorithm on robot
+	*/
+	public static final int PENALTY_KICK = 0x04;
+	/**
+	 * Starts the penalty defense algorithm on robot
+	*/
+	public static final int PENALTY_DEFENSE = 0x05;
 	
 	/**
 	 * Closes the connection to the robot 

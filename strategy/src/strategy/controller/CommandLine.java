@@ -70,6 +70,8 @@ public class CommandLine
 			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
+			else if (cmd.equals("penalty kick")) c.penaltyKick();
+			else if (cmd.equals("penalty defend")) c.penaltyDefend();
 			else if (cmd.equals("quit")) 
 			{
 				c.waitForQueueToEmpty();
