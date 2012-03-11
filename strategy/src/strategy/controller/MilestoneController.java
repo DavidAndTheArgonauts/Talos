@@ -1,5 +1,6 @@
 package strategy.controller;
 
+import gui.*;
 import comms.robot.*;
 import strategy.world.*;
 import strategy.mode.*;
@@ -14,6 +15,8 @@ public class MilestoneController extends AbstractController
 	
 	private Commander commander;
 	private World world;
+	
+	private static GUI gui;
 	
 	AbstractMode currentMode = null;
 	
@@ -122,6 +125,10 @@ public class MilestoneController extends AbstractController
 		
 		System.out.println("World data found!");
 		
+		
+		gui = new GUI(w.getWorldState(),color,goal);
+		
+		
 		// create controller thread and begin
 		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
 		gcThread.start();
@@ -220,6 +227,9 @@ public class MilestoneController extends AbstractController
 			
 			// update
 			currentMode.update(world);
+			
+			// draw
+			gui.setWorldState(world.getWorldState());
 			
 			// block until new world update
 			while (lastUpdate == world.getWorldState().getCreatedMillis())
