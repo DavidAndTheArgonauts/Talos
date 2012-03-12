@@ -2,6 +2,7 @@
 
 import connection.*;
 import controller.*;
+import controller.penalty.*;
 import sensor.*;
 
 import lejos.nxt.*;
@@ -26,6 +27,7 @@ public class NXT implements ConnectionInterface
 		// create controllers
 		Driver driver = new Driver(connection);
 		Kicker kicker = new Kicker(connection);
+		
 		
 		// create sensors
 		Touch sensor = new Touch(connection);

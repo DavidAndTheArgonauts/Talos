@@ -7,6 +7,8 @@ public abstract class Opcodes
 	public static final int SET_SPEED = 0x01;
 	public static final int KICK = 0x02;
 	public static final int REQUEST_SENSOR_DATA = 0x03;
+	public static final int PENALTY_KICK = 0x04;
+	public static final int PENALTY_DEFENSE = 0x05;
 	
 	public static final int CLOSE = 0x7E;
 	public static final int QUIT = 0x7F;
