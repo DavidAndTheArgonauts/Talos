@@ -66,8 +66,8 @@ public class CommandLine
 			else if (cmd.equals("drive fast")) c.drive(Commander.SPEED_FAST);
 			else if (cmd.equals("drive medium")) c.drive(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("drive slow")) c.drive(Commander.SPEED_SLOW); 
-			else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_MEDIUM);
-			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_MEDIUM);
+			else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_FAST);
+			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_FAST);
 			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
 			else if (cmd.equals("penalty kick")) c.penaltyKick();

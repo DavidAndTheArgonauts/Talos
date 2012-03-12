@@ -55,7 +55,7 @@
 		
 	</target>
 	
-	<target name="mode">
+	<target name="mode" depends="build">
 		
 		<input message="Please enter mode:" addproperty="talos.mode" />
 		<input message="Please enter goal (left/right):" addproperty="talos.goal" />
@@ -64,7 +64,7 @@
 			<arg value="localhost" />
 			<arg value="9899" />
 			<arg value="5500" />
-			<arg value="yellow" />
+			<arg value="blue" />
 			<arg value="${talos.mode}" />
 			<arg value="${talos.goal}" />
 		</java>
