@@ -27,6 +27,7 @@ public class NXT implements ConnectionInterface
 		// create controllers
 		Driver driver = new Driver(connection);
 		Kicker kicker = new Kicker(connection);
+		Penalty penalty = new Penalty(connection);
 		
 		
 		// create sensors
