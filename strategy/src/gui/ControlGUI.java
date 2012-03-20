@@ -30,7 +30,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 
 	boolean weAreBlue = true;
 	boolean shootingLeft = true;
-	boolean started = false;
+	boolean paused = false;
 
 	Commander commander;
 	
@@ -278,7 +278,17 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		
 		if (e.getActionCommand().equals("pause"))
 		{
-			commander.togglePause();
+			if(!paused){
+				pauseButton.setText("Paused");
+				paused = !paused;
+				commander.togglePause();
+				commander.pause();
+			} else {
+				pauseButton.setText("Running");
+				paused = !paused;
+				commander.togglePause();
+
+			}
 		}
 		
 		if (e.getActionCommand().equals("halt"))
@@ -294,7 +304,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 					{
 						controller.join();
 					}
-					catch (InterruptedException ie) {}
+					catch (InterruptedException ie) {ie.printStackTrace();}
 				}
 				
 			}
@@ -311,7 +321,12 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 
 	public void valueChanged(ListSelectionEvent e) 
 	{
+		if(e.getValueIsAdjusting() == false){
+			if(pList.getSelectedValue() != null){
+				next = (ModeEnum) pList.getSelectedValue();	
+			}
 
+		}
 	}
 
 }
