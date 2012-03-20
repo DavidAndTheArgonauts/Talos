@@ -141,12 +141,17 @@ public class Commander implements RobotCallback
 	public boolean registerController(AbstractController controller)
 	{
 		
+		//System.out.println("COMMANDER: Registering controller");
+
 		if (interruptManager != null && interruptManager.isAlive())
 		{
+			//System.out.println("COMMANDER: Could not register controller");
+			//System.exit(1);
 			return false;
 		}
 		interruptManager = new InterruptManager(this,controller);
 		interruptManager.start();
+		//System.out.println("COMMANDER: controller registered");
 		return true;
 		
 	}
@@ -513,24 +518,23 @@ public class Commander implements RobotCallback
 			
 				// Updates the number of revolutions each wheel has travelled
 				case Opcodes.WHEEL_FEEDBACK:
-				
+			
 					int[] tachoCount = response.getArguments(2);
 				
 					if (wheelUpdateTime != -1)
 					{
-						int dt = (int)(System.currentTimeMillis() - wheelUpdateTime);
+						double dt = (double)(System.currentTimeMillis() - wheelUpdateTime);
 					
 						if (dt != 0)
 						{
-							lWheelSpeed = tachoCount[0]/dt;
-							rWheelSpeed = tachoCount[1]/dt;
+							lWheelSpeed = (double)((tachoCount[0])*(40.0/24.0))/dt;
+							rWheelSpeed = (double)((tachoCount[1])*(40.0/24.0))/dt;
 						}
 					
 					}
 				
-					lRevCount += tachoCount[0];
-					rRevCount += tachoCount[1];
-				
+					lRevCount += (long)(tachoCount[0]*(40.0/24.0));
+					rRevCount += (long)(tachoCount[1]*(40.0/24.0));
 				
 					wheelUpdateTime = System.currentTimeMillis();
 				
