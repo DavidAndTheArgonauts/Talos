@@ -64,7 +64,7 @@
 			<arg value="localhost" />
 			<arg value="9899" />
 			<arg value="5500" />
-			<arg value="blue" />
+			<arg value="yellow" />
 			<arg value="${talos.mode}" />
 			<arg value="${talos.goal}" />
 		</java>

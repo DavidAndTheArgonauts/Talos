@@ -8,6 +8,7 @@ import gui.*;
 import java.awt.*;
 
 import java.awt.geom.Point2D;
+import java.util.*;
 
 public class ZGameMode extends AbstractMode implements GUIDrawer
 {
@@ -17,7 +18,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public static final double BALL_RADIUS = 12;
 	public static final double DESTINATION_RADIUS = 2;
 	
-	private static final int MAX_MOTOR_SPEED = 100;
+	private static final int MAX_MOTOR_SPEED = 0;
 	
 	private double[][] lines = new double[0][4];
 	
@@ -30,6 +31,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private Point2D target;
 	private double speedDelta = 0;
 	private boolean turning = false;
+	private long lastTime = -1;
 	
 	
 	public ZGameMode(Commander commander)
@@ -38,44 +40,92 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		GUI.subscribe(this);
 	}
+
 	
 	public boolean complete()
 	{
 		return false;
 	}
-	
-	public void paint(Graphics g, int cellWidth, int cellHeight)
+
+
+	public double[] estimateBallSpeed ( ArrayList<Integer> values ) {
+
+		double counter = 0;
+		double dx = 0, dy = 0;
+		double[] dir = new double[2];
+
+		for ( int v : values ) {
+			
+			WorldState ago = world.getPastByTime(v);
+
+			if ( ago != null ) {
+				double pastBallX = ago.getBallX();
+				double pastBallY = ago.getBallY();
+				double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
+				dx += (state.getBallX() - pastBallX) / timeAgo;
+				dy += (state.getBallY() - pastBallY) / timeAgo;
+				counter++;
+			}
+
+		}
+
+		dir[0] = dx / counter;
+		dir[1] = dy / counter;
+
+		return dir;
+
+	}
+
+	public void paint(Graphics g, int ratio )
 	{
 		
-		final double targetSize = 2;
+		/*final double targetSize = 2;
 		
 		g.setColor(new Color(158,119,0));
-		g.fillOval((int)((target.getX() - targetSize*0.5)*cellWidth),(int)((target.getY() - targetSize*0.5) * cellHeight), (int)(targetSize * cellWidth), (int)(targetSize * cellHeight));
-		
-		/*
-		int robotX = (int)(state.getRobotX(world.getColor()) * cellWidth);
-		int robotY = (int)(state.getRobotY(world.getColor()) * cellHeight);
-		
-		int targetX = (int)(target.getX() * cellWidth);
-		int targetY = (int)(target.getY() * cellHeight);
-		*/
+		g.fillOval(
+			(int)((target.getX() - targetSize*0.5) * cellWidth),
+			(int)((target.getY() - targetSize*0.5) * cellHeight), 
+			(int)(targetSize * cellWidth), 
+			(int)(targetSize * cellHeight) );
 		
 		for (int i = 0; i < lines.length; i++)
 		{
 			
 			g.drawLine((int)(lines[i][0] * cellWidth), (int)(lines[i][1] * cellHeight), (int)(lines[i][2] * cellWidth), (int)(lines[i][3] * cellHeight));
 			
+		}*/
+		
+		ArrayList<Integer> estTimes = new ArrayList<Integer>();
+		estTimes.add(100);
+		estTimes.add(200);		
+		estTimes.add(300);
+		estTimes.add(500);
+
+		for ( int v : estTimes ) {
+			WorldState ago = world.getPastByTime(v);
+			if ( ago != null ) {
+				GUI.drawCircle( g, ago.getBallX()*ratio, ago.getBallY()*ratio, 1*ratio, Color.WHITE, true );
+			}
 		}
+
+		double[] estBallSpeed =  estimateBallSpeed ( estTimes );
+		GUI.drawDirection( g, state.getBallX()*ratio, state.getBallY()*ratio, 1*ratio, Color.WHITE, estBallSpeed[0], estBallSpeed[1] );
+
+		double delay = 0.4;
+
+		double estimatedBallX = state.getBallX() + estBallSpeed[0] * delay;
+		double estimatedBallY = state.getBallY() + estBallSpeed[1] * delay;
+
+		GUI.drawCircle( g, estimatedBallX*ratio, estimatedBallY*ratio, 1.5*ratio, Color.WHITE, true );
 		
-		
-		
+
+
 	}
 	
 	public void reset(World world){}
 	
 	public void update(World world)
 	{
-		
 		this.world = world;
 		state = world.getWorldState();
 		updateStrategy( world );
@@ -194,6 +244,11 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		}
 		
+		if (lastTime != -1) {
+		  System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
+		}
+		lastTime = System.nanoTime();
+		
 	}
 	
 	public void updateStrategy( World world ) 
@@ -201,8 +256,6 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		if ( !state.getBallVisible() || !state.getRobotVisible(world.getColor()) )
 		{
-			commander.kick();
-			commander.setSpeed( -10, 10 );
 			mode = "stop";
 			return;
 		}
@@ -215,9 +268,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		double enemyX = state.getEnemyX(world.getColor());
 		double enemyY = state.getEnemyY(world.getColor());
-		
+
+
+
+
+
 		double[] gCoords = world.getGoalCoords();
-		
+	
 		target = calculateDestination(ballX, ballY ,gCoords[0],gCoords[1],10);
 		
 		if (target.getY() < 10)
@@ -245,6 +302,9 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		Point2D ballWP = findWP(robotX, robotY, targetX, targetY, ballX, ballY, BALL_RADIUS);
 		Point2D enemyWP = findWP(robotX, robotY, targetX, targetY, enemyX, enemyY, ENEMY_RADIUS);
+
+
+		
 		
 		
 		if ( vecSize(ballX - robotX, ballY - robotY) < 10 ) {
