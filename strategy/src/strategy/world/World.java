@@ -12,10 +12,13 @@ public class World
 	public static final int ROBOT_YELLOW = 0;
 	public static final int ROBOT_BLUE = 1;
 	
+
+
+    // EDIT THESE!!!!!!!
 	public static final double[] GOAL_LEFT = { 0, 40 };
 	public static final double[] GOAL_RIGHT = { 130, 40 };
 	
-	public static final double WORLD_HEIGHT = 80, WORLD_WIDTH = 130;
+	public static final double WORLD_HEIGHT = 122, WORLD_WIDTH = 242;
 	
 	private ArrayList<WorldState> worldStates; 
 	private VisionReceiver vision;

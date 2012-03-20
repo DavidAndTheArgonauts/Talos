@@ -16,8 +16,8 @@ public class GUI extends JPanel
 	
 	private static final int DIRECTION_LENGTH = 5;
 	
-	private static final int WIDTH = 130;
-	private static final int HEIGHT = 80;
+	private static final int WIDTH = (int) World.WORLD_WIDTH;
+	private static final int HEIGHT = (int) World.WORLD_HEIGHT;
 	
 	private JFrame jf;
 	private WorldState state;
