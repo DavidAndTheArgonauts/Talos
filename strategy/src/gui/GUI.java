@@ -26,6 +26,8 @@ public class GUI extends JPanel
 	
 	private int color;
 	private double[] goal;
+	private double robotRad = 8;
+	private double ballRad = 2;
 	
 	public GUI(WorldState state, int color, double[] goalCoords)
 	{
@@ -70,6 +72,23 @@ public class GUI extends JPanel
 		repaint();
 		
 	}
+
+	public static void drawCircle( Graphics g, double x, double y, double radius, Color c, boolean filled ) {
+		g.setColor( c );
+		double tlx = x - radius;
+		double tly = y - radius;
+		if (filled) {
+			g.fillOval( (int) tlx, (int) tly, (int) (2*radius), (int) (2*radius) );
+		} 
+		else {
+			g.drawOval( (int) tlx, (int) tly, (int) (2*radius), (int) (2*radius) );
+		}
+	}
+
+	public static void drawDirection( Graphics g, double x, double y, double radius, Color c, double dx, double dy ) {
+		g.setColor( c );
+		g.drawLine( (int) x, (int) y, (int) (x + dx*radius), (int) (y + dy*radius) );
+	}
 	
 	// override paint component
 	public void paintComponent( Graphics g ) {
@@ -82,11 +101,10 @@ public class GUI extends JPanel
 		double height = getBounds().getSize().getHeight();
 
 		// calculate width and height of each cell
-		int cellWidth = (int)( width/WIDTH );
-		int cellHeight = (int)( height/HEIGHT );
+		int ratio = (int)( Math.min( width/WIDTH, height/HEIGHT ) );
 		
-		int drawWidth = cellWidth * WIDTH;
-		int drawHeight = cellHeight * HEIGHT;
+		int drawWidth = ratio * WIDTH;
+		int drawHeight = ratio * HEIGHT;
 		
 		g.setColor(new Color(0,102,0));
 		g.fillRect(0,0,drawWidth,drawHeight);
@@ -94,79 +112,41 @@ public class GUI extends JPanel
 		// draw state
 		if (state == null)
 			return;
-		
-		double robotSize = 0;
-		if (color == World.ROBOT_BLUE)
-		{
-			robotSize = 2*ZGameMode.ROBOT_RADIUS;
-		}
-		else
-		{
-			robotSize = 2*ZGameMode.ENEMY_RADIUS;
-		}
-		
-		
-		double blueX = state.getBlueX();
-		double blueY = state.getBlueY();
-		
-		double blueXTL = (blueX - robotSize * 0.5) * cellWidth;
-		double blueYTL = (blueY - robotSize * 0.5) * cellHeight;
-		
+			
 		double blueDX = state.getBlueDX();
 		double blueDY = state.getBlueDY();
 		
-		if (state.getBlueVisible())
+		if ( state.getBlueVisible() )
 		{
-			g.setColor(Color.BLUE);
-			g.fillOval((int)(blueXTL), (int)(blueYTL), (int)(robotSize * cellWidth), (int)(robotSize * cellHeight));
-			g.setColor(Color.YELLOW);
-			g.drawLine((int)(blueX * cellWidth), (int)(blueY * cellHeight), (int)(blueX * cellWidth + robotSize * blueDX * cellWidth), (int)(blueY * cellHeight + robotSize * blueDY * cellHeight));
+			double x =  state.getBlueX();
+			double y =  state.getBlueY();
+			double dx = state.getBlueDX();
+			double dy = state.getBlueDY();
+			drawCircle( g, x*ratio, y*ratio, robotRad*ratio, Color.BLUE , true );
+			drawDirection( g, x*ratio, y*ratio, robotRad*ratio, Color.YELLOW , dx, dy );
+		}
+	
+		if ( state.getYellowVisible() )
+		{
+			double x =  state.getYellowX();
+			double y =  state.getYellowY();
+			double dx = state.getYellowDX();
+			double dy = state.getYellowDY();
+			drawCircle( g, x*ratio, y*ratio, robotRad*ratio, Color.YELLOW, true );
+			drawDirection( g, x*ratio, y*ratio, robotRad*ratio, Color.BLUE, dx, dy );
 		}
 		
-		
-		if (color == World.ROBOT_YELLOW)
+		if ( state.getBallVisible() )
 		{
-			robotSize = 2*ZGameMode.ROBOT_RADIUS;
+			double x =  state.getBallX();
+			double y =  state.getBallY();
+			drawCircle( g, x*ratio, y*ratio, ballRad*ratio, Color.RED, true );
 		}
-		else
-		{
-			robotSize = 2*ZGameMode.ENEMY_RADIUS;
-		}
-		
-		double yellowX = state.getYellowX();
-		double yellowY = state.getYellowY();
-		
-		double yellowXTL = (yellowX - robotSize * 0.5) * cellWidth;
-		double yellowYTL = (yellowY - robotSize * 0.5) * cellHeight;
-		
-		double yellowDX = state.getYellowDX();
-		double yellowDY = state.getYellowDY();
-		
-		if (state.getYellowVisible())
-		{
-			g.setColor(Color.YELLOW);
-			g.fillOval((int)(yellowXTL), (int)(yellowYTL), (int)(robotSize * cellWidth), (int)(robotSize * cellHeight));
-			g.setColor(Color.BLUE);
-			g.drawLine((int)(yellowX * cellWidth), (int)(yellowY * cellHeight), (int)(yellowX * cellWidth + robotSize * yellowDX * cellWidth), (int)(yellowY * cellHeight + robotSize * yellowDY * cellHeight));
-		}
-		
-		
-		double ballX = state.getBallX();
-		double ballY = state.getBallY();
-		
-		double ballXTL = (ballX - ZGameMode.BALL_RADIUS) * cellWidth;
-		double ballYTL = (ballY - ZGameMode.BALL_RADIUS) * cellHeight;
-		
-		if (state.getBallVisible())
-		{
-			g.setColor(Color.RED);
-			g.fillOval((int)(ballXTL), (int)(ballYTL), (int)(ZGameMode.BALL_RADIUS * 2 * cellWidth), (int)(ZGameMode.BALL_RADIUS * 2 * cellHeight));
-		}
-		
+
 		// draw from all painters
 		for (int i = 0; i < painters.size(); i++)
 		{
-			painters.get(i).paint(g, cellWidth, cellHeight);
+			painters.get(i).paint(g, ratio );
 		}
 		
 	}

@@ -31,6 +31,11 @@ public class WorldState {
 		return created;
 	}
 
+	public long getTime()
+	{
+		return created;
+	}
+
 	//Setters
 	
 	//Ball

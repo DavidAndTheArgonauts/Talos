@@ -4,7 +4,5 @@ import java.awt.*;
 
 public interface GUIDrawer
 {
-	
-	public void paint(Graphics g, int cellWidth, int cellHeight);
-	
+	public void paint(Graphics g, int ratio);
 }

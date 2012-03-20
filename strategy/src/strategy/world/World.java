@@ -109,6 +109,23 @@ public class World
 		}
 		
 	}
+
+	public WorldState getPastByTime(long ago) { 
+		
+		synchronized (worldStates)
+		{
+			long currentTime = System.currentTimeMillis();
+			for (int i = worldStates.size() - 1; i >= 0; i--) {
+				long stateTime = worldStates.get(i).getTime();
+				if ( currentTime - stateTime > ago ) {
+					return worldStates.get(i);
+				}
+			}
+
+			System.out.println("World state not found in given time!");
+			return null;
+		}
+	}
 	
 	public int getHistorySize() {
 		
