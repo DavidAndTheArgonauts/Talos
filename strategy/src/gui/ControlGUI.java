@@ -21,6 +21,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 	JButton startButton;
 	JButton changeButton;
 	JButton exitButton;
+	JButton pauseButton;
 
 	JList pList;
 
@@ -91,12 +92,16 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		stopButton.setActionCommand("halt");
 		startButton = new JButton("Start");
 		startButton.setActionCommand("start");
+		pauseButton = new JButton("Pause/Resume");
+		pauseButton.setActionCommand("pause");
 
 		stopButton.addActionListener(this);
 		startButton.addActionListener(this);
+		pauseButton.addActionListener(this);
 		
 		toppanel.add(startButton);
 		toppanel.add(stopButton);
+		toppanel.add(pauseButton);
 
 		JPanel centerpanel = new JPanel();
 
@@ -269,6 +274,11 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		if (e.getActionCommand().equals("right"))
 		{
 			shootingLeft = false;
+		}
+		
+		if (e.getActionCommand().equals("pause"))
+		{
+			commander.togglePause();
 		}
 		
 		if (e.getActionCommand().equals("halt"))
