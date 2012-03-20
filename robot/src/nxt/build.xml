@@ -43,7 +43,7 @@
 		<antcall target="rebuild" />
 	</target>
 	
-	<target name="upload" depends="build">
+	<target name="upload" depends="rebuild">
 		<exec executable="nxj">
 			<arg value="-cp" />
 			<arg value="${sdp.nxt.output.classes}" />
