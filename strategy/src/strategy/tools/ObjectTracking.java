@@ -22,25 +22,40 @@ public class ObjectTracking
 	public class PredictedPosition
 	{
 		
-		public double x, y, speed;
+		private double speed;
+		private Vector position;
+		private Vector velocity;
 		
-		public PredictedPosition(double x, double y, double speed)
+		public PredictedPosition(Vector positon, Vector velocity, double speed)
 		{
-			this.x = x;
-			this.y = y;
+			this.position = position;
+			this.velocity = velocity;
 			this.speed = speed;
+		}
+		
+		public Vector getPosition()
+		{
+			return position;
+		}
+		
+		public Vector getPosition(double timestep)
+		{
+			return new Vector(position.getX() + velocity.getX() * timestep, position.getY() + velocity.getY() * timestep);	
+		}
+		
+		public Vector getVelocity()
+		{
+			return velocity;
+		}
+		
+		public double getSpeed()
+		{
+			return speed;
 		}
 		
 	}
 	
-	private World world;
-	
-	public ObjectTracking(World world)
-	{
-		
-		updateWorld(world);
-		
-	}
+	private World world = null;
 	
 	public void updateWorld(World world)
 	{
@@ -49,6 +64,8 @@ public class ObjectTracking
 
 	private PredictedPosition getRobotPosition()
 	{
+    		
+    		if (world == null) return null;
     		
     		WorldState lastState = world.getWorldState();
     		
@@ -73,12 +90,26 @@ public class ObjectTracking
 
 		if (counter == 0) return null;
 		
-		return new PredictedPosition(dx / counter, dy / counter, Vector.size(new Vector(dx / counter, dy / counter)));
+		// current positions
+		double robotX = lastState.getRobotX(world.getColor());
+		double robotY = lastState.getRobotY(world.getColor());
+		
+		// average speeds
+		dx /= counter;
+		dy /= counter;
+		
+		Vector velocity = new Vector(dx, dy);
+		
+		Vector position = new Vector(robotX, robotY);
+		
+		return new PredictedPosition(position, velocity, velocity.size());
 
 	}
 	
 	private PredictedPosition getBallPosition()
 	{
+    		
+    		if (world == null) return null;
     		
     		WorldState lastState = world.getWorldState();
     		
@@ -103,12 +134,26 @@ public class ObjectTracking
 
 		if (counter == 0) return null;
 		
-		return new PredictedPosition(dx / counter, dy / counter,  Vector.size(new Vector(dx / counter, dy / counter)));
-
+		// current positions
+		double ballX = lastState.getBallX();
+		double ballY = lastState.getBallY();
+		
+		// average speeds
+		dx /= counter;
+		dy /= counter;
+		
+		Vector velocity = new Vector(dx, dy);
+		
+		Vector position = new Vector(ballX, ballY);
+		
+		return new PredictedPosition(position, velocity, velocity.size());
+		
 	}
 	
 	private PredictedPosition getEnemyPosition()
 	{
+    		
+    		if (world == null) return null;
     		
     		WorldState lastState = world.getWorldState();
     		
@@ -133,14 +178,20 @@ public class ObjectTracking
 
 		if (counter == 0) return null;
 		
-		return new PredictedPosition(dx / counter, dy / counter,  Vector.size(new Vector(dx / counter, dy / counter)));
+		// current positions
+		double robotX = lastState.getEnemyX(world.getColor());
+		double robotY = lastState.getEnemyY(world.getColor());
+		
+		// average speeds
+		dx /= counter;
+		dy /= counter;
+		
+		Vector velocity = new Vector(dx, dy);
+		
+		Vector position = new Vector(robotX, robotY);
+		
+		return new PredictedPosition(position, velocity, velocity.size());
 
-	}
-	
-	
-	public static double vecSize(double x, double y)
-	{
-		return Math.sqrt((x*x) + (y*y));
 	}
 	
 }
