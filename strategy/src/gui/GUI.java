@@ -40,7 +40,7 @@ public class GUI extends JPanel
 		jf.getContentPane().add( this );
 
 		// set default close operation
-		jf.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		//jf.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		
 		// get the inset size of the JFrame
 		jf.setSize( 5*WIDTH + jf.getInsets().left + jf.getInsets().right , 5*HEIGHT + jf.getInsets().top + jf.getInsets().bottom );
@@ -76,7 +76,6 @@ public class GUI extends JPanel
 	public void close()
 	{
 		
-		setVisible(false);
 		jf.dispose();
 		
 	}

@@ -119,7 +119,10 @@ public class GUIController extends AbstractController
 	private void cleanup()
 	{
 		
+		System.out.println("<< CLEANING UP >>");
+		
 		gui.close();
+		gui = null;
 		commander.unregisterController();
 		
 	}

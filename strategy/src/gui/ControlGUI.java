@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 
 import strategy.controller.*;
 import strategy.mode.*;
+import strategy.world.*;
 
 public class ControlGUI implements ActionListener, ListSelectionListener
 {
@@ -27,15 +28,48 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 	ModeEnum next;
 
 	boolean weAreBlue = true;
+	boolean shootingLeft = true;
 	boolean started = false;
 
 	Commander commander;
+	World world = null;
+	
+	
+	
+	private AbstractController controller = null;
+	private int visionPort;
+	
+	public static void main(String[] args)
+	{
+		
+		if (args.length < 3)
+		{
+			System.out.println("Args required: <proxy host> <proxy port> <vision port>");
+		}
+		
+		String proxyHost = args[0];
+		int proxyPort = Integer.parseInt(args[1]);
+		int visionPort = Integer.parseInt(args[2]);
+		
+		Commander commander = new Commander();
+		commander.connect(proxyHost,proxyPort);
 
-	Class cls;
-
-	public 	ControlGUI(Commander commander)
+		// if not connected, quit
+		if (!commander.isConnected())
+		{
+			System.out.println("Cannot connect to proxy");
+			System.exit(0);
+		}
+		
+		ControlGUI cg = new ControlGUI(commander, visionPort);
+		cg.createGui();
+		
+	}
+	
+	public ControlGUI(Commander commander, int visionPort)
 	{
 		this.commander = commander;
+		this.visionPort = visionPort;
 	}
 
 	public void createGui()
@@ -58,16 +92,12 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		stopButton.setActionCommand("halt");
 		startButton = new JButton("Start");
 		startButton.setActionCommand("start");
-		changeButton = new JButton("Change Planner");
-		changeButton.setActionCommand("change");
 
 		stopButton.addActionListener(this);
 		startButton.addActionListener(this);
-		changeButton.addActionListener(this);
-
-		toppanel.add(stopButton);
+		
 		toppanel.add(startButton);
-		toppanel.add(changeButton);
+		toppanel.add(stopButton);
 
 		JPanel centerpanel = new JPanel();
 
@@ -101,6 +131,31 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		radioPanel.add(blue);
 		radioPanel.add(yellow);
 		centerpanel.add(radioPanel);
+		
+		
+		
+		
+		JRadioButton left = new JRadioButton("Shooting left");
+		left.setActionCommand("left");
+		left.setSelected(true);
+
+		JRadioButton right = new JRadioButton("Shooting right");
+		right.setActionCommand("right");
+
+		ButtonGroup goalGroup = new ButtonGroup();
+		goalGroup.add(left);
+		goalGroup.add(right);
+
+		left.addActionListener(this);
+		right.addActionListener(this);
+
+		JPanel goalRadioPanel = new JPanel(new GridLayout(0,1));
+		goalRadioPanel.add(left);
+		goalRadioPanel.add(right);
+		centerpanel.add(goalRadioPanel);
+		
+		
+		
 
 		JPanel bottompanel = new JPanel();
 
@@ -126,6 +181,8 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 	{
 		if (e.getActionCommand().equals(startButton.getActionCommand()))
 		{
+			
+			
 			String mode = pList.getSelectedValue().toString();
 			System.out.println(mode);
 			AbstractMode reflectMode = null;
@@ -146,7 +203,6 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 				ctor = cls.getDeclaredConstructor(Commander.class);
 
 				ctor.setAccessible(true);
-				//reflectMode = new OffensiveMode(c);
 				reflectMode = (AbstractMode)ctor.newInstance(commander);
 
 			} 
@@ -154,7 +210,92 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 			{
 				e1.printStackTrace();
 				System.out.println("Unable to load class");
-			} 
+				return;
+			}
+			
+			if (controller != null)
+			{
+				
+				controller.controllerInterruptQuit();
+				while (controller.isAlive())
+				{
+					try
+					{
+						controller.join();
+					}
+					catch (InterruptedException ie) {}
+				}
+				
+			}
+			
+			// create world
+			
+			if (world == null)
+			{
+			
+				int color = ((weAreBlue) ? World.ROBOT_BLUE : World.ROBOT_YELLOW);
+				double[] goal = ((shootingLeft) ? World.GOAL_LEFT : World.GOAL_RIGHT);
+			
+				world = new World(color, goal);
+				world.listenForVision(visionPort);
+			
+			}			
+
+			// wait until world is giving real states
+			while(world.getWorldState() == null)
+			{
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException ie)
+				{
+			
+				}
+			}
+			
+			controller = new GUIController(commander,world,reflectMode);
+			controller.start();
+			
+		}
+		
+		if (e.getActionCommand().equals("yellow"))
+		{
+			weAreBlue = false;
+		}
+		if (e.getActionCommand().equals("blue"))
+		{
+			weAreBlue = true;
+		}
+		if (e.getActionCommand().equals("left"))
+		{
+			shootingLeft = true;
+		}
+		if (e.getActionCommand().equals("right"))
+		{
+			shootingLeft = false;
+		}
+		
+		if (e.getActionCommand().equals("halt"))
+		{
+			
+			if (controller != null)
+			{
+				
+				controller.controllerInterruptQuit();
+				while (controller.isAlive())
+				{
+					try
+					{
+						controller.join();
+					}
+					catch (InterruptedException ie) {}
+				}
+				
+			}
+			
+			commander.setSpeed(1,1);
+			commander.setSpeed(0,0);
 		}
 
 		if (e.getActionCommand().equals(exitButton.getActionCommand()))
