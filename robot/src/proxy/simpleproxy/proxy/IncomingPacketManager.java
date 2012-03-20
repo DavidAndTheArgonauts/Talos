@@ -19,7 +19,7 @@ class IncomingPacketManager implements Runnable
 	public void run()
 	{
 		
-		//System.out.println("  IN >> OPEN");
+		System.out.println("  IN >> OPEN");
 		
 		try
 		{
@@ -40,7 +40,7 @@ class IncomingPacketManager implements Runnable
 				
 				queue.offer(byteBuffer);
 				
-				//System.out.println("RECV >> " + byteBuffer);
+				System.out.println("RECV >> " + byteArrayToInt(byteBuffer));
 				
 			}
 		}
@@ -50,7 +50,7 @@ class IncomingPacketManager implements Runnable
 		}
 		finally 
 		{
-			//System.out.println("  IN >> CLOSED");
+			System.out.println("  IN >> CLOSED");
 			try
 			{
 				is.close();
@@ -58,6 +58,15 @@ class IncomingPacketManager implements Runnable
 			catch (Exception e) {}
 		}
 		
+	}
+
+	public static int byteArrayToInt(byte[] b) {
+		int value = 0;
+		for (int i = 0; i < 4; i++) {
+			int shift = (4 - 1 - i) * 8;
+			value += (b[i] & 0x000000FF) << shift;
+		}
+		return value;
 	}
 	
 }

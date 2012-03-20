@@ -17,6 +17,7 @@ public class MilestoneController extends AbstractController
 	private World world;
 	
 	private static GUI gui;
+	private static ControlGUI cgui;
 	
 	AbstractMode currentMode = null;
 	
@@ -56,14 +57,17 @@ public class MilestoneController extends AbstractController
 		// create commander and connect
 		Commander c = new Commander();
 		c.connect(proxyHost,proxyPort);
-		
+
 		// if not connected, quit
-		if (!c.isConnected())
+		/*if (!c.isConnected())
 		{
 			System.out.println("Cannot connect to proxy");
 			System.exit(0);
-		}
+		}*/
 		
+		cgui = new ControlGUI(c);
+		cgui.createGui();
+
 		System.out.println("Connected to proxy");
 		AbstractMode reflectMode = null;
 		Class cls;
@@ -131,7 +135,6 @@ public class MilestoneController extends AbstractController
 		
 		// create controller thread and begin
 		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
-		gcThread.start();
 		
 		System.out.println("Registering controller");
 		if (!c.registerController(gcThread))
@@ -139,6 +142,8 @@ public class MilestoneController extends AbstractController
 			System.out.println("Unable to register controller");
 		}
 		
+		gcThread.start();
+
 		System.out.println("Press <enter> to quit");
 		
 		// wait for enter to be pressed

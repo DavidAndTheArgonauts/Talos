@@ -53,7 +53,7 @@ public class FacingInterrupt extends AbstractInterrupt
 
 		double angleTurned = Math.toDegrees(turnDiff / Commander.WHEEL_SEPARATION);
 		
-		if (VERBOSE1)
+		if (VERBOSE)
 			System.out.println("angle turned = " + angleTurned + " [value = " + value + "] (lWheelDiff = " + lWheelDiff + ",rWheelDiff = " + rWheelDiff + ")");
 		
 		if (value > 0 && angleTurned > value)

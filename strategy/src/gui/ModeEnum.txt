@@ -1,0 +1,57 @@
+/*
+* Mock Planner Enum to test with
+*/
+public enum ModeEnum
+{
+	REACTIVE,
+	DEDUCTIVE,
+	ZPLANNER;
+}
+
+//For future. If we get to the point where we use multiple swapple strategies, we'll use this block of code
+	private static Map<PlannerEnum, AbstractPlanner> planners = new EnumMap<PlannerEnum, AbstractPlanner>(PlannerEnum.class);
+	private static PlannerEnum current ; 
+	static {
+		planners.put(PlannerEnum.REACTIVE, new ReactivePlanner());
+		planners.put(PlannerEnum.DEDUCTIVE, new DeductivePlanner());
+		planners.put(PlannerEnum.ZPLANNER, new ZPlanner());
+		current = PlannerEnum.ZPLANNER;
+	}
+
+public static void main(String[] args){
+
+		Gui gui = new Gui(current);
+		gui.createGui();
+
+		world = new World();
+		vision = new VisionReceiver(5500, world);
+
+		commander.subscribe(commander);
+
+		//planners.get(current).execute();
+
+		//vision.close();
+	}
+
+	//Planners cna use this to pass control to other strategies. 
+	//They should halt their own running before calling this. 
+
+	public static void startStrategy(PlannerEnum e){
+		planners.get(e).execute();
+	}
+
+	public static void haltStrategy(PlannerEnum e) {
+		planners.get(e).halt();
+	}
+
+	public static Commander getCommand(){
+		return commander;
+	}
+
+	public static World getWorld(){
+		return world;
+	}
+
+	public static VisionReceiver getVision(){
+		return vision;
+	}

@@ -20,7 +20,7 @@ class OutgoingPacketManager implements Runnable
 	
 	public void run()
 	{
-		//System.out.println(" OUT >> OPEN");
+		System.out.println(" OUT >> OPEN");
 		try
 		{
 			while (!Thread.interrupted())
@@ -36,7 +36,7 @@ class OutgoingPacketManager implements Runnable
 				os.write(byteBuffer);
 				os.flush();
 				
-				//System.out.println("SENT >> " + byteBuffer);
+				System.out.println("SENT >> " + byteArrayToInt(byteBuffer));
 				
 			}
 		}
@@ -46,7 +46,7 @@ class OutgoingPacketManager implements Runnable
 		}
 		finally 
 		{
-			//System.out.println(" OUT >> CLOSED");
+			System.out.println(" OUT >> CLOSED");
 			try
 			{
 				os.close();
@@ -54,6 +54,15 @@ class OutgoingPacketManager implements Runnable
 			catch (Exception e) {}
 		}
 		
+	}
+
+	public static int byteArrayToInt(byte[] b) {
+		int value = 0;
+		for (int i = 0; i < 4; i++) {
+			int shift = (4 - 1 - i) * 8;
+			value += (b[i] & 0x000000FF) << shift;
+		}
+		return value;
 	}
 	
 }

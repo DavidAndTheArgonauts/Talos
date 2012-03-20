@@ -33,12 +33,10 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private double speedDelta = 0;
 	private boolean turning = false;
 	private long lastTime = -1;
-	private double delay = 0.65;
+	private double delay = 0.4;
 	private ArrayList<Integer> estTimes = new ArrayList<Integer>();
 	private double[] estBallSpeed;
-	private double estimatedBallX, estimatedBallY;
-	private long lastKick = -1;
-	private int kickcounts = 0;
+	private double estimatedBallX, estimatedBallX;
 
 
 	public ZGameMode(Commander commander)
@@ -135,7 +133,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 						
 		if ( mode == "stop" )
 		{
-			//commander.stop();
+			commander.stop();
 		}
 			
 				
@@ -241,14 +239,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 			driveLeft = (int) Math.round( leftMotor * MAX_MOTOR_SPEED * speedDelta );
 			driveRight = (int) Math.round( rightMotor * MAX_MOTOR_SPEED * speedDelta );
 			commander.setSpeed( driveLeft, driveRight );
-
 		
 			System.out.println("Speed (" + driveLeft + "," + driveRight + ")\n");
 		
 		}
 		
 		if (lastTime != -1) {
-		  //System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
+		  System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
 		}
 		lastTime = System.nanoTime();
 		
@@ -257,7 +254,11 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public void updateStrategy( World world ) 
 	{
 		
-		mode = "skip";
+		if ( !state.getBallVisible() || !state.getRobotVisible(world.getColor()) )
+		{
+			mode = "stop";
+			return;
+		}
 		
 		double robotX = state.getRobotX(world.getColor());
 		double robotY = state.getRobotY(world.getColor());
@@ -268,25 +269,10 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		double enemyX = state.getEnemyX(world.getColor());
 		double enemyY = state.getEnemyY(world.getColor());
 
-		if ( estimatedBallX < robotX ) 
-		{
-			if ( ( ( System.currentTimeMillis() - lastKick ) / 1000f ) > 2 ) 
-			{
-				commander.kick();
-				kickcounts++;
-				lastKick = System.currentTimeMillis();
-				System.out.println("kicking!" + kickcounts );
-			}
-			else {
-			}
-					
+		if ( estimatedBallY < ballY ) {
+			commander.kick();
 		}
-			
-		else
-		{
-			//commander.setSpeed( 0, 0 );
-		}
-		
+	
 	}
 	
 	
