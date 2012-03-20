@@ -30,6 +30,13 @@ public abstract class AbstractController extends Thread
 		
 	}
 	
+	public void controllerInterruptQuit()
+	{
+		
+		controllerInterrupt(InterruptManager.INTERRUPT_QUIT,-1);
+		
+	}
+	
 	public boolean controllerInterrupted()
 	{
 		

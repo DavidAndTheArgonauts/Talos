@@ -108,7 +108,13 @@ public class Commander implements RobotCallback
 			connection.disconnect();
 			System.out.println("Disconnected");
 		}
+
+		unregisterController();
 		
+	}
+
+	public void unregisterController(){
+
 		if (interruptManager != null)
 		{
 			
@@ -127,9 +133,7 @@ public class Commander implements RobotCallback
 				}
 				
 			}
-			
 		}
-		
 	}
 	
 	/**
