@@ -10,6 +10,7 @@
 	<property name="strategy.cmd.zplan" value="strategy.controller.ZPlan" />
 	<property name="strategy.cmd.game" value="strategy.controller.GameController" />
 	<property name="strategy.cmd.mode" value="strategy.controller.MilestoneController" />
+	<property name="strategy.cmd.gui" value="gui.ControlGUI" />
 	
 	<target name="clean">
 		
@@ -67,6 +68,16 @@
 			<arg value="yellow" />
 			<arg value="${talos.mode}" />
 			<arg value="${talos.goal}" />
+		</java>
+		
+	</target>
+	
+	<target name="gui" depends="build">
+		
+		<java fork="true" classname="${strategy.cmd.gui}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
+			<arg value="localhost" />
+			<arg value="9899" />
+			<arg value="5500" />
 		</java>
 		
 	</target>
