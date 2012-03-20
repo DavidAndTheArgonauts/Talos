@@ -32,7 +32,6 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 	boolean started = false;
 
 	Commander commander;
-	World world = null;
 	
 	
 	
@@ -230,16 +229,12 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 			
 			// create world
 			
-			if (world == null)
-			{
-			
-				int color = ((weAreBlue) ? World.ROBOT_BLUE : World.ROBOT_YELLOW);
-				double[] goal = ((shootingLeft) ? World.GOAL_LEFT : World.GOAL_RIGHT);
-			
-				world = new World(color, goal);
-				world.listenForVision(visionPort);
-			
-			}			
+						
+			int color = ((weAreBlue) ? World.ROBOT_BLUE : World.ROBOT_YELLOW);
+			double[] goal = ((shootingLeft) ? World.GOAL_LEFT : World.GOAL_RIGHT);
+		
+			World world = new World(color, goal);
+			world.listenForVision(visionPort);			
 
 			// wait until world is giving real states
 			while(world.getWorldState() == null)

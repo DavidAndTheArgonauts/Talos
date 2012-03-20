@@ -164,7 +164,6 @@ public class MilestoneController extends AbstractController
 			}
 		}
 		
-		
 		// stop robot and disconnect
 		c.stop();
 		c.waitForQueueToEmpty();

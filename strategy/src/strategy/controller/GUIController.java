@@ -123,6 +123,10 @@ public class GUIController extends AbstractController
 		
 		gui.close();
 		gui = null;
+		
+		world.close();
+		
+		
 		commander.unregisterController();
 		
 	}
