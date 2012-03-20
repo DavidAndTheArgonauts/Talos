@@ -29,7 +29,7 @@ public class InterceptMode extends AbstractMode
 		
 	}
 	
-	public updateTarget(double targetX, double targetY) {
+	public void updateTarget(double targetX, double targetY) {
 		destCoords[0] = targetX;
 		destCoords[1] = targetY;
 		
@@ -54,6 +54,7 @@ public class InterceptMode extends AbstractMode
 				// work out if we need to turn or drive
 				// etc
 				
+				
 				break;
 		
 			case Turning:
@@ -62,6 +63,7 @@ public class InterceptMode extends AbstractMode
 					// register interrupt
 					// facingInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_FACING,60);
 					// spin left
+					int ang = 0;
 					if(ang > 0) {
 						commander.setSpeed(-50, 50);
 					} else {
@@ -79,7 +81,7 @@ public class InterceptMode extends AbstractMode
 					// if we want to drive forward
 					// use Tools to calc distance
 					// register interrupt
-					double distToGo;
+					double distToGo = 0;
 					distanceInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,distToGo);
 					commander.setSpeed(70,70);
 					// drive forward
@@ -140,22 +142,20 @@ public class InterceptMode extends AbstractMode
 	
 	public void handleInterrupt(World world, int interrupt)
 	{
-		switch(interrupt) {
-			case facingInterrupt:
+		
+			if(facingInterrupt==interrupt) {
 				currentState = State.Driving;
 				commander.stop();
-				break;
-			
-			case distanceInterrupt:
+			} else if(distanceInterrupt==interrupt) {
 				currentState = State.Intercepting;
 				commander.stop();
-				break;
-				
-			case quitInterrupt:
+			} else if(quitInterrupt==interrupt) {
 				currentState = State.Quitting;
-				break;
+			} else {}
 		
-		}
+		
+	}
+	
 		
 	
 	
