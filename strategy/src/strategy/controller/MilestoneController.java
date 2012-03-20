@@ -17,6 +17,7 @@ public class MilestoneController extends AbstractController
 	private World world;
 	
 	private static GUI gui;
+	private static ControlGUI cgui;
 	
 	AbstractMode currentMode = null;
 	
@@ -56,19 +57,22 @@ public class MilestoneController extends AbstractController
 		// create commander and connect
 		Commander c = new Commander();
 		c.connect(proxyHost,proxyPort);
-		
+
 		// if not connected, quit
-		if (!c.isConnected())
+		/*if (!c.isConnected())
 		{
 			System.out.println("Cannot connect to proxy");
 			System.exit(0);
-		}
+		}*/
 		
+		cgui = new ControlGUI(c);
+		cgui.createGui();
+
 		System.out.println("Connected to proxy");
 		AbstractMode reflectMode = null;
 		Class cls;
 		
-		try {
+		/*try {
 			//reflectmode = Class.forName
 			//reflectMode = Constructor.forName(args[4]).newInstance(c);
 			cls = Class.forName("strategy.mode." + args[4]);
@@ -89,7 +93,7 @@ public class MilestoneController extends AbstractController
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("HELLLO");
-		}
+		}*/
 		
 		// create world and listen for vision
 		double[] goal = new double[2];
