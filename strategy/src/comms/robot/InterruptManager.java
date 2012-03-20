@@ -128,9 +128,9 @@ public class InterruptManager extends Thread
 							{
 								Thread.sleep(100);
 							}
-							catch (Exception e)
+							catch (InterruptedException e)
 							{
-								
+								return;
 							}
 						}
 						

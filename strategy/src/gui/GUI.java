@@ -72,6 +72,14 @@ public class GUI extends JPanel
 		repaint();
 		
 	}
+	
+	public void close()
+	{
+		
+		setVisible(false);
+		jf.dispose();
+		
+	}
 
 	public static void drawCircle( Graphics g, double x, double y, double radius, Color c, boolean filled ) {
 		g.setColor( c );

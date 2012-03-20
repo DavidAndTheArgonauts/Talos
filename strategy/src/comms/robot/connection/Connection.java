@@ -117,26 +117,29 @@ public class Connection implements RobotCallback
 			System.err.println("Not connected");
 			return;
 		}
-	
-		try
+		
+		while (incomingThread != null && outgoingThread != null && incomingThread.isAlive() && outgoingThread.isAlive())
 		{
+			try
+			{
 			
-			incomingThread.interrupt();
-			outgoingThread.interrupt();
+				incomingThread.interrupt();
+				outgoingThread.interrupt();
 			
-			outgoingThread.join();
-			incomingThread.join();
+				outgoingThread.join();
+				incomingThread.join();
 			
-			is.close();
-			os.close();
+				is.close();
+				os.close();
 			
-			clientSocket.close();
+				clientSocket.close();
 			
-		}
-		catch(Exception e)
-		{
-			System.err.println("Unable to close connection");
-			e.printStackTrace();
+			}
+			catch(Exception e)
+			{
+				System.err.println("Unable to close connection");
+				e.printStackTrace();
+			}
 		}
 	}
 	

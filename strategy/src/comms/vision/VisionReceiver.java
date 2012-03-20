@@ -124,6 +124,7 @@ public class VisionReceiver
 	*/
 	public void close() {
 		receiver.stopListening();
+		
 		receiver.close();
 	}
 	

@@ -17,7 +17,6 @@ public class MilestoneController extends AbstractController
 	private World world;
 	
 	private static GUI gui;
-	private static ControlGUI cgui;
 	
 	AbstractMode currentMode = null;
 	
@@ -59,15 +58,12 @@ public class MilestoneController extends AbstractController
 		c.connect(proxyHost,proxyPort);
 
 		// if not connected, quit
-		/*if (!c.isConnected())
+		if (!c.isConnected())
 		{
 			System.out.println("Cannot connect to proxy");
 			System.exit(0);
-		}*/
+		}
 		
-		cgui = new ControlGUI(c);
-		cgui.createGui();
-
 		System.out.println("Connected to proxy");
 		AbstractMode reflectMode = null;
 		Class cls;
@@ -129,9 +125,7 @@ public class MilestoneController extends AbstractController
 		
 		System.out.println("World data found!");
 		
-		
 		gui = new GUI(w.getWorldState(),color,goal);
-		
 		
 		// create controller thread and begin
 		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
@@ -143,7 +137,7 @@ public class MilestoneController extends AbstractController
 		}
 		
 		gcThread.start();
-
+		
 		System.out.println("Press <enter> to quit");
 		
 		// wait for enter to be pressed
@@ -157,7 +151,7 @@ public class MilestoneController extends AbstractController
 		}
 		
 		// interrupt and wait for thread to die
-		gcThread.interrupt();
+		gcThread.controllerInterrupt(InterruptManager.INTERRUPT_QUIT,-1);
 		while (gcThread.isAlive())
 		{
 			try
@@ -170,14 +164,21 @@ public class MilestoneController extends AbstractController
 			}
 		}
 		
+		
 		// stop robot and disconnect
 		c.stop();
 		c.waitForQueueToEmpty();
 		
+		c.disconnect();
+		
 		// close world connection
 		w.close();
 		
-		c.disconnect();
+		gui.close();
+		
+		System.out.println("Active threads: " + Thread.activeCount());
+		
+		System.out.println("Exiting..");
 		
 	}
 	
@@ -207,6 +208,7 @@ public class MilestoneController extends AbstractController
 				
 				if (isQuitInterrupt())
 				{
+					System.out.println("Found quit interrupt");
 					return;
 				}
 				
@@ -222,6 +224,7 @@ public class MilestoneController extends AbstractController
 				
 				if (isQuitInterrupt())
 				{
+					System.out.println("Found quit interrupt");
 					return;
 				}
 				
@@ -248,6 +251,7 @@ public class MilestoneController extends AbstractController
 					 
 					 if (isQuitInterrupt())
 					 {
+					 	System.out.println("Found quit interrupt");
 					 	return;
 					 }
 					 
