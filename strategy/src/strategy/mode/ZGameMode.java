@@ -20,7 +20,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
     
 	
 	
-	private static final int MAX_MOTOR_SPEED = 50;
+	private static final int MAX_MOTOR_SPEED = 100;
 	
 	private double[][] lines = new double[0][4];
 	
@@ -35,7 +35,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private double speedDelta = 0;
 	private boolean turning = false;
 	private long lastTime = -1;
-	private double delay = 0.65;
+	private double delay = 0.4;
 	private ArrayList<Integer> estTimes = new ArrayList<Integer>();
 	private double[] estBallSpeed, estRobotSpeed;
 	private double estimatedBallX, estimatedBallY;
@@ -139,6 +139,24 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
     }
 
+    public double[] estimateBallPos ( double time ) {
+        double[] pos = new double[2];
+        pos[0] = state.getBallX() + estBallSpeed[0] * time;
+        pos[1] = state.getBallY() + estBallSpeed[1] * time;
+        return pos;
+    }
+
+    public double[] estimateRobotPos ( double time ) {
+        double[] pos = new double[2];
+        pos[0] = state.getRobotX(world.getColor()) + estRobotSpeed[0] * time;
+        pos[1] = state.getRobotY(world.getColor()) + estRobotSpeed[1] * time;
+        return pos;
+    }
+
+
+
+        
+
 	public void paint(Graphics g, int ratio )
 	{
 		
@@ -158,12 +176,9 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         
 		GUI.drawDirection( g, state.getBallX()*ratio, state.getBallY()*ratio, 1*ratio, Color.WHITE, estBallSpeed[0], estBallSpeed[1] );
 
-		estimatedBallX = state.getBallX() + estBallSpeed[0] * delay;
-		estimatedBallY = state.getBallY() + estBallSpeed[1] * delay;
+		GUI.drawCircle( g, estimateBallPos(delay)[0]*ratio, estimateBallPos(delay)[1]*ratio, 1.5*ratio, Color.WHITE, true );
 
-		GUI.drawCircle( g, estimatedBallX*ratio, estimatedBallY*ratio, 1.5*ratio, Color.WHITE, true );
-
-        double Lx = distFromEdge;
+        /*double Lx = distFromEdge;
         double Ty = distFromEdge;
         double Rx = World.WORLD_WIDTH - distFromEdge;
         double By = World.WORLD_HEIGHT - distFromEdge;
@@ -200,9 +215,12 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             GUI.drawCircle( g, Rx*ratio, Ry*ratio, 1.5*ratio, Color.ORANGE, true );
             gotoX = Rx;
             gotoY = Ry;
-        }
+        }*/
 
-        if ( estBallSpeed[2] > 2 ) mode = "goto";
+        if ( estBallSpeed[2] > 1 ) {
+            mode = "goto";
+        }
+    
         else mode = "stop";
         
         System.out.println( "ballSpeed: " + estBallSpeed[2] );
@@ -212,8 +230,17 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         GUI.drawDirection( g, state.getRobotX(world.getColor())*ratio, state.getRobotY(world.getColor())*ratio, 1*ratio, Color.RED, estRobotSpeed[0], estRobotSpeed[1] );
 
 
-        gotoX = x;
-        gotoY = y;
+        gotoX = estimateBallPos(delay)[0];
+        gotoY = estimateBallPos(delay)[1];
+        
+        g.setColor( Color.RED );
+        g.drawLine( (int) state.getRobotX(world.getColor())*ratio, 
+                    (int) state.getRobotY(world.getColor())*ratio, 
+                    (int) gotoX*ratio, 
+                    (int) gotoY*ratio );
+
+
+
         
         if ( mode == "stop" ) {
             targetDriveLeft = 0;
