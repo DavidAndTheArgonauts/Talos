@@ -230,8 +230,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         GUI.drawDirection( g, state.getRobotX(world.getColor())*ratio, state.getRobotY(world.getColor())*ratio, 1*ratio, Color.RED, estRobotSpeed[0], estRobotSpeed[1] );
 
 
-        gotoX = estimateBallPos(delay)[0];
-        gotoY = estimateBallPos(delay)[1];
+        double gotoDistance = vecSize(  state.getRobotX(world.getColor())-estimateBallPos(delay)[0],
+                                        state.getRobotY(world.getColor())-estimateBallPos(delay)[1]);
+        
+        System.out.println(gotoDistance);
+
+        gotoX = estimateBallPos(gotoDistance/30f)[0];
+        gotoY = estimateBallPos(gotoDistance/30f)[1];
         
         g.setColor( Color.RED );
         g.drawLine( (int) state.getRobotX(world.getColor())*ratio, 
