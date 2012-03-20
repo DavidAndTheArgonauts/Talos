@@ -7,7 +7,7 @@ public class InterceptMode extends AbstractMode
 {
 	
 	
-	private enum State {Turning, Driving, Intercepting, Dribbling, Quitting, Nothing, Resetting};
+	private enum State {Turning, Driving, Intercepting, Dribbling, Quitting, Nothing, Resetting, Arcing};
 	
 	private State currentState;
 	private double[] destCoords;
@@ -53,6 +53,7 @@ public class InterceptMode extends AbstractMode
 			case Resetting:
 				// work out if we need to turn or drive
 				// etc
+				
 				break;
 		
 			case Turning:
@@ -67,6 +68,10 @@ public class InterceptMode extends AbstractMode
 						commander.setSpeed(50, -50);
 					}
 					currentState = State.Nothing;
+				break;
+				
+			case Arcing:
+				
 				break;
 				
 				
