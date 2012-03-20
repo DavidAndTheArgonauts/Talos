@@ -72,7 +72,7 @@ public class MilestoneController extends AbstractController
 		AbstractMode reflectMode = null;
 		Class cls;
 		
-		/*try {
+		try {
 			//reflectmode = Class.forName
 			//reflectMode = Constructor.forName(args[4]).newInstance(c);
 			cls = Class.forName("strategy.mode." + args[4]);
@@ -93,7 +93,7 @@ public class MilestoneController extends AbstractController
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("HELLLO");
-		}*/
+		}
 		
 		// create world and listen for vision
 		double[] goal = new double[2];
@@ -135,7 +135,6 @@ public class MilestoneController extends AbstractController
 		
 		// create controller thread and begin
 		AbstractController gcThread = new MilestoneController(w,c, reflectMode);
-		gcThread.start();
 		
 		System.out.println("Registering controller");
 		if (!c.registerController(gcThread))
@@ -143,6 +142,8 @@ public class MilestoneController extends AbstractController
 			System.out.println("Unable to register controller");
 		}
 		
+		gcThread.start();
+
 		System.out.println("Press <enter> to quit");
 		
 		// wait for enter to be pressed

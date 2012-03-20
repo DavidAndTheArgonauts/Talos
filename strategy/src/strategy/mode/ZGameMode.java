@@ -18,6 +18,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public static final double BALL_RADIUS = 12;
 	public static final double DESTINATION_RADIUS = 2;
 	
+	
 	private static final int MAX_MOTOR_SPEED = 0;
 	
 	private double[][] lines = new double[0][4];
@@ -32,8 +33,14 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private double speedDelta = 0;
 	private boolean turning = false;
 	private long lastTime = -1;
-	
-	
+	private double delay = 0.65;
+	private ArrayList<Integer> estTimes = new ArrayList<Integer>();
+	private double[] estBallSpeed;
+	private double estimatedBallX, estimatedBallY;
+	private long lastKick = -1;
+	private int kickcounts = 0;
+
+
 	public ZGameMode(Commander commander)
 	{	
 		super(commander);
@@ -95,9 +102,8 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 			
 		}*/
 		
-		ArrayList<Integer> estTimes = new ArrayList<Integer>();
 		estTimes.add(100);
-		estTimes.add(200);		
+		estTimes.add(200);
 		estTimes.add(300);
 		estTimes.add(500);
 
@@ -108,19 +114,15 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 			}
 		}
 
-		double[] estBallSpeed =  estimateBallSpeed ( estTimes );
+		estBallSpeed =  estimateBallSpeed ( estTimes );
 		GUI.drawDirection( g, state.getBallX()*ratio, state.getBallY()*ratio, 1*ratio, Color.WHITE, estBallSpeed[0], estBallSpeed[1] );
 
-		double delay = 0.4;
-
-		double estimatedBallX = state.getBallX() + estBallSpeed[0] * delay;
-		double estimatedBallY = state.getBallY() + estBallSpeed[1] * delay;
+		estimatedBallX = state.getBallX() + estBallSpeed[0] * delay;
+		estimatedBallY = state.getBallY() + estBallSpeed[1] * delay;
 
 		GUI.drawCircle( g, estimatedBallX*ratio, estimatedBallY*ratio, 1.5*ratio, Color.WHITE, true );
-		
-
-
 	}
+
 	
 	public void reset(World world){}
 	
@@ -133,7 +135,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 						
 		if ( mode == "stop" )
 		{
-			commander.stop();
+			//commander.stop();
 		}
 			
 				
@@ -239,13 +241,14 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 			driveLeft = (int) Math.round( leftMotor * MAX_MOTOR_SPEED * speedDelta );
 			driveRight = (int) Math.round( rightMotor * MAX_MOTOR_SPEED * speedDelta );
 			commander.setSpeed( driveLeft, driveRight );
+
 		
 			System.out.println("Speed (" + driveLeft + "," + driveRight + ")\n");
 		
 		}
 		
 		if (lastTime != -1) {
-		  System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
+		  //System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
 		}
 		lastTime = System.nanoTime();
 		
@@ -254,11 +257,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public void updateStrategy( World world ) 
 	{
 		
-		if ( !state.getBallVisible() || !state.getRobotVisible(world.getColor()) )
-		{
-			mode = "stop";
-			return;
-		}
+		mode = "skip";
 		
 		double robotX = state.getRobotX(world.getColor());
 		double robotY = state.getRobotY(world.getColor());
@@ -269,311 +268,24 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		double enemyX = state.getEnemyX(world.getColor());
 		double enemyY = state.getEnemyY(world.getColor());
 
-
-
-
-
-		double[] gCoords = world.getGoalCoords();
-	
-		target = calculateDestination(ballX, ballY ,gCoords[0],gCoords[1],10);
-		
-		if (target.getY() < 10)
+		if ( estimatedBallX < robotX ) 
 		{
-			target.setLocation(target.getX(),10);
-		}
-		else if (target.getY() > 70)
-		{
-			target.setLocation(target.getX(),70);
-		}
-		if (target.getX() < 10)
-		{
-			target.setLocation(10,target.getY());
-		}
-		else if (target.getX() > 120)
-		{
-			target.setLocation(120,target.getY());
-		}
-		
-		double targetX = target.getX();
-		double targetY = target.getY();
-		
-		boolean enemyIntersect = lineCircleIntersect(robotX, robotY, targetX, targetY, enemyX, enemyY, ENEMY_RADIUS);
-		boolean ballIntersect = lineCircleIntersect(robotX, robotY, targetX, targetY, ballX, ballY, BALL_RADIUS);
-		
-		Point2D ballWP = findWP(robotX, robotY, targetX, targetY, ballX, ballY, BALL_RADIUS);
-		Point2D enemyWP = findWP(robotX, robotY, targetX, targetY, enemyX, enemyY, ENEMY_RADIUS);
-
-
-		
-		
-		
-		if ( vecSize(ballX - robotX, ballY - robotY) < 10 ) {
-		
-			System.out.println("ball kicking");
-		
-			turntoX = gCoords[0] - robotX;
-			turntoY = gCoords[1] - robotY;
-		
-			double targetAngle = Math.toDegrees(Math.atan2(turntoX,turntoY));
-		
-			double dirX = state.getRobotDX(world.getColor());
-			double dirY = state.getRobotDY(world.getColor());
-		
-			double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
-		
-			double dirRoboTarget = targetAngle - dirAngle;
-				
-			if ( dirRoboTarget > 180 ) {
-				dirRoboTarget -= 360;
-			}
-
-			else if ( dirRoboTarget < -180 ) {
-				dirRoboTarget += 360;
-			}
-			
-			
-			if ( Math.abs( dirRoboTarget ) < 45 ) {
+			if ( ( ( System.currentTimeMillis() - lastKick ) / 1000f ) > 2 ) 
+			{
 				commander.kick();
-				System.out.println("kick1");
+				kickcounts++;
+				lastKick = System.currentTimeMillis();
+				System.out.println("kicking!" + kickcounts );
 			}
-			
-			
-		
-				
-			
-		}
-		
-		
-		else if ( vecSize(targetX - robotX, targetY - robotY) < 10 ) {
-
-			System.out.println("Close to target");
-			
-			mode = "turnto";
-			turntoX = gCoords[0] - robotX;
-			turntoY = gCoords[1] - robotY;
-			
-			if ( !turning ) {
-				mode = "goto";
-				System.out.println("non-turning");
-				
-				gotoX = ( ballX + gCoords[0] ) / 2f;
-				gotoY = ( ballY + gCoords[1] ) / 2f;
-				speedDelta = 1;
-				
-				commander.kick();
-				System.out.println("kick2");
+			else {
 			}
-			
-			
-			
-		}
-		
-		else if ( (!enemyIntersect && !ballIntersect)  )
-		{
-			System.out.println("Going straight to target");
-			
-			lines = new double[1][4];
-			lines[0][0] = robotX;
-			lines[0][1] = robotY;
-			lines[0][2] = targetX;
-			lines[0][3] = targetY;
-			
-			gotoX = targetX;
-			gotoY = targetY;
-			
-			mode = "goto";
-			
-			double dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-			
-			if ( dirTargetNorm > 20 ) speedDelta = 1;
-			else speedDelta = dirTargetNorm / 20f;
-			
-
-			if ( dirTargetNorm < DESTINATION_RADIUS ) {
-				mode = "stop";
-				System.out.println("target found");
-						
-			}
-			
-		}
-		else if (!enemyIntersect && ballIntersect)
-		{
-			
-			System.out.println("Avoiding ball");
-			
-			Point2D waypoint = ballWP;
-			
-			lines = new double[2][4];
-			
-			lines[0][0] = robotX;
-			lines[0][1] = robotY;
-			lines[0][2] = waypoint.getX();
-			lines[0][3] = waypoint.getY();
-			
-			lines[1][0] = targetX;
-			lines[1][1] = targetY;
-			lines[1][2] = waypoint.getX();
-			lines[1][3] = waypoint.getY();
-			
-			mode = "goto";
-			
-			gotoX = waypoint.getX();
-			gotoY = waypoint.getY();
-			
-			speedDelta = 1;
-			
-			double dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-			
-			if (dirTargetNorm < DESTINATION_RADIUS)
-			{
-				
-				gotoX = targetX;
-				gotoY = targetY;
-				
-				dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-				
-				if ( dirTargetNorm > 20 ) speedDelta = 1;
-				else speedDelta = dirTargetNorm / 20f;
-				
-				
-				if ( dirTargetNorm < DESTINATION_RADIUS ) {
-					mode = "stop";
-					System.out.println("target found");
-				}
-				
-			}
-			
-		}
-		else if (enemyIntersect && !ballIntersect)
-		{
-			
-			System.out.println("Avoiding enemy");
-			
-			Point2D waypoint = enemyWP;
-			
-			lines = new double[2][4];
-			
-			lines[0][0] = robotX;
-			lines[0][1] = robotY;
-			lines[0][2] = waypoint.getX();
-			lines[0][3] = waypoint.getY();
-			
-			lines[1][0] = targetX;
-			lines[1][1] = targetY;
-			lines[1][2] = waypoint.getX();
-			lines[1][3] = waypoint.getY();
-			
-			mode = "goto";
-			
-			gotoX = waypoint.getX();
-			gotoY = waypoint.getY();
-			
-			speedDelta = 1;
-			
-			double dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-			
-			if (dirTargetNorm < DESTINATION_RADIUS)
-			{
-				
-				gotoX = targetX;
-				gotoY = targetY;
-				
-				dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-				
-				if ( dirTargetNorm > 20 ) speedDelta = 1;
-				else speedDelta = dirTargetNorm / 20f;
-				
-				
-				if ( dirTargetNorm < DESTINATION_RADIUS ) {
-					mode = "stop";
-					System.out.println("target found");
-				}
-				
-			}
-			
-		}
-		else if (ballIntersect && enemyIntersect)
-		{
-			
-			System.out.println("Avoiding enemy and ball");
-			
-			Point2D firstWP = null, secondWP = null;
-			
-			if (vecSize(ballWP.getX() - robotX, ballWP.getY() - robotY) < vecSize(enemyWP.getX() - robotX, enemyWP.getY() - robotY))
-			{
-				
-				firstWP = ballWP;
-				secondWP = findWP(firstWP.getX(), firstWP.getY(), targetX, targetY, enemyX, enemyY, ENEMY_RADIUS);
-				
-			}
-			else
-			{
-				
-				firstWP = enemyWP;
-				secondWP = findWP(firstWP.getX(), firstWP.getY(), targetX, targetY, ballX, ballY, BALL_RADIUS);
-				
-			}
-			
-			lines = new double[3][4];
-			
-			lines[0][0] = robotX;
-			lines[0][1] = robotY;
-			lines[0][2] = firstWP.getX();
-			lines[0][3] = firstWP.getY();
-			
-			lines[1][0] = firstWP.getX();
-			lines[1][1] = firstWP.getY();
-			lines[1][2] = secondWP.getX();
-			lines[1][3] = secondWP.getY();
-			
-			lines[2][0] = targetX;
-			lines[2][1] = targetY;
-			lines[2][2] = secondWP.getX();
-			lines[2][3] = secondWP.getY();
-			
-			mode = "goto";
-			
-			gotoX = firstWP.getX();
-			gotoY = firstWP.getY();
-			
-			speedDelta = 1;
-			
-			double dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-			
-			if (dirTargetNorm < DESTINATION_RADIUS)
-			{
-				
-				gotoX = secondWP.getX();
-				gotoY = secondWP.getY();
-				
-				speedDelta = 1;
-				
-				dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-				if ( dirTargetNorm < DESTINATION_RADIUS ) {
 					
-					gotoX = targetX;
-					gotoY = targetY;
-					
-					dirTargetNorm = vecSize(gotoX - robotX, gotoY - robotY);
-					
-					if ( dirTargetNorm > 20 ) speedDelta = 1;
-					else speedDelta = dirTargetNorm / 20f;
-				
-					if ( dirTargetNorm < DESTINATION_RADIUS ) {
-					
-						mode = "stop";
-						System.out.println("target found");
-					}
-				}
-				
-			}
-			
 		}
-		
-		
-		
-		
-		
+			
+		else
+		{
+			//commander.setSpeed( 0, 0 );
+		}
 		
 	}
 	
