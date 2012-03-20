@@ -59,6 +59,8 @@ public class Commander implements RobotCallback
 	private String host;
 	private int port;
 	
+	private boolean paused = false;
+	
 	private InterruptManager interruptManager = null;
 	
 	public Commander()
@@ -340,6 +342,8 @@ public class Commander implements RobotCallback
 	public void setSpeed(int left, int right)
 	{
 		
+		if (paused) return;
+		
 		// if we are sending the same wheel speed command
 		if (left == lWheelSetSpeed && right == rWheelSetSpeed)
 		{
@@ -352,6 +356,24 @@ public class Commander implements RobotCallback
 		clearQueue();
 		connection.queueCommand(new Message(Opcodes.SET_SPEED,left,right));
 		
+	}
+	
+	public void pause()
+	{
+		setSpeed(1,1);
+		stop();
+		
+		paused = true;
+	}
+	
+	public void resume()
+	{
+		paused = false;
+	}
+	
+	public void togglePause()
+	{
+		paused = !paused;
 	}
 
 	public void penaltyKick()
