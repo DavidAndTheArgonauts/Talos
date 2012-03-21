@@ -6,5 +6,4 @@ public enum ModeEnum
 	InterruptTestMode,
 	StaticShootMode,
 	ZGameMode;
-    CircleTesting
 }
