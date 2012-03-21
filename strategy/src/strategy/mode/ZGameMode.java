@@ -35,13 +35,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private double speedDelta = 0;
 	private boolean turning = false;
 	private long lastTime = -1;
-	private double delay = 0.4;
 	private ArrayList<Integer> estTimes = new ArrayList<Integer>();
 	private double[] estBallSpeed, estRobotSpeed;
 	private double estimatedBallX, estimatedBallY;
 	private long lastKick = -1;
 	private int kickcounts = 0;
-    private double distFromEdge = 10;
+    private double[] ball = new double[2];
+    private double[] robot = new double[2];
 
 
 
@@ -67,7 +67,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         times.add(100);
         times.add(200);
         times.add(300);
-        times.add(500);
+        //times.add(500);
 
 		double counter = 0;
 		double dx = 0, dy = 0;
@@ -81,21 +81,17 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 				double pastBallX = ago.getBallX();
 				double pastBallY = ago.getBallY();
 				double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
-				dx += (state.getBallX() - pastBallX) / timeAgo;
-				dy += (state.getBallY() - pastBallY) / timeAgo;
+				dx += (ball[0] - pastBallX) / timeAgo;
+				dy += (ball[1] - pastBallY) / timeAgo;
 				counter++;
 			}
 
 		}
-
         if (counter == 0) return null;
-
 		dir[0] = dx / counter;
 		dir[1] = dy / counter;
         dir[2] = vecSize(  dx / counter, dy / counter );
-
 		return dir;
-
 	}
 
     public double[] estimateRobotSpeed () {
@@ -105,7 +101,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         times.add(100);
         times.add(200);
         times.add(300);
-        times.add(500);
+        //times.add(500);
        
         double counter = 0;
         double dx = 0, dy = 0;
@@ -119,130 +115,167 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
                 double pastRobotX = ago.getRobotX(world.getColor());
                 double pastRobotY = ago.getRobotY(world.getColor());
                 double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
-                dx += (state.getRobotX(world.getColor()) - pastRobotX) / timeAgo;
-                dy += (state.getRobotY(world.getColor()) - pastRobotY) / timeAgo;
+                dx += (robot[0] - pastRobotX) / timeAgo;
+                dy += (robot[1] - pastRobotY) / timeAgo;
                 counter++;
             }
-
         }
-
-        
-         
         if (counter == 0) return null;
-
         dir[0] = dx / counter;
         dir[1] = dy / counter;
         dir[2] = vecSize(  dx / counter, dy / counter );
-        
-        
         return dir;
-
     }
 
     public double[] estimateBallPos ( double time ) {
         double[] pos = new double[2];
-        pos[0] = state.getBallX() + estBallSpeed[0] * time;
-        pos[1] = state.getBallY() + estBallSpeed[1] * time;
+        pos[0] = ball[0] + estBallSpeed[0] * time;
+        pos[1] = ball[1] + estBallSpeed[1] * time;
         return pos;
     }
 
     public double[] estimateRobotPos ( double time ) {
         double[] pos = new double[2];
-        pos[0] = state.getRobotX(world.getColor()) + estRobotSpeed[0] * time;
-        pos[1] = state.getRobotY(world.getColor()) + estRobotSpeed[1] * time;
+        pos[0] = robot[0] + estRobotSpeed[0] * time;
+        pos[1] = robot[1] + estRobotSpeed[1] * time;
         return pos;
     }
 
+    public double distanceRobotObject ( double[] obj ) {
+        double distance = vecSize(  robot[0] - obj[0], robot[1] - obj[1] );
+        return distance;
+    }
 
+    public double[] limitVectorToTable( double[] start, double[] end ) {
+        return limitVectorToTable( start[0], start[1], end[0], end[1] );
+    }
 
+    public double[] limitVectorToTable( double x, double y, double targetX, double targetY ) {
+
+        double distFromEdge = 10;
+        double[] result = new double[2];
+
+        double dx = targetX - x;
+        double dy = targetY - y;
         
-
-	public void paint(Graphics g, int ratio )
-	{
-		
-
-
-/*		for ( int v : estTimes ) {
-			WorldState ago = world.getPastByTime(v);
-			if ( ago != null ) {
-				GUI.drawCircle( g, ago.getBallX()*ratio, ago.getBallY()*ratio, 1*ratio, Color.WHITE, true );
-			}
-		}*/
-
-		estBallSpeed =  estimateBallSpeed();
-        estRobotSpeed = estimateRobotSpeed();
-           
-        if (estBallSpeed == null || estRobotSpeed == null) return;
-        
-		GUI.drawDirection( g, state.getBallX()*ratio, state.getBallY()*ratio, 1*ratio, Color.WHITE, estBallSpeed[0], estBallSpeed[1] );
-
-		GUI.drawCircle( g, estimateBallPos(delay)[0]*ratio, estimateBallPos(delay)[1]*ratio, 1.5*ratio, Color.WHITE, true );
-
-        /*double Lx = distFromEdge;
+        double Lx = distFromEdge;
         double Ty = distFromEdge;
         double Rx = World.WORLD_WIDTH - distFromEdge;
         double By = World.WORLD_HEIGHT - distFromEdge;
-
-        double dx = estBallSpeed[0];
-        double dy = estBallSpeed[1];
-        
-        double x = state.getBallX();
-        double y = state.getBallY();
 
         double Bx = ( +dx*(By-y) + dy*x )/dy;
         double Tx = ( -dx*(y+Ty) + dy*x )/dy;
         double Ry = ( +dy*(Rx-x) + dx*y )/dx;
         double Ly = ( -dy*(x+Lx) + dx*y )/dx;
 
-        String side = "";
+        if ( targetX > 0 && targetX < World.WORLD_WIDTH && targetY > 0 && targetY < World.WORLD_HEIGHT ) {
+            result[0] = targetX;
+            result[1] = targetY;
+            return result;
+        }
 
         if ( Tx < Rx && Tx > Lx && ( ( dx > 0 ) == ( (Tx - x) > 0 ) ) ) {
-            GUI.drawCircle( g, Tx*ratio, Ty*ratio, 1.5*ratio, Color.ORANGE, true );
-            gotoX = Tx;
-            gotoY = Ty;
+            result[0] = Tx;
+            result[1] = Ty;
         }
         if ( Bx < Rx && Bx > Lx && ( ( dx > 0 ) == ( (Bx - x) > 0 ) ) ) {
-            GUI.drawCircle( g, Bx*ratio, By*ratio, 1.5*ratio, Color.ORANGE, true );
-            gotoX = Bx;
-            gotoY = By;
+            result[0] = Bx;
+            result[1] = By;
         }
         if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
-            GUI.drawCircle( g, Lx*ratio, Ly*ratio, 1.5*ratio, Color.ORANGE, true );
-            gotoX = Lx;
-            gotoY = Ly;
+            result[0] = Lx;
+            result[1] = Ly;
         }
         if ( Ry > Ty && Ry < By && ( ( dy > 0 ) == ( (Ry - y) > 0 ) ) ) {
-            GUI.drawCircle( g, Rx*ratio, Ry*ratio, 1.5*ratio, Color.ORANGE, true );
-            gotoX = Rx;
-            gotoY = Ry;
-        }*/
-
-        if ( estBallSpeed[2] > 1 ) {
-            mode = "goto";
+            result[0] = Rx;
+            result[1] = Ry;
         }
+
+        return result;
+
+    }
+
+    public double[] estimateBallFromEnemy( double X, double Y, double DX, double DY ) {
+        double targetX = X + DX*1;
+        double targetY = Y + DY*1;
+        return limitVectorToTable( X, Y, targetX, targetY );
+    }
+
+        
+
+	public void paint(Graphics g, int ratio )
+	{
+        robot[0] = state.getRobotX(world.getColor());
+        robot[1] = state.getRobotY(world.getColor());
+        
+        ball[0] = state.getBallX();
+        ball[1] = state.getBallY();
+
     
-        else mode = "stop";
+        estBallSpeed =  estimateBallSpeed();
+        estRobotSpeed = estimateRobotSpeed();
+           
+        if (estBallSpeed == null || estRobotSpeed == null) return;
+        
+		GUI.drawCircle(     g, 
+                            estimateBallPos( 0.4 )[0]*ratio, 
+                            estimateBallPos( 0.4 )[1]*ratio, 
+                            1.5*ratio, 
+                            Color.WHITE, 
+                            true );
         
         System.out.println( "ballSpeed: " + estBallSpeed[2] );
         System.out.println( "robotSpeed: " + estRobotSpeed[2] );
         System.out.println( "mode: " + mode );
 
-        GUI.drawDirection( g, state.getRobotX(world.getColor())*ratio, state.getRobotY(world.getColor())*ratio, 1*ratio, Color.RED, estRobotSpeed[0], estRobotSpeed[1] );
-
-
-        double gotoDistance = vecSize(  state.getRobotX(world.getColor())-estimateBallPos(delay)[0],
-                                        state.getRobotY(world.getColor())-estimateBallPos(delay)[1]);
+        double speed = 30;
+        double[] expPos = estimateBallPos(0.4);
+        expPos = limitVectorToTable(ball, expPos);
         
-        System.out.println(gotoDistance);
+        double dist = distanceRobotObject( expPos );
+        double robotDistTime = dist/speed;
 
-        gotoX = estimateBallPos(gotoDistance/30f)[0];
-        gotoY = estimateBallPos(gotoDistance/30f)[1];
+        expPos = estimateBallPos(0.4 + robotDistTime);
+        expPos = limitVectorToTable(ball, expPos);
+        
+        System.out.println( "robotDistTime: " + robotDistTime );
+
+        mode = "goto";
+        
+        if ( estBallSpeed[2] > 2 )
+        {
+            gotoX = expPos[0];
+            gotoY = expPos[1];
+            System.out.println( "estimating using ball" );
+        } 
+
+        else
+        {
+            double[] expFromEnemy = estimateBallFromEnemy(  state.getEnemyX(world.getColor()), 
+                                                            state.getEnemyY(world.getColor()),
+                                                            state.getEnemyDX(world.getColor()),
+                                                            state.getEnemyDY(world.getColor()) );
+            gotoX = expFromEnemy[0];
+            gotoX = expFromEnemy[1];
+            System.out.println( "using enemy robot's direction" );
+        }
+
+
+
+       
         
         g.setColor( Color.RED );
-        g.drawLine( (int) state.getRobotX(world.getColor())*ratio, 
-                    (int) state.getRobotY(world.getColor())*ratio, 
+        g.drawLine( (int) robot[0]*ratio, 
+                    (int) robot[1]*ratio, 
                     (int) gotoX*ratio, 
                     (int) gotoY*ratio );
+
+        GUI.drawCircle( g, 
+                        gotoX*ratio, 
+                        gotoY*ratio, 
+                        1.5*ratio, 
+                        Color.BLUE, 
+                        true );
 
 
 
@@ -282,11 +315,20 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
 
 
-            
-        commander.setSpeed( driveLeft, driveRight );
-        prevDriveLeft = driveLeft;
-        prevDriveRight = driveRight;
-        System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight );
+        if (GUI.paused) {
+            commander.setSpeed( 0, 0);
+            prevDriveLeft = 0;
+            prevDriveRight = 0;
+        }
+
+        else {
+            commander.setSpeed( driveLeft, driveRight );
+            prevDriveLeft = driveLeft;
+            prevDriveRight = driveRight;
+            System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight );
+        }
+        
+        
         
 	}
 
@@ -361,22 +403,20 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 		if ( mode == "goto" )
 		{
-            double dirX = estRobotSpeed[0];
-            double dirY = estRobotSpeed[1];
-			double robotX = state.getRobotX(world.getColor());
-			double robotY = state.getRobotY(world.getColor());
-			double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
+            double dirX = state.getRobotDX(world.getColor());
+            double dirY = state.getRobotDY(world.getColor());
+            double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
 
-			double dirTargetX = gotoX - robotX;
-			double dirTargetY = gotoY - robotY;
+			double dirTargetX = gotoX - robot[0];
+			double dirTargetY = gotoY - robot[1];
 			double dirTargetNorm = vecSize(dirTargetX, dirTargetY);
 			double dirTargetAngle = Math.toDegrees( Math.atan2(dirTargetX, dirTargetY) );
 		
 			double dirRoboTarget = dirTargetAngle - dirAngle;
 		
-			System.out.println("Direction (" + dirX + "," + dirY + ")");
-			System.out.println("dirAngle: " + dirAngle);
-			System.out.println("targetAngle: " + dirTargetAngle);
+			//System.out.println("Direction (" + dirX + "," + dirY + ")");
+			//System.out.println("dirAngle: " + dirAngle);
+			//System.out.println("targetAngle: " + dirTargetAngle);
 		
 			if ( dirRoboTarget > 180 ) {
 				dirRoboTarget -= 360;
@@ -386,7 +426,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 				dirRoboTarget += 360;
 			}
 
-			System.out.println("dirRoboTarget: " + dirRoboTarget);
+			//System.out.println("dirRoboTarget: " + dirRoboTarget);
 
 			double leftMotor = 0, rightMotor = 0;
 
@@ -399,11 +439,11 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
                 rightMotor = 1;
                 leftMotor = 1 - Math.abs(dirRoboTarget) / 300.;
             }
-        
+        /*
             if (  estRobotSpeed[2] < 5 ) {
                 rightMotor = 1;
                 leftMotor = 1;
-            }
+            }*/
 
             if ( dirTargetNorm > 10 ) speedDelta = 1;
             else speedDelta = dirTargetNorm / 10f;
@@ -424,11 +464,11 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public void updateStrategy( World world ) 
 	{
 		
-       /* double robotX = state.getRobotX(world.getColor());
-		double robotY = state.getRobotY(world.getColor());
+       /* double robot[0] = robot[0];
+		double robot[1] = robot[1];
 
-		double ballX = state.getBallX();
-		double ballY = state.getBallY();
+		double ball[0] = ball[0];
+		double ball[1] = ball[1];
 		
 		double enemyX = state.getEnemyX(world.getColor());
 		double enemyY = state.getEnemyY(world.getColor());
@@ -436,7 +476,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
         */
 
-		/*if ( estimatedBallX < robotX ) 
+		/*if ( estimatedBallX < robot[0] ) 
 		{
 			if ( ( ( System.currentTimeMillis() - lastKick ) / 1000f ) > 2 ) 
 			{
@@ -470,47 +510,6 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public static double vecSize(double x, double y)
 	{
 		return Math.sqrt((x*x) + (y*y));
-	}
-	
-	public Point2D calculateDestination(double ballX, double ballY, double goalX, double goalY, double distance )
-	{
-
-		double destinationX;
-		double destinationY;
-
-		if(goalY == ballY)
-		{
-			
-			destinationX = ballX + distance;
-			destinationY = ballY;
-
-		}
-		else
-		{
-		
-			//calculate the vector from goal to ball
-			double vectorx = (ballX-goalX);
-			double vectory = (ballY-goalY);
-
-			//normalising to unit vector
-			double i = Math.sqrt((vectorx*vectorx) + (vectory*vectory));
-
-			double unitVectorx = vectorx/i;
-			double unitVectory = vectory/i;
-
-			//calculate destination by adding multiples of the uWnit vector
-			// Handling out of bounds
-
-
-			destinationX = (ballX + (distance*unitVectorx));
-			destinationY = (ballY + (distance*unitVectory));
-
-		}
-
-		//System.out.println("X: " + destinationX + " Y: " + destinationY);
-		Point2D destination = new Point2D.Double(destinationX, destinationY);
-		return destination;
-
 	}
 	
 	public static Point2D closestPoint(double lx1, double ly1, double lx2, double ly2, double targetX, double targetY) {
