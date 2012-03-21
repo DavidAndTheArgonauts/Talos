@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.awt.event.*;
 
 import java.util.*;
 
@@ -11,7 +12,7 @@ import strategy.world.*;
 
 import strategy.mode.*;
 
-public class GUI extends JPanel
+public class GUI extends JPanel implements MouseListener
 {
 	
 	private static final int DIRECTION_LENGTH = 5;
@@ -28,6 +29,8 @@ public class GUI extends JPanel
 	private double[] goal;
 	private double robotRad = 8;
 	private double ballRad = 2;
+	
+	private double clickX = -1, clickY = -1;
 	
 	public GUI(WorldState state, int color, double[] goalCoords)
 	{
@@ -51,6 +54,8 @@ public class GUI extends JPanel
 		jf.setVisible(true);
 		
 		setWorldState(state);
+		
+		addMouseListener(this);
 		
 	}
 	
@@ -156,7 +161,63 @@ public class GUI extends JPanel
 			painters.get(i).paint(g, ratio );
 		}
 		
+		// draw click
+		if (clickX != -1 && clickY != -1) drawCircle(g, clickX*ratio, clickY*ratio, 10, Color.BLACK, true);
+		
 	}
+	
+	public double getClickX()
+	{
+		return clickX;
+	}
+	
+	public double getClickY()
+	{
+		return clickY;
+	}
+	
+	/* mouse listener methods */
+	
+	public void mouseClicked(MouseEvent e)
+	{
+		
+		// convert click using ratio
+		// get size of panel
+		double width = getBounds().getSize().getWidth();
+		double height = getBounds().getSize().getHeight();
+
+		// calculate width and height of each cell
+		int ratio = (int)( Math.min( width/WIDTH, height/HEIGHT ) );
+		
+		// actual x and y (in cm)
+		double x = e.getX() / ratio;
+		double y = e.getY() / ratio;
+		
+		clickX = x;
+		clickY = y;
+		
+	}
+	
+	public void mouseEntered(MouseEvent e)
+	{
+	
+	}
+	
+	public void mouseExited(MouseEvent e)
+	{
+	
+	}
+	
+	public void mousePressed(MouseEvent e)
+	{
+	
+	}
+	
+	public void mouseReleased(MouseEvent e)
+	{
+		
+	}
+	
 	
 }
 
