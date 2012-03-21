@@ -20,7 +20,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
     
 	
 	
-	private static final int MAX_MOTOR_SPEED = 70;
+	private static final int MAX_MOTOR_SPEED = 100;
     private double speed = 120;
 	
 	private double[][] lines = new double[0][4];
@@ -129,7 +129,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         //gotoY = GUI.getClickY();
 
         
-        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 150 ) {
+        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 120 ) {
             //mode = "turnto";
             turntoX = gotoX - robot[0];
             turntoY = gotoY - robot[1];
@@ -624,13 +624,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             result[0] = Bx;
             result[1] = By;
         }
-        if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
-            result[0] = Lx;
-            result[1] = Ly;
-        }
         if ( Ry > Ty && Ry < By && ( ( dy > 0 ) == ( (Ry - y) > 0 ) ) ) {
             result[0] = Rx;
             result[1] = Ry;
+        }
+        if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
+            result[0] = Lx;
+            result[1] = Ly;
         }
 
         return result;
@@ -660,13 +660,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             result[0] = Bx;
             result[1] = By;
         }
-        if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
-            result[0] = Lx;
-            result[1] = Ly;
-        }
         if ( Ry > Ty && Ry < By && ( ( dy > 0 ) == ( (Ry - y) > 0 ) ) ) {
             result[0] = Rx;
             result[1] = Ry;
+        }
+        if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
+            result[0] = Lx;
+            result[1] = Ly;
         }
 
         return result;
