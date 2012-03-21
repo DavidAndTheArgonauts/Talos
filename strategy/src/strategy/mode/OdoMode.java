@@ -5,115 +5,29 @@ import comms.robot.*;
 
 import gui.*;
 
-import java.awt.*;
+import strategy.tools.*;
 
-import java.awt.geom.Point2D;
-import java.util.*;
-
-public class OdoMode extends AbstractMode implements GUIDrawer
+public class OdoMode extends AbstractMode //implements GUIDrawer
 {
 	
-	private static final double DELAY = 0.65;
-	
-	private World lastWorld;
-	private WorldState lastState;
+	private static final double EDGE_TOLERENCE = 10;
 	
 	public OdoMode(Commander commander)
 	{	
 		super(commander);
 		
-		GUI.subscribe(this);
+		//GUI.subscribe(this);
+		
+		ObjectTracking.PredictedPosition pp = new ObjectTracking.PredictedPosition(null,null,0);
+		
 	}
-
 	
 	public boolean complete()
 	{
 		return false;
 	}
-
-
-	public double[] estimateBallSpeed() 
-	{
-		
-		World world = lastWorld;
-		
-		int[] times = {
-			100,
-			200,
-			300,
-			500
-		};
-
-		double counter = 0;
-		double dx = 0, dy = 0;
-		double[] dir = new double[3];
-
-		for ( int v : times ) {
-			
-			WorldState ago = world.getPastByTime(v);
-
-			if ( ago != null ) {
-				double pastBallX = ago.getBallX();
-				double pastBallY = ago.getBallY();
-				double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
-				dx += (lastState.getBallX() - pastBallX) / timeAgo;
-				dy += (lastState.getBallY() - pastBallY) / timeAgo;
-				counter++;
-			}
-
-		}
-
-		if (counter == 0) return null;
-
-		dir[0] = dx / counter;
-		dir[1] = dy / counter;
-		dir[2] = vecSize(  dx / counter, dy / counter );
-
-		return dir;
-
-	}
-
-	public double[] estimateRobotSpeed() 
-	{
-    		
-    		World world = lastWorld;
-    		
-		int[] times = {
-			100,
-			200,
-			300,
-			500
-		};
-
-		double counter = 0;
-		double dx = 0, dy = 0;
-		double[] dir = new double[3];
-
-		for ( int v : times ) {
-			
-			WorldState ago = world.getPastByTime(v);
-
-			if ( ago != null ) {
-				double pastRobotX = ago.getRobotX(world.getColor());
-				double pastRobotY = ago.getRobotY(world.getColor());
-				double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
-				dx += (lastState.getRobotX(world.getColor()) - pastRobotX) / timeAgo;
-				dy += (lastState.getRobotY(world.getColor()) - pastRobotY) / timeAgo;
-				counter++;
-            	}
-
-		}
-
-		if (counter == 0) return null;
-
-		dir[0] = dx / counter;
-		dir[1] = dy / counter;
-		dir[2] = vecSize(  dx / counter, dy / counter );
-
-		return dir;
-
-	}
-
+	
+	/*
 	public void paint(Graphics g, int ratio)
 	{
 
@@ -134,10 +48,11 @@ public class OdoMode extends AbstractMode implements GUIDrawer
 	/*
 	public void findInterceptWP()
 	{
-		double Lx = distFromEdge;
-		double Ty = distFromEdge;
-		double Rx = World.WORLD_WIDTH - distFromEdge;
-		double By = World.WORLD_HEIGHT - distFromEdge;
+		
+		double Lx = EDGE_TOLERENCE;
+		double Ty = EDGE_TOLERENCE;
+		double Rx = World.WORLD_WIDTH - EDGE_TOLERENCE;
+		double By = World.WORLD_HEIGHT - EDGE_TOLERENCE;
 
 		double dx = estBallSpeed[0];
 		double dy = estBallSpeed[1];
@@ -234,10 +149,7 @@ public class OdoMode extends AbstractMode implements GUIDrawer
 	public void update(World world)
 	{
 		
-		lastWorld = world;
-		lastState = world.getWorldState();
 		
-		//calculateInterceptWaypoint();
 		
 	}
 	
@@ -248,13 +160,5 @@ public class OdoMode extends AbstractMode implements GUIDrawer
 		
 		
 	}
-	
-	public static double vecSize(double x, double y)
-	{
-		return Math.sqrt((x*x) + (y*y));
-	}
-	
-	
-	
 	
 }
