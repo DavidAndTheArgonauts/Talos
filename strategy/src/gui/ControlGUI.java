@@ -30,7 +30,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 
 	boolean weAreBlue = true;
 	boolean shootingLeft = true;
-	boolean paused = false;
+	public static boolean paused = false;
 
 	Commander commander;
 	
@@ -275,22 +275,12 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		{
 			shootingLeft = false;
 		}
-		/*
+		
 		if (e.getActionCommand().equals("pause"))
 		{
-			if(!paused){
-				pauseButton.setText("Paused");
-				paused = !paused;
-				commander.togglePause();
-				commander.pause();
-			} else {
-				pauseButton.setText("Running");
-				paused = !paused;
-				commander.togglePause();
-
-			}
+		paused = !paused;
 		}
-		*/
+		
 		if (e.getActionCommand().equals("halt"))
 		{
 			
