@@ -8,7 +8,7 @@ package strategy.tools;
 
 import strategy.world.*;
 
-public class ObjectTracking
+public abstract class ObjectTracking
 {
 	
 	private static final int[] TIMESTEPS = {
@@ -54,15 +54,8 @@ public class ObjectTracking
 		}
 		
 	}
-	
-	private World world = null;
-	
-	public void updateWorld(World world)
-	{
-		this.world = world;
-	}
 
-	public PredictedPosition getRobotPosition()
+	public static PredictedPosition getRobotPosition(World world)
 	{
     		
     		if (world == null) return null;
@@ -106,7 +99,7 @@ public class ObjectTracking
 
 	}
 	
-	public PredictedPosition getBallPosition()
+	public static PredictedPosition getBallPosition(World world)
 	{
     		
     		if (world == null) return null;
@@ -150,7 +143,7 @@ public class ObjectTracking
 		
 	}
 	
-	public PredictedPosition getEnemyPosition()
+	public static PredictedPosition getEnemyPosition(World world)
 	{
     		
     		if (world == null) return null;

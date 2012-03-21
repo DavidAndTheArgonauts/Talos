@@ -5,5 +5,6 @@ public enum ModeEnum
 	GotoBallMode,
 	InterruptTestMode,
 	StaticShootMode,
-	ZGameMode;
+	ZGameMode,
+	OdoMode;
 }
