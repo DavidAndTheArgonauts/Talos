@@ -62,7 +62,7 @@ public class ObjectTracking
 		this.world = world;
 	}
 
-	private PredictedPosition getRobotPosition()
+	public PredictedPosition getRobotPosition()
 	{
     		
     		if (world == null) return null;
@@ -106,7 +106,7 @@ public class ObjectTracking
 
 	}
 	
-	private PredictedPosition getBallPosition()
+	public PredictedPosition getBallPosition()
 	{
     		
     		if (world == null) return null;
@@ -150,7 +150,7 @@ public class ObjectTracking
 		
 	}
 	
-	private PredictedPosition getEnemyPosition()
+	public PredictedPosition getEnemyPosition()
 	{
     		
     		if (world == null) return null;
