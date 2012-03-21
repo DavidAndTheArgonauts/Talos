@@ -19,7 +19,7 @@ public class ObjectTracking
 	};
 	
 	/* class to store predicted positions */
-	public class PredictedPosition
+	public static class PredictedPosition
 	{
 		
 		private double speed;
