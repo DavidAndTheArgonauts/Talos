@@ -30,7 +30,7 @@ public class GUI extends JPanel implements MouseListener
 	private double robotRad = 8;
 	private double ballRad = 2;
 	
-	private double clickX = -1, clickY = -1;
+	private static double clickX = -1, clickY = -1;
 	
 	public GUI(WorldState state, int color, double[] goalCoords)
 	{
@@ -166,12 +166,12 @@ public class GUI extends JPanel implements MouseListener
 		
 	}
 	
-	public double getClickX()
+	public static double getClickX()
 	{
 		return clickX;
 	}
 	
-	public double getClickY()
+	public static double getClickY()
 	{
 		return clickY;
 	}
