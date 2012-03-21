@@ -46,7 +46,7 @@ public class Driver implements ConnectionInterface
 				while(!Thread.interrupted()){
 					// Wait ~100ms
 					try{
-						Thread.sleep(100);
+						Thread.sleep(10);
 					}
 					catch (Exception e)
 					{
