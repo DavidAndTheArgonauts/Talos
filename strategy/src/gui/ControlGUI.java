@@ -275,7 +275,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 		{
 			shootingLeft = false;
 		}
-		
+		/*
 		if (e.getActionCommand().equals("pause"))
 		{
 			if(!paused){
@@ -290,7 +290,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 
 			}
 		}
-		
+		*/
 		if (e.getActionCommand().equals("halt"))
 		{
 			
