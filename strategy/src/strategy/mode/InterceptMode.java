@@ -2,19 +2,26 @@ package strategy.mode;
 
 import strategy.world.*;
 import comms.robot.*;
+import strategy.tools.*;
 
 public class InterceptMode extends AbstractMode
 {
 	
 	
-	private enum State {Turning, Driving, Intercepting, Dribbling, Quitting, Nothing, Resetting, Arcing};
+	private enum State {Turning, Driving, Intercepting, Dribbling, Quitting, Nothing, Arcing, Begin};
 	
 	private State currentState;
-	private double[] destCoords;
+	private Vector destination;
 	
 	private int facingInterrupt = -1;
 	private int distanceInterrupt = -1;
 	private int quitInterrupt = -1;
+	
+	private World world;
+	
+	private ObjectTracking tracker;
+	
+	private ObjectTracking.PredictedPosition robot;
 	
 	
 	private int interruptId = -1;
@@ -24,14 +31,23 @@ public class InterceptMode extends AbstractMode
 	public InterceptMode(Commander commander, double targetX, double targetY)
 	{
 		super(commander);
-		currentState = State.Turning;
-		updateTarget(targetX, targetY);
+		currentState = State.Begin;
+		updateTarget(new Vector(targetX, targetY));
+		tracker = new ObjectTracking();
+		
 		
 	}
 	
-	public void updateTarget(double targetX, double targetY) {
-		destCoords[0] = targetX;
-		destCoords[1] = targetY;
+	public InterceptMode(Commander commander) {
+		super(commander);
+		currentState = State.Begin;
+		tracker = new ObjectTracking();
+		updateTarget(new Vector(60,40));
+	}
+	
+	public void updateTarget(Vector pos) {
+		destination = pos;
+		currentState = State.Begin;
 		
 	}
 	
@@ -41,21 +57,29 @@ public class InterceptMode extends AbstractMode
 	}
 	
 	public void reset(World world){
-		currentState = State.Resetting;
+		currentState = State.Begin;
+		tracker = new ObjectTracking();
+		tracker.updateWorld(world);
 		
 	}
 	
 	public void update(World world)
 	{
 		
+		this.world = world;
+		tracker.updateWorld(world);
+		
+		
 		switch(currentState) {
 		
-			case Resetting:
-				// work out if we need to turn or drive
-				// etc
-				
-				
+			case Begin:
+				// Decide where to start
+				// probably turning since we are stationary
+
+				currentState = State.Turning;
 				break;
+		
+		
 		
 			case Turning:
 					// if we want to turn
@@ -63,16 +87,34 @@ public class InterceptMode extends AbstractMode
 					// register interrupt
 					// facingInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_FACING,60);
 					// spin left
-					int ang = 0;
-					if(ang > 0) {
-						commander.setSpeed(-50, 50);
-					} else {
-						commander.setSpeed(50, -50);
-					}
-					currentState = State.Nothing;
+					double ang = 0;
+					WorldState worldstate = world.getWorldState();
+					ang = 8 * Math.toDegrees(  Vector.angleVectors(new Vector(worldstate.getRobotX(world.getColor()), worldstate.getRobotY(world.getColor())), destination));
+					
+					System.out.println("ANG: " + ang);
+
+					//if(ang > 0) {
+							commander.setSpeed(50, -50);
+					///	} else {
+							//commander.setSpeed(-50, 50);
+						///}
+						
+						System.out.println(" << REGISTERING TURN INTERRUPT >> ");
+						
+						facingInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_FACING,-90);
+						currentState = State.Nothing;
+					
 				break;
 				
 			case Arcing:
+					// calculate angle
+					// calculate distance
+					// work out optimal arc?
+					//robot = tracker.getRobotPosition();
+					//double ang = Vector.angleVectors(robot.getPosition(), destination);
+					//double resultant = new Vector(robot.getPosition().getX(), robot.getPosition().getY(), destination.getX(), destination.getY());
+					
+					
 				
 				break;
 				
@@ -81,11 +123,14 @@ public class InterceptMode extends AbstractMode
 					// if we want to drive forward
 					// use Tools to calc distance
 					// register interrupt
-					double distToGo = 0;
-					distanceInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,distToGo);
+					robot = tracker.getRobotPosition();
+					double resultant = (new Vector(robot.getPosition().getX(), robot.getPosition().getY(), destination.getX(), destination.getY())).size();
+					distanceInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,resultant);
 					commander.setSpeed(70,70);
-					// drive forward
+					distanceInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,resultant);
 					currentState = State.Nothing;
+
+
 				break;
 				
 				
@@ -103,25 +148,21 @@ public class InterceptMode extends AbstractMode
 				
 			case Nothing:
 				
-				
+				System.out.println("LOL");
 				break;
 				
 			case Quitting:
 				commander.stop();
 				complete = true;
 				break;
-		
-		
+
 		}
 		
-		
-		
+
 		if (complete)
 			return;
 			
-		if(quitInterrupt == -1) {
-			quitInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,40);
-		}
+		
 		
 		/*
 		if (interruptId == -1)
@@ -144,10 +185,11 @@ public class InterceptMode extends AbstractMode
 	{
 		
 			if(facingInterrupt==interrupt) {
-				currentState = State.Driving;
+				currentState = State.Arcing;
+				System.out.println(" << HANDLING TURN INTERRUPT >> ");
 				commander.stop();
 			} else if(distanceInterrupt==interrupt) {
-				currentState = State.Intercepting;
+				currentState = State.Arcing;
 				commander.stop();
 			} else if(quitInterrupt==interrupt) {
 				currentState = State.Quitting;
