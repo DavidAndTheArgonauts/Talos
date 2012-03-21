@@ -21,6 +21,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	
 	
 	private static final int MAX_MOTOR_SPEED = 70;
+    private double speed = 120;
 	
 	private double[][] lines = new double[0][4];
 	
@@ -73,11 +74,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
                             Color.WHITE, 
                             true );
         
-        System.out.println( "ballSpeed: " + estBallSpeed[2] );
-        System.out.println( "robotSpeed: " + estRobotSpeed[2] );
-        System.out.println( "mode: " + mode );
+        //System.out.println( "ballSpeed: " + estBallSpeed[2] );
+        //System.out.println( "robotSpeed: " + estRobotSpeed[2] );
+        
 
-        double speed = 60;
+
+
+
         double[] expPos = estimateBallPos(0.4);
         expPos = limitVectorToTable(ball, expPos);
         
@@ -87,10 +90,15 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         expPos = estimateBallPos(0.4 + robotDistTime);
         expPos = limitVectorToTable(ball, expPos);
         
-        System.out.println( "robotDistTime: " + robotDistTime );
+        //System.out.println( "robotDistTime: " + robotDistTime );
 
 
-        if ( dist < 20 && ( ( System.currentTimeMillis() - lastKick ) / 1000f > 1 ) && !ControlGUI.paused ) {
+        if ( distanceRobotObject( estimateBallPos(0.65) ) < 50 
+             //&& ( ( System.currentTimeMillis() - lastKick ) / 1000f > 1 ) 
+             && !ControlGUI.paused 
+             //&& ( ( world.getGoalCoords()[0] - robot[0] ) > 0 ) == ( state.getRobotDX(world.getColor()) > 0 ) 
+        )
+        {
             commander.kick();
             lastKick = System.currentTimeMillis();
             System.out.println("kicking!" );
@@ -121,10 +129,12 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         //gotoY = GUI.getClickY();
 
         
-        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 60 ) {
-            mode = "turnto";
+        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 150 ) {
+            //mode = "turnto";
             turntoX = gotoX - robot[0];
             turntoY = gotoY - robot[1];
+            targetDriveLeft *= -1;
+            targetDriveRight *= -1;
         }
         
 
@@ -160,7 +170,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         int driveLeft = 0, driveRight = 0;
         
         int acceleration = 10;
-        int deceleration = 20;
+        int deceleration = 10;
 
         if ( targetDriveLeft > prevDriveLeft + acceleration ) {
             driveLeft = prevDriveLeft + acceleration;
@@ -191,7 +201,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         }*/
 
         double R = wheelBase / 2f * (driveRight + driveLeft) / (driveLeft - driveRight);
-        System.out.println("R: " + R);
+        //System.out.println("R: " + R);
 
         double centerX = robot[0] - state.getRobotDY(world.getColor()) * R;
         double centerY = robot[1] + state.getRobotDX(world.getColor()) * R;
@@ -211,7 +221,8 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
                         Color.RED, 
                         true );
         
-        System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight );
+        System.out.println( "mode: " + mode );
+        System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight + "\n" );
 
         if ( ControlGUI.paused ) {
             commander.setSpeed( 0, 0);
@@ -254,9 +265,9 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 		
 			double dirRoboTarget = targetAngle - dirAngle;
 		
-			System.out.println("Direction (" + dirX + "," + dirY + ")");
-			System.out.println("dirAngle: " + dirAngle);
-			System.out.println("targetAngle: " + targetAngle);
+			//System.out.println("Direction (" + dirX + "," + dirY + ")");
+			//System.out.println("dirAngle: " + dirAngle);
+			//System.out.println("targetAngle: " + targetAngle);
 		
 			if ( dirRoboTarget > 180 ) {
 				dirRoboTarget -= 360;
@@ -266,7 +277,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 				dirRoboTarget += 360;
 			}
 
-			System.out.println("dirRoboTarget: " + dirRoboTarget);
+			//System.out.println("dirRoboTarget: " + dirRoboTarget);
 
 			double leftMotor = 0, rightMotor = 0, speedDelta = 0;
 
@@ -608,22 +619,18 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         if ( Tx < Rx && Tx > Lx && ( ( dx > 0 ) == ( (Tx - x) > 0 ) ) ) {
             result[0] = Tx;
             result[1] = Ty;
-            System.out.println("Top");
         }
         if ( Bx < Rx && Bx > Lx && ( ( dx > 0 ) == ( (Bx - x) > 0 ) ) ) {
             result[0] = Bx;
             result[1] = By;
-            System.out.println("Bottom");
         }
         if ( Ly > Ty && Ly < By && ( ( dy > 0 ) == ( (Ly - y) > 0 ) ) ) {
             result[0] = Lx;
             result[1] = Ly;
-            System.out.println("Left");
         }
         if ( Ry > Ty && Ry < By && ( ( dy > 0 ) == ( (Ry - y) > 0 ) ) ) {
             result[0] = Rx;
             result[1] = Ry;
-            System.out.println("Right");
         }
 
         return result;
