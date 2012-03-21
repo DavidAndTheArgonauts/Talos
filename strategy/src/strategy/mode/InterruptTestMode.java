@@ -32,7 +32,7 @@ public class InterruptTestMode extends AbstractMode
 
 		if (interruptId == -1)
 			interruptId = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_FACING,-360);
-
+		
 		commander.setSpeed(30,30);
 		
 	}
