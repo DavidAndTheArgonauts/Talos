@@ -30,7 +30,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 
 	boolean weAreBlue = true;
 	boolean shootingLeft = true;
-	public static boolean paused = false;
+	public static boolean paused = true;
 
 	Commander commander;
 	

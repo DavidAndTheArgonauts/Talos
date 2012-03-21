@@ -20,7 +20,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
     
 	
 	
-	private static final int MAX_MOTOR_SPEED = 30;
+	private static final int MAX_MOTOR_SPEED = 70;
 	
 	private double[][] lines = new double[0][4];
 	
@@ -39,12 +39,14 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	private double[] estBallSpeed, estRobotSpeed;
 	private double estimatedBallX, estimatedBallY;
 	private long lastKick = -1;
+    private long touchSensorPressed  = -1;
 	private int kickcounts = 0;
     private double[] ball = new double[2];
     private double[] robot = new double[2];
     private double wheelBase = 15;
+    private double distFromEdge = 15;
   
-
+    private int touchInterrupt = -1;
 
 	public void paint(Graphics g, int ratio )
 	{
@@ -59,7 +61,6 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         ball[0] = state.getBallX();
         ball[1] = state.getBallY();
 
-    
         estBallSpeed =  estimateBallSpeed();
         
            
@@ -76,7 +77,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         System.out.println( "robotSpeed: " + estRobotSpeed[2] );
         System.out.println( "mode: " + mode );
 
-        double speed = 30;
+        double speed = 60;
         double[] expPos = estimateBallPos(0.4);
         expPos = limitVectorToTable(ball, expPos);
         
@@ -87,6 +88,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         expPos = limitVectorToTable(ball, expPos);
         
         System.out.println( "robotDistTime: " + robotDistTime );
+
+
+        if ( dist < 20 && ( ( System.currentTimeMillis() - lastKick ) / 1000f > 1 ) && !ControlGUI.paused ) {
+            commander.kick();
+            lastKick = System.currentTimeMillis();
+            System.out.println("kicking!" );
+        }
 
         mode = "goto";
         
@@ -109,8 +117,8 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         }
 
 
-        gotoX = GUI.getClickX();
-        gotoY = GUI.getClickY();
+        //gotoX = GUI.getClickX();
+        //gotoY = GUI.getClickY();
 
         
         if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 60 ) {
@@ -121,38 +129,38 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         
 
         g.setColor( Color.ORANGE );
-        /*g.drawLine( (int) state.getEnemyX(world.getColor())*ratio, 
+        g.drawLine( (int) state.getEnemyX(world.getColor())*ratio, 
                     (int) state.getEnemyY(world.getColor())*ratio, 
                     (int) (state.getEnemyX(world.getColor())*ratio + state.getEnemyDX(world.getColor())*ratio*1000) , 
                     (int) (state.getEnemyY(world.getColor())*ratio + state.getEnemyDY(world.getColor())*ratio*1000) );
-*/
+
        
         
         g.setColor( Color.RED );
-        /*g.drawLine( (int) robot[0]*ratio, 
+        g.drawLine( (int) robot[0]*ratio, 
                     (int) robot[1]*ratio, 
                     (int) gotoX*ratio, 
-                    (int) gotoY*ratio );*/
+                    (int) gotoY*ratio );
 
-        /*GUI.drawCircle( g, 
+        GUI.drawCircle( g, 
                         gotoX*ratio, 
                         gotoY*ratio, 
                         1.5*ratio, 
                         Color.BLUE, 
-                        true );*/
+                        true );
 
 
 
         
-        if ( mode == "stop" ) {
+        if ( mode == "stop" || !state.getBallVisible() ) {
             targetDriveLeft = 0;
             targetDriveRight = 0;
         }
 
         int driveLeft = 0, driveRight = 0;
         
-        int acceleration = 5;
-        int deceleration = 10;
+        int acceleration = 10;
+        int deceleration = 20;
 
         if ( targetDriveLeft > prevDriveLeft + acceleration ) {
             driveLeft = prevDriveLeft + acceleration;
@@ -177,6 +185,11 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         /*driveLeft = 10;
         driveRight = 30;*/
 
+        /*if ( (System.currentTimeMillis() - touchSensorPressed) / 1000f < 0.5 ) {
+            driveLeft = -50;
+            driveRight = -50;
+        }*/
+
         double R = wheelBase / 2f * (driveRight + driveLeft) / (driveLeft - driveRight);
         System.out.println("R: " + R);
 
@@ -198,7 +211,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
                         Color.RED, 
                         true );
         
-
+        System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight );
 
         if ( ControlGUI.paused ) {
             commander.setSpeed( 0, 0);
@@ -210,13 +223,15 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             commander.setSpeed( driveLeft, driveRight );
             prevDriveLeft = driveLeft;
             prevDriveRight = driveRight;
-            System.out.println( "driveLeft: " + driveLeft + " driveRight: " + driveRight );
-        }
+       }
 
 	}
 
 	
-	public void reset(World world){}
+	public void reset(World world)
+    {
+        touchInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_TOUCH, InterruptManager.MODE_EITHER);
+    }
 	
 	public void update(World world)
 	{
@@ -306,8 +321,8 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
 			//System.out.println("dirRoboTarget: " + dirRoboTarget);
 
-            if ( dirTargetNorm > 30 ) speedDelta = 1;
-            else if ( dirTargetNorm > 20 ) speedDelta = dirTargetNorm / 30f;
+            if ( dirTargetNorm > 50 ) speedDelta = 1;
+            else if ( dirTargetNorm > 20 ) speedDelta = dirTargetNorm / 50f;
             else speedDelta = 0;
 
            
@@ -316,7 +331,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             double y = dirTargetNorm * Math.cos( Math.toRadians( dirRoboTarget ) );
             double R = -Math.abs( ( x*x + y*y ) / (2*x) );
 
-            System.out.println("x: " + x + " y: " + y + " R: " + R );
+            //System.out.println("x: " + x + " y: " + y + " R: " + R );
 
             double fasterWheel = MAX_MOTOR_SPEED * speedDelta;
             double slowerWheel = fasterWheel * (R + wheelBase / 2f) / (R - wheelBase / 2f);
@@ -384,7 +399,15 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 	public void handleInterrupt(World world, int interrupt)
 	{
 		
-		
+		if (interrupt == touchInterrupt)
+        {
+            
+            System.out.println("Touch sensor pressed");
+            touchSensorPressed = System.currentTimeMillis();
+            
+
+            touchInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_TOUCH, InterruptManager.MODE_EITHER);
+        }
 		
 	}
 	
@@ -457,6 +480,8 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         super(commander);
         
         GUI.subscribe(this);
+
+        
     }
 
     
@@ -558,7 +583,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
     public double[] limitVectorToTable( double x, double y, double targetX, double targetY ) {
 
-        double distFromEdge = 10;
+        
         double[] result = new double[2];
 
         double dx = targetX - x;
@@ -607,7 +632,6 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
     public double[] limitVectorToTableDir( double x, double y, double dx, double dy ) {
 
-        double distFromEdge = 10;
         double[] result = new double[2];
 
         double Lx = distFromEdge;

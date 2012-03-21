@@ -15,8 +15,8 @@ public class World
 
 
     // EDIT THESE!!!!!!!
-	public static final double[] GOAL_LEFT = { 0, 40 };
-	public static final double[] GOAL_RIGHT = { 130, 40 };
+	public static final double[] GOAL_LEFT = { 0, 61 };
+	public static final double[] GOAL_RIGHT = { 242, 61 };
 	
 	public static final double WORLD_HEIGHT = 122, WORLD_WIDTH = 242;
 	
