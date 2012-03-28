@@ -20,7 +20,7 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
     
 	
 	
-	private static final int MAX_MOTOR_SPEED = 100;
+	private static final int MAX_MOTOR_SPEED = 70;
     private double speed = 120;
 	
 	private double[][] lines = new double[0][4];
@@ -81,22 +81,23 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
 
 
-        double[] expPos = estimateBallPos(0.4);
+        //double[] expPos = estimateBallPos(0.4);
+		double[] expPos = estimateBallPos(0.65);
         expPos = limitVectorToTable(ball, expPos);
         
-        double dist = distanceRobotObject( expPos );
-        double robotDistTime = dist/speed;
+        //double dist = distanceRobotObject( expPos );
+        //double robotDistTime = dist/speed;
 
-        expPos = estimateBallPos(0.4 + robotDistTime);
-        expPos = limitVectorToTable(ball, expPos);
+        //expPos = estimateBallPos(0.4 + robotDistTime);
+        //expPos = limitVectorToTable(ball, expPos);
         
         //System.out.println( "robotDistTime: " + robotDistTime );
 
 
         if ( distanceRobotObject( estimateBallPos(0.65) ) < 50 
-             //&& ( ( System.currentTimeMillis() - lastKick ) / 1000f > 1 ) 
+             && ( ( System.currentTimeMillis() - lastKick ) / 1000f > 1 ) 
              && !ControlGUI.paused 
-             //&& ( ( world.getGoalCoords()[0] - robot[0] ) > 0 ) == ( state.getRobotDX(world.getColor()) > 0 ) 
+             && ( ( world.getGoalCoords()[0] - robot[0] ) > 0 ) == ( state.getRobotDX(world.getColor()) > 0 ) 
         )
         {
             commander.kick();
@@ -106,14 +107,14 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
         mode = "goto";
         
-        if ( estBallSpeed[2] > 2 )
-        {
+        //if ( estBallSpeed[2] > 2 )
+        //{
             gotoX = expPos[0];
             gotoY = expPos[1];
-            System.out.println( "estimating using ball" );
-        } 
+            //System.out.println( "estimating using ball" );
+        //} 
 
-        else
+        /*else
         {
             double[] expFromEnemy = limitVectorToTableDir(  state.getEnemyX(world.getColor()), 
                                                             state.getEnemyY(world.getColor()),
@@ -122,19 +123,19 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
             gotoX = expFromEnemy[0];
             gotoY = expFromEnemy[1];
             System.out.println( "using enemy robot's direction" );
-        }
+        }*/
 
 
         //gotoX = GUI.getClickX();
         //gotoY = GUI.getClickY();
 
         
-        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 120 ) {
-            //mode = "turnto";
+        if ( Math.abs( angleRobotObj(gotoX, gotoY) ) > 60 ) {
+            mode = "turnto";
             turntoX = gotoX - robot[0];
             turntoY = gotoY - robot[1];
-            targetDriveLeft *= -1;
-            targetDriveRight *= -1;
+            //targetDriveLeft *= -1;
+            //targetDriveRight *= -1;
         }
         
 
@@ -162,9 +163,13 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
 
 
         
-        if ( mode == "stop" || !state.getBallVisible() ) {
-            targetDriveLeft = 0;
-            targetDriveRight = 0;
+        if ( !state.getBallVisible() ) {
+            targetDriveLeft = -50;
+            targetDriveRight = 50;
+			commander.kick();
+            lastKick = System.currentTimeMillis();
+            System.out.println("kicking!" );
+			
         }
 
         int driveLeft = 0, driveRight = 0;
@@ -195,10 +200,10 @@ public class ZGameMode extends AbstractMode implements GUIDrawer
         /*driveLeft = 10;
         driveRight = 30;*/
 
-        /*if ( (System.currentTimeMillis() - touchSensorPressed) / 1000f < 0.5 ) {
+        if ( (System.currentTimeMillis() - touchSensorPressed) / 1000f < 0.5 ) {
             driveLeft = -50;
             driveRight = -50;
-        }*/
+        }
 
         double R = wheelBase / 2f * (driveRight + driveLeft) / (driveLeft - driveRight);
         //System.out.println("R: " + R);
