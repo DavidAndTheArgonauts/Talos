@@ -26,8 +26,12 @@ public class GoalieMode extends AbstractMode
 	public void update(World world)
 	{
 		
-		int lUS = commander.getLeftUltrasonic(),
+		int 	lUS = commander.getLeftUltrasonic(),
 			rUS = commander.getRightUltrasonic();
+		
+		
+			
+			
 			
 		System.out.println("Ultrasonic values: [" + lUS + "," + rUS + "]");
 		
