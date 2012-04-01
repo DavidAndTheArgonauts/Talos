@@ -33,6 +33,7 @@ public class NXT implements ConnectionInterface
 		
 		// create sensors
 		Touch sensor = new Touch(connection);
+		Ultrasonic ultrasonic = new Ultrasonic(connection);
 		
 		while (!NXT.terminateConnection)
 		{

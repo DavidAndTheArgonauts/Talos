@@ -52,6 +52,7 @@ public class Commander implements RobotCallback
 	private int lWheelSetSpeed = 0, rWheelSetSpeed = 0;
 	private boolean lSensorTouched = false, rSensorTouched = false;
 	private int lTouchCount = 0, rTouchCount = 0;
+	private int lUltrasonic = 0, rUltrasonic = 0;
 	
 	private Connection connection = new Connection();
 	
@@ -349,21 +350,19 @@ public class Commander implements RobotCallback
 		lWheelSetSpeed = left;
 		rWheelSetSpeed = right;
 		
-		clearQueue();
+		// connection.clearQueue();
 		connection.queueCommand(new Message(Opcodes.SET_SPEED,left,right));
 		
 	}
 	
 	public void penaltyKick()
 	{
-		clearQueue();
 		connection.queueCommand(new Message(Opcodes.PENALTY_KICK));
 	}
 	
 	
 	public void penaltyDefend()
 	{
-		clearQueue();
 		connection.queueCommand(new Message(Opcodes.PENALTY_DEFENSE));
 	}
 
@@ -503,6 +502,26 @@ public class Commander implements RobotCallback
 			return rWheelSetSpeed;
 		}
 	}
+
+	public int getLeftUltrasonic()
+	{
+		return lUltrasonic;
+	}
+
+	public int getRightUltrasonic()
+	{
+		return rUltrasonic;
+	}
+	
+	public void enableUltrasonic()
+	{
+		connection.queueCommand(new Message(Opcodes.ULTRASONIC,1));
+	}
+	
+	public void disableUltrasonic()
+	{
+		connection.queueCommand(new Message(Opcodes.ULTRASONIC,0));
+	}
 	
 	/**
 	 * Blocks until the queue is empty
@@ -569,6 +588,14 @@ public class Commander implements RobotCallback
 						rSensorTouched = false;
 					}
 				
+					break;
+				case Opcodes.ULTRASONIC_DATA:
+					
+					int[] distances = response.getArguments(2);
+					
+					lUltrasonic = distances[0];
+					rUltrasonic = distances[1];
+					
 					break;
 			}
 		}

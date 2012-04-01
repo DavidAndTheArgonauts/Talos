@@ -23,6 +23,8 @@ public abstract class Opcodes
 	 * Starts the penalty defense algorithm on robot
 	*/
 	public static final int PENALTY_DEFENSE = 0x05;
+
+	public static final int ULTRASONIC = 0x06;
 	
 	/**
 	 * Closes the connection to the robot 
@@ -46,5 +48,7 @@ public abstract class Opcodes
 	 * When the wheels are moving, feedback about actual speeds is returned
 	*/
 	public static final int WHEEL_FEEDBACK = 0x03;
+
+	public static final int ULTRASONIC_DATA = 0x04;
 	
 }
