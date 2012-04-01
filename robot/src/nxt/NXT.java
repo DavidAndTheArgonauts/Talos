@@ -26,12 +26,14 @@ public class NXT implements ConnectionInterface
 		
 		// create controllers
 		Driver driver = new Driver(connection);
+		//GradualDriver driver = new GradualDriver(connection);
 		Kicker kicker = new Kicker(connection);
 		Penalty penalty = new Penalty(connection);
 		
 		
 		// create sensors
 		Touch sensor = new Touch(connection);
+		Ultrasonic ultrasonic = new Ultrasonic(connection);
 		
 		while (!NXT.terminateConnection)
 		{

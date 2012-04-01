@@ -9,7 +9,7 @@ import java.lang.*;
 /*
 	Code that operates the driver motor
 */
-public class Driver implements ConnectionInterface
+public class GradualDriver implements ConnectionInterface
 {
 
 	// Parameter variables for wheel speeds [left, right]
@@ -21,12 +21,14 @@ public class Driver implements ConnectionInterface
 
 	private Thread response;
 	
-	private int lSpeed = 0, rSpeed = 0;
+	private int lSpeed = 0, rSpeed = 0, laSpeed = 0, raSpeed = 0;
+
+	private static final int INCREMENT = 2;
 	
 	/**
 	* @param(connection): passes the connection from Connection class to receive and send messages
 	*/
-	public Driver(Connection conn)
+	public GradualDriver(Connection conn)
 	{
 		this.connection = conn;
 		connection.subscribe(this);
@@ -55,6 +57,67 @@ public class Driver implements ConnectionInterface
 					int lTC = Motor.B.getTachoCount();
 					int rTC = Motor.C.getTachoCount();
 
+					boolean changed = false;
+					
+					if(lSpeed>laSpeed)
+					{
+						laSpeed += INCREMENT;
+						changed = true;
+						if (laSpeed>lSpeed)
+						{
+							laSpeed = lSpeed;
+						}
+					}
+					else if (lSpeed<laSpeed)
+					{
+						laSpeed -= INCREMENT;
+						changed = true;
+						if (laSpeed<lSpeed)
+						{
+							laSpeed = lSpeed;
+						}
+
+					}
+
+					if(rSpeed>raSpeed)
+					{
+						raSpeed += INCREMENT;
+						changed = true;
+						if (raSpeed>rSpeed)
+						{
+							raSpeed = rSpeed;
+						}
+					}
+					else if (rSpeed<raSpeed)
+					{
+						raSpeed -= INCREMENT;
+						changed = true;
+						if (raSpeed<rSpeed)
+						{
+							raSpeed = rSpeed;
+						}
+					}
+
+					if (changed)
+					{
+						Motor.B.setSpeed(laSpeed);
+						Motor.C.setSpeed(raSpeed);
+						System.out.println("(" + laSpeed + ", " + raSpeed + ")");
+
+						// Check if motors are meant to go forwards or backwards
+						if (laSpeed < 0){
+							Motor.B.forward();
+						} else {
+							Motor.B.backward();
+						}
+
+						if (raSpeed < 0){
+							Motor.C.forward();
+						} else {
+							Motor.C.backward();
+						}
+					}
+
 					// Send message
 					if (lSpeed != 0 || rSpeed != 0)
 					{
@@ -78,30 +141,18 @@ public class Driver implements ConnectionInterface
 		// Checks message broadcasted is for this class
 		if (msg.getOpcode() == Opcodes.SET_SPEED)
 		{
+
+			System.out.println("Received speed!");
+
 			// Get wheel percentages
 			args = msg.getArguments(2);
 
 			// Get resolutions per second
 			int leftSpeed = (int)(Driver.args[0]*0.01*900);
 			int rightSpeed = (int)(Driver.args[1]*0.01*900);
-			Motor.B.setSpeed(leftSpeed);
-			Motor.C.setSpeed(rightSpeed);
 			
 			lSpeed = leftSpeed;
 			rSpeed = rightSpeed;
-			
-			// Check if motors are meant to go forwards or backwards
-			if (leftSpeed < 0){
-				Motor.B.forward();
-			} else {
-				Motor.B.backward();
-			}
-
-			if (rightSpeed < 0){
-				Motor.C.forward();
-			} else {
-				Motor.C.backward();
-			}
 
 		}
 
