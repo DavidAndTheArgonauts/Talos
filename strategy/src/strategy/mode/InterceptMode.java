@@ -3,7 +3,7 @@ package strategy.mode;
 import strategy.world.*;
 import comms.robot.*;
 import strategy.tools.*;
-
+/*
 public class InterceptMode extends AbstractMode
 {
 	
@@ -175,7 +175,7 @@ public class InterceptMode extends AbstractMode
 		if(distanceInterrupt == -1) {
 			distanceInterrupt = commander.getInterruptManager().registerInterrupt(InterruptManager.INTERRUPT_DISTANCE,40);
 		}
-		*/
+		
 		
 	}
 	
@@ -202,4 +202,4 @@ public class InterceptMode extends AbstractMode
 	
 	
 	
-}
+}*/

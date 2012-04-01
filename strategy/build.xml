@@ -75,7 +75,7 @@
 	<target name="gui" depends="build">
 		
 		<java fork="true" classname="${strategy.cmd.gui}" dir="${strategy.build}" classpath="${strategy.libs.javaosc};${strategy.build}">
-			<arg value="localhost" />
+			<arg value="cactus" />
 			<arg value="9899" />
 			<arg value="5500" />
 		</java>

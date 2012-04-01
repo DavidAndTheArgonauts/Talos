@@ -51,17 +51,11 @@ public class Driver implements ConnectionInterface
 					catch (Exception e)
 					{
 					}
-					// Get number of seconds that have passed by
-					//double dt = (System.currentTimeMillis() - timer)/1000.0;
-					// Convert TachoCount to degrees rotated per second
-					//int leftRotPerSec = (int)((double)(Motor.B.getTachoCount() - leftTachoCount)/(dt*9.0));
-					//int rightRotPerSec =  (int)((double)(Motor.C.getTachoCount() - rightTachoCount)/(dt*9.0));
 					// Update counters
 					int lTC = Motor.B.getTachoCount();
 					int rTC = Motor.C.getTachoCount();
-					//timer = System.currentTimeMillis();
+
 					// Send message
-					
 					if (lSpeed != 0 || rSpeed != 0)
 					{
 						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, -1 * (lTC - leftTachoCount), -1 * (rTC - rightTachoCount)));

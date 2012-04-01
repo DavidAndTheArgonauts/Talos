@@ -27,6 +27,8 @@ public class InterruptTestMode extends AbstractMode
 	public void update(World world)
 	{
 		
+		int wheelSpeed = 40;	
+		
 		if (complete)
 			return;
 
@@ -35,7 +37,7 @@ public class InterruptTestMode extends AbstractMode
 		
 		System.out.println("Turning..");
 		
-		commander.setSpeed(-10,10);
+		commander.setSpeed(-wheelSpeed,wheelSpeed);
 		
 	}
 	

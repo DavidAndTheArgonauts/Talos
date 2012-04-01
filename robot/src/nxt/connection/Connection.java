@@ -80,7 +80,8 @@ public class Connection
 		catch (Exception e)
 		{
 			// Show exception message
-			LCD.drawString("EXCEPTION",0,6);
+			//LCD.drawString("EXCEPTION",0,6);
+			LCD.drawString(e.getMessage(),0,7);
 		}
 		finally
 		{
