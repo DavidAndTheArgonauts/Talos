@@ -29,7 +29,7 @@ public class ControlGUI implements ActionListener, ListSelectionListener
 	ModeEnum next;
 
 	boolean weAreBlue = true;
-	boolean shootingLeft = true;
+	public static boolean shootingLeft = true;
 	public static boolean paused = true;
 
 	Commander commander;

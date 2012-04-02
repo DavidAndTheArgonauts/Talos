@@ -35,34 +35,33 @@ public class Ultrasonic implements ConnectionInterface
 		if (msg.getOpcode() == Opcodes.ULTRASONIC)
 		{
 			
-			int[] args = msg.getArguments(1);
-			if (args[0] == 0)
+			int args[] = msg.getArguments(1);
+			
+			if (ultrasonic != null && ultrasonic.isAlive())
 			{
 				
-				if (ultrasonic != null && ultrasonic.isAlive())
+				ultrasonic.interrupt();
+				while (ultrasonic.isAlive())
 				{
 					
-					ultrasonic.interrupt();
-					while (ultrasonic.isAlive())
+					try
 					{
-						
-						try
-						{
-							ultrasonic.join();
-						}
-						catch (Exception e)
-						{
-							
-						}
+						ultrasonic.join();
+					}
+					catch (Exception e)
+					{
 						
 					}
 					
 				}
 				
 			}
-			else if (args[0] == 1)
-			{
 			
+			if (args[0] == 1)
+			{
+				
+				
+				
 				ultrasonic = new Thread() {
 				
 					public void run()
