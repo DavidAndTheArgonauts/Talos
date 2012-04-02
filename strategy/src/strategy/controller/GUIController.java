@@ -85,6 +85,7 @@ public class GUIController extends AbstractController
 			// draw
 			gui.setWorldState(world.getWorldState());
 			
+			/*
 			// block until new world update
 			while (lastUpdate == world.getWorldState().getCreatedMillis())
 			{
@@ -111,7 +112,9 @@ public class GUIController extends AbstractController
 			}
 			
 			lastUpdate = world.getWorldState().getCreatedMillis();
+			*/
 			
+			try { Thread.sleep(10); } catch (InterruptedException e) { break; }
 		}
 		
 	}
