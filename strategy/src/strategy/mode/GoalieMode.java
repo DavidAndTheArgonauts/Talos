@@ -103,8 +103,10 @@ public class GoalieMode extends AbstractMode
 		//double targetPos = state.getBallY();
 		double targetPos = estimateBallPos(0.5)[1];
 
-		if ( targetPos < 15 ) targetPos = 15;
-		if ( targetPos >  World.WORLD_HEIGHT - 15 ) targetPos =  World.WORLD_HEIGHT - 15;
+		if ( targetPos < 10 ) targetPos = 10;
+		if ( targetPos >  World.WORLD_HEIGHT - 10 ) targetPos =  World.WORLD_HEIGHT - 10;
+
+		if ( !state.getBallVisible() ) targetPos =  World.WORLD_HEIGHT / 2f;
 		
 		double driveSpeed;
 		
