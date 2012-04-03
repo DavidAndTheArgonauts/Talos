@@ -50,23 +50,26 @@ public class GoalieMode extends AbstractMode
 			bUS = rUS;			
 		}
 		
-		double totalUS = 107;
-			
-		//if ( lUS != 255 && rUS != 255 ) totalUS = lUS + rUS;
-		//else totalUS = 106;
 		
-		double halfRobot = ( World.WORLD_HEIGHT - totalUS) / 2f;
 		
 		double pos;
 
-		// position using average
-		/*if ( tUS == 255 ) pos = World.WORLD_HEIGHT - bUS - halfRobot;
-		else if ( bUS == 255 ) pos = tUS + halfRobot;
-		else pos = ( (tUS + halfRobot) + (World.WORLD_HEIGHT - bUS - halfRobot) ) / 2f;*/
-		
 		// position using closer
+		double totalUS = 107;
+		double halfRobot = ( World.WORLD_HEIGHT - totalUS) / 2f;
+
 		if ( tUS < bUS ) pos = tUS + halfRobot;
 		else pos = World.WORLD_HEIGHT - bUS - halfRobot;
+
+		if ( lUS != 255 && rUS != 255 ) {
+			totalUS = lUS + rUS;
+			halfRobot = ( World.WORLD_HEIGHT - totalUS) / 2f;
+
+			pos = ( (tUS + halfRobot) + (World.WORLD_HEIGHT - bUS - halfRobot) ) / 2f;
+			System.out.println("position using both");
+		}
+
+		
 
 		//pos = state.getRobotY(world.getColor());
 		
@@ -75,8 +78,8 @@ public class GoalieMode extends AbstractMode
 		
 		
 		
-		//double targetPos = GUI.getClickY();
-		double targetPos = state.getBallY();
+		double targetPos = GUI.getClickY();
+		//double targetPos = state.getBallY();
 		
 		double driveSpeed;
 		
@@ -95,7 +98,7 @@ public class GoalieMode extends AbstractMode
         double dirY = state.getRobotDY(world.getColor());
         double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
 
-		double dirAngleMod = dirAngle;
+		double dirAngleMod = 180 - dirAngle;
 	
 		if ( dirAngleMod > 180 ) {
                 dirAngleMod -= 360;
@@ -105,25 +108,29 @@ public class GoalieMode extends AbstractMode
 			dirAngleMod += 360;
         }
 
-
-
-
-		double rearWheelSlowDown = Math.abs(dirAngleMod) / 50f;
-		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
-
 		System.out.printf("dirAngleMod %.2f\n", dirAngleMod);
-		System.out.printf("rearWheelSlowDown %.2f\n", rearWheelSlowDown);
+
+
+		double rearWheelSlowDown;
 
 		int driveSign;
 		if ( ( targetPos - pos ) > 0 ) { 
+			// driving right
 			driveSign = 1;
-			//rearWheelSlowDown = 0.03;
+			rearWheelSlowDown = 0.1 -( dirAngleMod / 100f );
 		}
 		else {
+			// driving left		
 			driveSign = -1;
-			//rearWheelSlowDown = 0.09;
-			
+			rearWheelSlowDown = 0.1 + 0.3 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
 		}
+
+		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
+		if (rearWheelSlowDown < -1) rearWheelSlowDown = -1;
+
+		System.out.printf("rearWheelSlowDown %.2f\n", rearWheelSlowDown);
+
+
 
 
 		targetDriveSpeed = driveSpeed * driveSign * MAXSPEED;

@@ -56,26 +56,97 @@ public class CommandLine
 		};
 		touchThread.start();
 		
+		Thread speedThread = new Thread()
+		{
+			
+			public void run()
+			{
+	
+				// run until interrupted
+				while (!Thread.interrupted())
+				{
+		
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch (InterruptedException e)
+					{
+						break;
+					}
+		
+					//if (Math.max(c.getLeftSpeed(), c.getRightSpeed()) > 10)
+					{
+						System.out.println(" [ " + c.getLeftSpeed() + " , " + c.getRightSpeed() + " ] ");
+					}
+		
+				}
+	
+			}
+			
+		};
+		//speedThread.start();
+		
 		while (true)
 		{
 			
-			String cmd = readLine();
-			
-			if (cmd.equals("stop")) c.stop();
-			else if (cmd.equals("kick")) c.kick();
-			else if (cmd.equals("drive fast")) c.drive(Commander.SPEED_FAST);
-			else if (cmd.equals("drive medium")) c.drive(Commander.SPEED_MEDIUM);
-			else if (cmd.equals("drive slow")) c.drive(Commander.SPEED_SLOW); 
-			else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_FAST);
-			else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_FAST);
-			else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
-			else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
-			else if (cmd.equals("penalty kick")) c.penaltyKick();
-			else if (cmd.equals("penalty defend")) c.penaltyDefend();
-			else if (cmd.equals("quit")) 
+			try
 			{
-				c.waitForQueueToEmpty();
-				break;
+			
+				String cmd = readLine();
+			
+				if (cmd.equals("stop")) c.stop();
+				else if (cmd.equals("kick")) c.kick();
+			
+				/*
+				else if (cmd.equals("drive fast")) c.drive(Commander.SPEED_FAST);
+				else if (cmd.equals("drive medium")) c.drive(Commander.SPEED_MEDIUM);
+				else if (cmd.equals("drive slow")) c.drive(Commander.SPEED_SLOW); 
+				else if (cmd.equals("spin left")) c.spinLeft(Commander.SPEED_FAST);
+				else if (cmd.equals("spin right")) c.spinRight(Commander.SPEED_FAST);
+				else if (cmd.equals("turn left")) c.turnLeft(Commander.SPEED_MEDIUM);
+				else if (cmd.equals("turn right")) c.turnRight(Commander.SPEED_MEDIUM);
+				else if (cmd.equals("penalty kick")) c.penaltyKick();
+				else if (cmd.equals("penalty defend")) c.penaltyDefend();
+				*/
+				
+				/*
+				if (cmd.startsWith("steer"))
+				{
+					
+					String[] parts = cmd.split(" ");
+				
+					int steer = Integer.parseInt(parts[1]);
+				
+					c.steer(steer);
+					
+				}
+				*/
+				
+				if (cmd.startsWith("go"))
+				{
+				
+					String[] parts = cmd.split(" ");
+				
+					int lSpeed = Integer.parseInt(parts[1]),
+						rSpeed = Integer.parseInt(parts[2]);
+				
+					rSpeed *= -1;
+				
+					c.setSpeed(lSpeed, rSpeed);
+				
+				
+				}
+			
+				else if (cmd.equals("quit")) 
+				{
+					c.waitForQueueToEmpty();
+					break;
+				}
+			}
+			catch (Exception e)
+			{
+			
 			}
 			
 		}
@@ -86,6 +157,18 @@ public class CommandLine
 			{
 				touchThread.interrupt();
 				touchThread.join();
+			}
+			catch (InterruptedException ie)
+			{
+				
+			}
+		}
+		while (speedThread.isAlive())
+		{
+			try
+			{
+				speedThread.interrupt();
+				speedThread.join();
 			}
 			catch (InterruptedException ie)
 			{
