@@ -350,7 +350,7 @@ public class Commander implements RobotCallback
 		lWheelSetSpeed = left;
 		rWheelSetSpeed = right;
 		
-		// connection.clearQueue();
+		connection.clearQueue();
 		connection.queueCommand(new Message(Opcodes.SET_SPEED,left,right));
 		
 	}

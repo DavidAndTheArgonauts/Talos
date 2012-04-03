@@ -67,14 +67,16 @@ public class GoalieMode extends AbstractMode
 		// position using closer
 		if ( tUS < bUS ) pos = tUS + halfRobot;
 		else pos = World.WORLD_HEIGHT - bUS - halfRobot;
+
+		//pos = state.getRobotY(world.getColor());
 		
 		System.out.println( "top: " + tUS + " bottom: " + bUS );
 		System.out.println( "pos: " + pos );
 		
 		
 		
-		double targetPos = GUI.getClickY();
-		//double targetPos = state.getBallY();
+		//double targetPos = GUI.getClickY();
+		double targetPos = state.getBallY();
 		
 		double driveSpeed;
 		
@@ -87,22 +89,13 @@ public class GoalieMode extends AbstractMode
 		else 
 			driveSpeed = 0;
 		
-		int driveSign;
-		if ( ( targetPos - pos ) > 0 ) 
-			driveSign = 1;
-		else 
-			driveSign = -1;
+		double MAXSPEED = 100;
 		
-		double MAXSPEED = 50;
-		
-		targetDriveSpeed = driveSpeed * driveSign * MAXSPEED;
-
-
 		double dirX = state.getRobotDX(world.getColor());
         double dirY = state.getRobotDY(world.getColor());
         double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
 
-		double dirAngleMod = 180 - dirAngle;
+		double dirAngleMod = dirAngle;
 	
 		if ( dirAngleMod > 180 ) {
                 dirAngleMod -= 360;
@@ -112,27 +105,32 @@ public class GoalieMode extends AbstractMode
 			dirAngleMod += 360;
         }
 
-		double rearWheelSlowDown = dirAngleMod / 50f;
+
+
+
+		double rearWheelSlowDown = Math.abs(dirAngleMod) / 50f;
 		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
-		if (rearWheelSlowDown < -1) rearWheelSlowDown = -1;
 
 		System.out.printf("dirAngleMod %.2f\n", dirAngleMod);
 		System.out.printf("rearWheelSlowDown %.2f\n", rearWheelSlowDown);
-		
+
+		int driveSign;
+		if ( ( targetPos - pos ) > 0 ) { 
+			driveSign = 1;
+			//rearWheelSlowDown = 0.03;
+		}
+		else {
+			driveSign = -1;
+			//rearWheelSlowDown = 0.09;
+			
+		}
 
 
-
-
-
-
-
-
-
-
+		targetDriveSpeed = driveSpeed * driveSign * MAXSPEED;
 		
 		int motorSpeed = 0;
-        int acceleration = 20;
-		int deceleration = 20;
+        int acceleration = 1;
+		int deceleration = 1;
 
 		if ( targetDriveSpeed > prevMotorSpeed + acceleration ) {
 		    motorSpeed = (int) (prevMotorSpeed + acceleration);
@@ -153,6 +151,7 @@ public class GoalieMode extends AbstractMode
 		if ( ControlGUI.paused ) {
 		    commander.setSpeed( 0, 0);
 		    prevMotorSpeed = 0;
+			System.out.println("PAUSED");
 		}
 
 		else {
