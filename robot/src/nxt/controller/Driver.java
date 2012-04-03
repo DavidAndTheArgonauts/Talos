@@ -12,16 +12,16 @@ import java.lang.*;
 public class Driver implements ConnectionInterface
 {
 
-	// Parameter variables for wheel speeds [left, right]
-	public static int[] args;
- 
+	
 	private final Connection connection;
 
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	private Thread response;
 	
-	private int lSpeed = 0, rSpeed = 0;
+	public static int lSpeed = 0, rSpeed = 0;
+	public static long lTachoSet = 0, rTachoSet = 0;
+	public static long setTime = 0;
 	
 	/**
 	* @param(connection): passes the connection from Connection class to receive and send messages
@@ -37,7 +37,8 @@ public class Driver implements ConnectionInterface
 			// Keeps track of current time
 			//private long timer;
 			private int leftTachoCount = 0, rightTachoCount = 0;
-
+			private int lSpeedDelta = 0, rSpeedDelta = 0;
+			
 			public void run(){
 				// TachoCount is the number of degrees wheel has rotated
 				Motor.B.resetTachoCount();
@@ -61,6 +62,84 @@ public class Driver implements ConnectionInterface
 						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, -1 * (lTC - leftTachoCount), -1 * (rTC - rightTachoCount)));
 					}
 					
+					long lTachoSet, rTachoSet, setTime;
+					int lSpeed, rSpeed;
+					synchronized (lock)
+					{
+						lTachoSet = Driver.lTachoSet;
+						rTachoSet = Driver.rTachoSet;
+						setTime = Driver.setTime;
+						lSpeed = Driver.lSpeed;
+						rSpeed = Driver.rSpeed;
+					
+					
+						if (lSpeed != 0 || rSpeed != 0)
+						{
+					
+							//System.out.println("==");
+					
+							long now = System.currentTimeMillis();
+							double diff = (now - setTime) / 1000d;
+							
+							if (diff > 0.05)
+							{
+								
+								//System.out.println(diff);
+								
+								int maxLSpeed = (int)Math.min(lSpeed, Battery.getVoltage() * 95);
+								int maxRSpeed = (int)Math.max(rSpeed, -Battery.getVoltage() * 95); // change here
+						
+								long lExpectedCount = (long)(maxLSpeed * diff + lTachoSet);
+								long rExpectedCount = (long)(maxRSpeed * diff + rTachoSet);
+						
+						
+								//System.out.println("--[" + lExpectedCount);
+								//System.out.println("++[" + lTC);
+								
+								
+								lSpeedDelta = (int)((lExpectedCount - lTC))*10;
+								rSpeedDelta = (int)((rExpectedCount - rTC))*10;
+						
+								System.out.println("[" + lSpeedDelta + "," + rSpeedDelta + "]");
+				
+				
+								int lSetSpeed = lSpeed + lSpeedDelta;
+								int rSetSpeed = rSpeed + rSpeedDelta;
+								
+								System.out.println("L[" + lSetSpeed + "]");
+								System.out.println("R[" + rSetSpeed + "]");
+								
+								Motor.B.setSpeed(lSetSpeed);
+								Motor.C.setSpeed(rSetSpeed);
+							
+						
+								
+								// Check if motors are meant to go forwards or backwards
+								if (lSetSpeed > 0){
+									Motor.B.forward();
+								} else {
+									Motor.B.backward();
+								}
+						
+								if (rSetSpeed > 0){
+									Motor.C.forward();
+								} else {
+									Motor.C.backward();
+								}
+								
+							}
+						
+						}
+						else
+						{
+						
+							Motor.B.stop();
+							Motor.C.stop();
+						
+						}
+					
+					}
+					
 					leftTachoCount = lTC;
 					rightTachoCount = rTC;
 					
@@ -79,29 +158,41 @@ public class Driver implements ConnectionInterface
 		if (msg.getOpcode() == Opcodes.SET_SPEED)
 		{
 			// Get wheel percentages
-			args = msg.getArguments(2);
+			int[] args = msg.getArguments(2);
 
-			// Get resolutions per second
-			int leftSpeed = (int)(Driver.args[0]*0.01*900);
-			int rightSpeed = (int)(Driver.args[1]*0.01*900);
-			Motor.B.setSpeed(leftSpeed);
-			Motor.C.setSpeed(rightSpeed);
 			
-			lSpeed = leftSpeed;
-			rSpeed = rightSpeed;
 			
-			// Check if motors are meant to go forwards or backwards
-			if (leftSpeed < 0){
-				Motor.B.forward();
-			} else {
-				Motor.B.backward();
-			}
+			synchronized (lock)
+			{
+				
+				// Get resolutions per second
+				int leftSpeed = (int)(args[0]*0.01*900);
+				int rightSpeed = (int)(args[1]*0.01*900);
+				Motor.B.setSpeed(leftSpeed);
+				Motor.C.setSpeed(rightSpeed);
+				
+				lTachoSet = Motor.B.getTachoCount();
+				rTachoSet = Motor.C.getTachoCount();
+				setTime = System.currentTimeMillis();
+				lSpeed = leftSpeed;
+				rSpeed = rightSpeed;
+				
+				
+				// Check if motors are meant to go forwards or backwards
+				if (leftSpeed > 0){
+					Motor.B.forward();
+				} else {
+					Motor.B.backward();
+				}
 
-			if (rightSpeed < 0){
-				Motor.C.forward();
-			} else {
-				Motor.C.backward();
+				if (rightSpeed > 0){
+					Motor.C.forward();
+				} else {
+					Motor.C.backward();
+				}
+				
 			}
+			
 
 		}
 
