@@ -5,12 +5,19 @@ import comms.robot.*;
 
 import gui.*;
 
+import java.util.*;
+
 public class GoalieMode extends AbstractMode
 {
 	
 	private double targetDriveSpeed = 0;
 	private int prevMotorSpeed = 0;
 	private long lastTime = -1;
+	private World world;
+	private WorldState state;
+	private double[] estBallSpeed;
+	private double[] ball = new double[2];
+	private long lastKick = -1;
 	
 	public GoalieMode(Commander commander)
 	{
@@ -32,9 +39,23 @@ public class GoalieMode extends AbstractMode
 	public void update(World world)
 	{
 	
+		this.world = world;
+		state = world.getWorldState();
+	
 		WorldState state = world.getWorldState();
+
+		ball[0] = state.getBallX();
+        ball[1] = state.getBallY();
+
+		estBallSpeed =  estimateBallSpeed();
+
+		if (estBallSpeed == null ) return;
+
 		
-		int 	lUS = commander.getLeftUltrasonic(),
+	
+
+		
+		int lUS = commander.getLeftUltrasonic(),
 			rUS = commander.getRightUltrasonic();
 		
 		int tUS, bUS;
@@ -66,7 +87,7 @@ public class GoalieMode extends AbstractMode
 			halfRobot = ( World.WORLD_HEIGHT - totalUS) / 2f;
 
 			pos = ( (tUS + halfRobot) + (World.WORLD_HEIGHT - bUS - halfRobot) ) / 2f;
-			System.out.println("position using both");
+			//System.out.println("position using both");
 		}
 
 		
@@ -78,8 +99,12 @@ public class GoalieMode extends AbstractMode
 		
 		
 		
-		double targetPos = GUI.getClickY();
+		//double targetPos = GUI.getClickY();
 		//double targetPos = state.getBallY();
+		double targetPos = estimateBallPos(0.5)[1];
+
+		if ( targetPos < 15 ) targetPos = 15;
+		if ( targetPos >  World.WORLD_HEIGHT - 15 ) targetPos =  World.WORLD_HEIGHT - 15;
 		
 		double driveSpeed;
 		
@@ -91,13 +116,20 @@ public class GoalieMode extends AbstractMode
 			driveSpeed = Math.abs ( targetPos - pos ) / 50f;
 		else 
 			driveSpeed = 0;
+
+
+
 		
 		double MAXSPEED = 100;
-		
+
+
 		double dirX = state.getRobotDX(world.getColor());
         double dirY = state.getRobotDY(world.getColor());
         double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
 
+
+
+		// OOPPOOSSIITTEE!
 		double dirAngleMod = 180 - dirAngle;
 	
 		if ( dirAngleMod > 180 ) {
@@ -110,19 +142,55 @@ public class GoalieMode extends AbstractMode
 
 		System.out.printf("dirAngleMod %.2f\n", dirAngleMod);
 
+		// turning correction
+
+		int MAX_TURNING = 30;
+		
+		double turnLeftMotor = 0, turnRightMotor = 0, turnSpeedDelta = 0;
+
+            if ( dirAngleMod > 0 ) {
+                turnLeftMotor = -1;
+                turnRightMotor = 1;
+            }
+
+            else  {
+                turnLeftMotor = 1;
+                turnRightMotor = -1;
+            }
+            
+
+            
+            if ( Math.abs( dirAngleMod ) > 120 ) turnSpeedDelta = 0.4;
+            else if ( Math.abs( dirAngleMod ) > 60 ) turnSpeedDelta = 0.3;
+            else if ( Math.abs( dirAngleMod ) > 30 ) turnSpeedDelta = 0.2;
+            else {
+                turnSpeedDelta = Math.abs( dirAngleMod ) / 200;
+            }
+ 
+			int turnDriveLeft = (int) Math.round( turnLeftMotor * MAX_TURNING * turnSpeedDelta );
+			int turnDriveRight = (int) Math.round( turnRightMotor * MAX_TURNING * turnSpeedDelta );
+
+
+
+		// turning correction end
+		
+
+
 
 		double rearWheelSlowDown;
 
 		int driveSign;
 		if ( ( targetPos - pos ) > 0 ) { 
 			// driving right
+			if (rUS < 10) driveSpeed = 0;
 			driveSign = 1;
 			rearWheelSlowDown = 0.1 -( dirAngleMod / 100f );
 		}
 		else {
-			// driving left		
+			// driving left
+			if (lUS < 10) driveSpeed = 0;
 			driveSign = -1;
-			rearWheelSlowDown = 0.1 + 0.3 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
+			rearWheelSlowDown = 0.1 + 0.1 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
 		}
 
 		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
@@ -132,12 +200,32 @@ public class GoalieMode extends AbstractMode
 
 
 
+		if ( 	Math.abs ( estimateBallPos(0.6)[0] - state.getRobotX(world.getColor()) ) < 10
+				&& ( System.currentTimeMillis() - lastKick ) / 1000f > 1
+				&& !ControlGUI.paused )
+        {
+            commander.kick();
+			commander.waitForQueueToEmpty();
+            lastKick = System.currentTimeMillis();
+            //System.out.println("kicking!" );
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 		targetDriveSpeed = driveSpeed * driveSign * MAXSPEED;
 		
 		int motorSpeed = 0;
-        int acceleration = 1;
-		int deceleration = 1;
+        int acceleration = 10;
+		int deceleration = 10;
 
 		if ( targetDriveSpeed > prevMotorSpeed + acceleration ) {
 		    motorSpeed = (int) (prevMotorSpeed + acceleration);
@@ -150,24 +238,28 @@ public class GoalieMode extends AbstractMode
 		}
 
 
-		int rearMotorSpeed = (int) ( motorSpeed * (1 - rearWheelSlowDown) );
+		int rearMotorSpeed = (int) ( motorSpeed * (1 - rearWheelSlowDown) + turnDriveRight );
+		int frontMotorSpeed = (int) ( motorSpeed + turnDriveLeft );
 		
 		System.out.println("Ultrasonic values: [" + lUS + "," + rUS + "]");
 		System.out.println( "targetDriveSpeed: " + Math.round(targetDriveSpeed) + " motorSpeed: " + motorSpeed + " rearMotorSpeed: " + rearMotorSpeed + "\n" );
 
 		if ( ControlGUI.paused ) {
 		    commander.setSpeed( 0, 0);
+			commander.stop();
+			commander.waitForQueueToEmpty();
 		    prevMotorSpeed = 0;
 			System.out.println("PAUSED");
 		}
 
 		else {
-			commander.setSpeed( motorSpeed, -rearMotorSpeed );
+			commander.setSpeed( frontMotorSpeed, -rearMotorSpeed );
+			commander.waitForQueueToEmpty();
 			prevMotorSpeed = motorSpeed;
 	    }
 
 		if (lastTime != -1) {
-		  System.out.println( "fps: " + 1000000000f / (System.nanoTime()-lastTime) );
+			System.out.printf("fps %.2f\n", 1000000000f / (System.nanoTime()-lastTime));
 		}
 		lastTime = System.nanoTime();
 		
@@ -179,5 +271,53 @@ public class GoalieMode extends AbstractMode
 		
 		
 	}
+
+	public double[] estimateBallPos ( double time ) {
+        double[] pos = new double[2];
+        pos[0] = ball[0] + estBallSpeed[0] * time;
+        pos[1] = ball[1] + estBallSpeed[1] * time;
+        return pos;
 	
+	}
+
+	public static double vecSize(double x, double y)
+	{
+		return Math.sqrt((x*x) + (y*y));
+	}
+
+	public double[] estimateBallSpeed ( ) {
+
+        ArrayList<Integer> times = new ArrayList<Integer>();
+        
+        times.add(100);
+        //times.add(200);
+        //times.add(300);
+        //times.add(500);
+
+        double counter = 0;
+        double dx = 0, dy = 0;
+        double[] dir = new double[3];
+
+        for ( int v : times ) {
+            
+            WorldState ago = world.getPastByTime(v);
+
+            if ( ago != null ) {
+                double pastBallX = ago.getBallX();
+                double pastBallY = ago.getBallY();
+                double timeAgo = (System.currentTimeMillis() - ago.getTime()) / 1000f;
+                dx += (ball[0] - pastBallX) / timeAgo;
+                dy += (ball[1] - pastBallY) / timeAgo;
+                counter++;
+            }
+
+        }
+        if (counter == 0) return null;
+        dir[0] = dx / counter;
+        dir[1] = dy / counter;
+        dir[2] = vecSize(  dx / counter, dy / counter );
+        return dir;
+    }
+
+
 }
