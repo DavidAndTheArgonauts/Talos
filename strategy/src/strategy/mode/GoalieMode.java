@@ -169,8 +169,8 @@ public class GoalieMode extends AbstractMode
                 turnSpeedDelta = Math.abs( dirAngleMod ) / 200;
             }
  
-			int turnDriveLeft = (int) Math.round( turnLeftMotor * MAX_TURNING * turnSpeedDelta );
-			int turnDriveRight = (int) Math.round( turnRightMotor * MAX_TURNING * turnSpeedDelta );
+			int turnDriveLeft = (int) Math.round( turnLeftMotor * MAX_TURNING * turnSpeedDelta * (1 + 3 * driveSpeed) );
+			int turnDriveRight = (int) Math.round( turnRightMotor * MAX_TURNING * turnSpeedDelta * (1 + 3 * driveSpeed) );
 
 
 
@@ -186,13 +186,17 @@ public class GoalieMode extends AbstractMode
 			// driving right
 			if (rUS < 10) driveSpeed = 0;
 			driveSign = 1;
-			rearWheelSlowDown = 0.1 -( dirAngleMod / 100f );
+			//rearWheelSlowDown = 0.1 -( dirAngleMod / 100f );
+            rearWheelSlowDown = 0;
+            //rearWheelSlowDown = -( dirAngleMod / 100f );
 		}
 		else {
 			// driving left
 			if (lUS < 10) driveSpeed = 0;
 			driveSign = -1;
-			rearWheelSlowDown = 0.1 + 0.1 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
+			//rearWheelSlowDown = 0.1 + 0.1 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
+            //rearWheelSlowDown = ( dirAngleMod / 100f );
+            rearWheelSlowDown = 0;
 		}
 
 		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
