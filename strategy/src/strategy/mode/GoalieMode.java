@@ -10,7 +10,7 @@ import java.util.*;
 public class GoalieMode extends AbstractMode
 {
 
-	private double MAXSPEED = 30;
+	private double MAXSPEED = 40;
 	
 	private double targetDriveSpeed = 0;
 	private int prevMotorSpeed = 0;
@@ -112,7 +112,8 @@ public class GoalieMode extends AbstractMode
 
 		if ( Math.abs(dirAngleMod) > 20 ) 
 			pos = state.getRobotY(world.getColor());
-		
+
+
 		System.out.println( "top: " + tUS + " bottom: " + bUS );
 		System.out.println( "pos: " + pos );
 		
@@ -122,10 +123,25 @@ public class GoalieMode extends AbstractMode
 		//double targetPos = state.getBallY();
 		double targetPos = estimateBallPos(0.5)[1];
 
+
+		targetPos += (targetPos - pos) * 0.5;
+
+
+		
+
 		if ( targetPos < 10 ) targetPos = 10;
 		if ( targetPos >  World.WORLD_HEIGHT - 10 ) targetPos =  World.WORLD_HEIGHT - 10;
 
-		if ( !state.getBallVisible() ) targetPos =  World.WORLD_HEIGHT / 2f;
+		if ( !state.getBallVisible() && !ControlGUI.paused ) {
+			targetPos =  World.WORLD_HEIGHT / 2f;
+			commander.kick();
+			commander.waitForQueueToEmpty();
+        }
+
+
+
+
+		
 		
 		double driveSpeed;
 		
