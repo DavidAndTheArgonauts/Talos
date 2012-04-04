@@ -5,9 +5,12 @@ import comms.robot.*;
 
 import gui.*;
 
+import java.awt.*;
+
+import java.awt.geom.Point2D;
 import java.util.*;
 
-public class GoalieMode extends AbstractMode
+public class GoalieMode extends AbstractMode implements GUIDrawer
 {
 
 	private double MAXSPEED = 40;
@@ -20,12 +23,13 @@ public class GoalieMode extends AbstractMode
 	private double[] estBallSpeed;
 	private double[] ball = new double[2];
 	private long lastKick = -1;
+	private double targetPos;
 
 	
 	public GoalieMode(Commander commander)
 	{
 		super(commander);
-		
+		GUI.subscribe(this);
 		commander.enableUltrasonic();
 	}
 	
@@ -110,21 +114,45 @@ public class GoalieMode extends AbstractMode
 			//System.out.println("position using both");
 		}
 
+		
 		if ( Math.abs(dirAngleMod) > 20 ) 
 			pos = state.getRobotY(world.getColor());
 
 
 		System.out.println( "top: " + tUS + " bottom: " + bUS );
+
+		// RRRRRRRRRRREEEEEEEEEEEEEEEMMMMMMMMMMOOOOOOOOOOOOVVVVVVVVVVVVEEEEEEEEEEEEEE
+		pos = state.getRobotY(world.getColor());
+
 		System.out.println( "pos: " + pos );
 		
 		
+
+
+
+
 		
 		//double targetPos = GUI.getClickY();
 		//double targetPos = state.getBallY();
-		double targetPos = estimateBallPos(0.5)[1];
-
-
+		targetPos = estimateBallPos(0.5)[1];
 		targetPos += (targetPos - pos) * 0.5;
+
+		if ( Math.abs( angleEnemyObj( estimateBallPos(0.5)[0], estimateBallPos(0.5)[1] ) ) < 30
+				&& distanceEnemyObject(estimateBallPos(0.5) ) < 30 ) {
+	
+			targetPos = limitVectorToTableDirVertical( 	state.getEnemyX(world.getColor()), 
+														state.getEnemyY(world.getColor()),
+														state.getEnemyDX(world.getColor()),
+														state.getEnemyDY(world.getColor()),
+														state.getRobotX(world.getColor())
+														);
+
+		}
+
+		
+
+
+	
 
 
 		
@@ -344,5 +372,54 @@ public class GoalieMode extends AbstractMode
         return dir;
     }
 
+	
+
+	public void paint(Graphics g, int ratio )
+	{
+		GUI.drawCircle(     g, 
+                            state.getRobotX(world.getColor())*ratio, 
+                            targetPos*ratio, 
+                            1.5*ratio, 
+                            Color.WHITE, 
+                            true );
+
+
+	}
+
+
+	public double limitVectorToTableDirVertical( double x, double y, double dx, double dy, double lineX ) {
+
+		return  (dy*(lineX-x)/dx + y);
+
+    }
+
+	 public double angleEnemyObj ( double objX, double objY ) {
+
+            double dirX = state.getEnemyDX(world.getColor());
+            double dirY = state.getEnemyDX(world.getColor());
+            double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
+
+            double dirTargetX = objX - state.getEnemyX(world.getColor());
+            double dirTargetY = objY - state.getEnemyY(world.getColor());
+            double dirTargetNorm = vecSize(dirTargetX, dirTargetY);
+            double dirTargetAngle = Math.toDegrees( Math.atan2(dirTargetX, dirTargetY) );
+
+            double dirRoboTarget = dirTargetAngle - dirAngle;
+
+            if ( dirRoboTarget > 180 ) {
+                dirRoboTarget -= 360;
+            }
+
+            else if ( dirRoboTarget < -180 ) {
+                dirRoboTarget += 360;
+            }
+
+            return dirRoboTarget;
+    }
+
+	public double distanceEnemyObject ( double[] obj ) {
+        double distance = vecSize(  state.getEnemyX(world.getColor()) - obj[0], state.getEnemyY(world.getColor()) - obj[1] );
+        return distance;
+    }
 
 }

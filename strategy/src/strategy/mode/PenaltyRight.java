@@ -69,7 +69,7 @@ public class PenaltyRight extends AbstractMode
 		
 
 		if (ControlGUI.shootingLeft) dirAngleMod = 345 - dirAngle; 
-		else dirAngleMod = 160 - dirAngle;
+		else dirAngleMod = 157 - dirAngle;
 	
 		if ( dirAngleMod > 180 ) {
                 dirAngleMod -= 360;
