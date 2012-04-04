@@ -10,7 +10,7 @@ import java.util.*;
 public class PenaltyRight extends AbstractMode
 {
 
-	
+	private AbstractMode mainMode = null;
 	
 	private double targetDriveSpeed = 0;
 	private long lastTime = -1;
@@ -39,7 +39,23 @@ public class PenaltyRight extends AbstractMode
 	
 	public void update(World world)
 	{
-	
+		
+		if (kicked == true)
+		{
+			
+			if (ControlGUI.paused)
+				ControlGUI.paused = false;
+			
+			if (mainMode == null)
+			{
+				mainMode = new GoalieMode(commander);
+				mainMode.reset(world);
+			}
+			
+			mainMode.update(world);
+			return;
+		}
+
 		this.world = world;
 		state = world.getWorldState();
 	
@@ -53,7 +69,7 @@ public class PenaltyRight extends AbstractMode
 		
 
 		if (ControlGUI.shootingLeft) dirAngleMod = 345 - dirAngle; 
-		else dirAngleMod = 165 - dirAngle;
+		else dirAngleMod = 160 - dirAngle;
 	
 		if ( dirAngleMod > 180 ) {
                 dirAngleMod -= 360;
@@ -98,7 +114,7 @@ public class PenaltyRight extends AbstractMode
 		
 		if (startTime == -1) startTime = System.currentTimeMillis();
 
-		if ( System.currentTimeMillis() - startTime > 5000 && !kicked ) {
+		if ( System.currentTimeMillis() - startTime > 2000 && !kicked ) {
 			commander.kick();
 			kicked = true;
 		}

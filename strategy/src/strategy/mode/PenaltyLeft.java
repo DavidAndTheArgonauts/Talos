@@ -10,7 +10,7 @@ import java.util.*;
 public class PenaltyLeft extends AbstractMode
 {
 
-	
+	private AbstractMode mainMode = null;
 	
 	private double targetDriveSpeed = 0;
 	private long lastTime = -1;
@@ -39,7 +39,23 @@ public class PenaltyLeft extends AbstractMode
 	
 	public void update(World world)
 	{
-	
+		
+		if (kicked == true)
+		{
+			
+			if (ControlGUI.paused)
+				ControlGUI.paused = false;
+			
+			if (mainMode == null)
+			{
+				mainMode = new GoalieMode(commander);
+				mainMode.reset(world);
+			}
+			
+			mainMode.update(world);
+			return;
+		}
+
 		this.world = world;
 		state = world.getWorldState();
 	
