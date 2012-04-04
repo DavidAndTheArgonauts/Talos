@@ -58,7 +58,7 @@ public class Driver implements ConnectionInterface
 					// Send message
 					if (lSpeed != 0 || rSpeed != 0)
 					{
-						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, -1 * (lTC - leftTachoCount), -1 * (rTC - rightTachoCount)));
+						connection.queueMessage(new Message(Opcodes.WHEEL_FEEDBACK, -1 * (lTC - leftTachoCount), (rTC - rightTachoCount)));
 					}
 					
 					leftTachoCount = lTC;
@@ -83,7 +83,7 @@ public class Driver implements ConnectionInterface
 
 			// Get resolutions per second
 			int leftSpeed = (int)(Driver.args[0]*0.01*900);
-			int rightSpeed = (int)(Driver.args[1]*0.01*900);
+			int rightSpeed = (int)(-Driver.args[1]*0.01*900);
 			Motor.B.setSpeed(leftSpeed);
 			Motor.C.setSpeed(rightSpeed);
 			

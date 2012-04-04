@@ -9,6 +9,8 @@ import java.util.*;
 
 public class GoalieMode extends AbstractMode
 {
+
+	private double MAXSPEED = 30;
 	
 	private double targetDriveSpeed = 0;
 	private int prevMotorSpeed = 0;
@@ -18,6 +20,7 @@ public class GoalieMode extends AbstractMode
 	private double[] estBallSpeed;
 	private double[] ball = new double[2];
 	private long lastKick = -1;
+
 	
 	public GoalieMode(Commander commander)
 	{
@@ -52,7 +55,24 @@ public class GoalieMode extends AbstractMode
 		if (estBallSpeed == null ) return;
 
 		
+
+		double dirX = state.getRobotDX(world.getColor());
+        double dirY = state.getRobotDY(world.getColor());
+        double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
+		
+		double dirAngleMod;
+		
+		if (ControlGUI.shootingLeft) dirAngleMod = - dirAngle; 
+		else dirAngleMod = 180 - dirAngle;
 	
+		if ( dirAngleMod > 180 ) {
+                dirAngleMod -= 360;
+        }
+        else if ( dirAngleMod < -180 ) {
+			dirAngleMod += 360;
+        }
+		System.out.printf("dirAngleMod %.2f\n", dirAngleMod);
+
 
 		
 		int lUS = commander.getLeftUltrasonic(),
@@ -90,9 +110,8 @@ public class GoalieMode extends AbstractMode
 			//System.out.println("position using both");
 		}
 
-		
-
-		//pos = state.getRobotY(world.getColor());
+		if ( Math.abs(dirAngleMod) > 20 ) 
+			pos = state.getRobotY(world.getColor());
 		
 		System.out.println( "top: " + tUS + " bottom: " + bUS );
 		System.out.println( "pos: " + pos );
@@ -112,37 +131,19 @@ public class GoalieMode extends AbstractMode
 		
 		System.out.println( "targetPos: " + targetPos );
 		
-		if ( Math.abs ( targetPos - pos ) > 50 )
+		if ( Math.abs ( targetPos - pos ) > 20 )
 			driveSpeed = 1f;
-		else if ( Math.abs ( targetPos - pos ) > 5 ) 
-			driveSpeed = Math.abs ( targetPos - pos ) / 50f;
+		else if ( Math.abs ( targetPos - pos ) > 0 ) 
+			driveSpeed = Math.abs ( targetPos - pos ) / 20f;
 		else 
 			driveSpeed = 0;
 
 
 
 		
-		double MAXSPEED = 100;
-
-
-		double dirX = state.getRobotDX(world.getColor());
-        double dirY = state.getRobotDY(world.getColor());
-        double dirAngle = Math.toDegrees(Math.atan2(dirX,dirY));
 
 
 
-		// OOPPOOSSIITTEE!
-		double dirAngleMod = 180 - dirAngle;
-	
-		if ( dirAngleMod > 180 ) {
-                dirAngleMod -= 360;
-        }
-
-        else if ( dirAngleMod < -180 ) {
-			dirAngleMod += 360;
-        }
-
-		System.out.printf("dirAngleMod %.2f\n", dirAngleMod);
 
 		// turning correction
 
@@ -162,15 +163,15 @@ public class GoalieMode extends AbstractMode
             
 
             
-            if ( Math.abs( dirAngleMod ) > 120 ) turnSpeedDelta = 0.4;
+            if ( Math.abs( dirAngleMod ) > 120 ) turnSpeedDelta = 0.3;
             else if ( Math.abs( dirAngleMod ) > 60 ) turnSpeedDelta = 0.3;
             else if ( Math.abs( dirAngleMod ) > 30 ) turnSpeedDelta = 0.2;
             else {
                 turnSpeedDelta = Math.abs( dirAngleMod ) / 200;
             }
  
-			int turnDriveLeft = (int) Math.round( turnLeftMotor * MAX_TURNING * turnSpeedDelta * (1 + 3 * driveSpeed) );
-			int turnDriveRight = (int) Math.round( turnRightMotor * MAX_TURNING * turnSpeedDelta * (1 + 3 * driveSpeed) );
+			int turnDriveLeft = (int) Math.round( turnLeftMotor * MAX_TURNING * turnSpeedDelta );
+			int turnDriveRight = (int) Math.round( turnRightMotor * MAX_TURNING * turnSpeedDelta  );
 
 
 
@@ -182,21 +183,23 @@ public class GoalieMode extends AbstractMode
 		double rearWheelSlowDown;
 
 		int driveSign;
-		if ( ( targetPos - pos ) > 0 ) { 
+		if (	( !ControlGUI.shootingLeft && ( targetPos - pos ) > 0 ) || 
+				( ControlGUI.shootingLeft && ( targetPos - pos ) < 0 )   )
+		{ 
 			// driving right
 			if (rUS < 10) driveSpeed = 0;
 			driveSign = 1;
 			//rearWheelSlowDown = 0.1 -( dirAngleMod / 100f );
-            rearWheelSlowDown = 0;
-            //rearWheelSlowDown = -( dirAngleMod / 100f );
+            //rearWheelSlowDown = 0;
+            rearWheelSlowDown = -( dirAngleMod / 200f );
 		}
 		else {
 			// driving left
 			if (lUS < 10) driveSpeed = 0;
 			driveSign = -1;
 			//rearWheelSlowDown = 0.1 + 0.1 * Math.pow( (prevMotorSpeed / 100f), 2 ) + ( dirAngleMod / 100f );
-            //rearWheelSlowDown = ( dirAngleMod / 100f );
-            rearWheelSlowDown = 0;
+            rearWheelSlowDown = ( dirAngleMod / 200f );
+            //rearWheelSlowDown = 0;
 		}
 
 		if (rearWheelSlowDown > 1) rearWheelSlowDown = 1;
@@ -206,8 +209,8 @@ public class GoalieMode extends AbstractMode
 
 
 
-		if ( 	Math.abs ( estimateBallPos(0.6)[0] - state.getRobotX(world.getColor()) ) < 10
-				&& ( System.currentTimeMillis() - lastKick ) / 1000f > 1
+		if ( 	Math.abs ( estimateBallPos(0.5)[0] - state.getRobotX(world.getColor()) ) < 10
+				&& ( System.currentTimeMillis() - lastKick ) / 1000f > 0.5
 				&& !ControlGUI.paused )
         {
             commander.kick();

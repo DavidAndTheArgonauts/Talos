@@ -8,4 +8,6 @@ public enum ModeEnum
 	ZGameMode,
 	OdoMode,
 	GoalieMode,
+	PenaltyLeft,
+	PenaltyRight,
 }
